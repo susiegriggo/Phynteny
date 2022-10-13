@@ -5,6 +5,7 @@ Functions to prepare data for training with the LSTM viral gene organisation mod
 #imports 
 import numpy as np 
 import random 
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 def encode_strand(strand): 
     """ 
@@ -16,15 +17,36 @@ def encode_strand(strand):
     
     return np.array([1 if i==1 else 0 for i in strand]), np.array([1 if i==2 else 0 for i in strand])
 
+def derep_trainingdata(training_data, phrog_encoding): 
+    """ 
+    Ensure there is only one copy of each phrog order and sense order 
+    
+    :param training_data: dictionary containing training data 
+    :param phrog_encoding: dictionary which converts phrogs to category integer encoding 
+    :return: dereplicated training dictionary 
+    """
+    
+    #get the training keys and encodings 
+    training_keys = list(training_data.keys()) 
+    training_encodings = [[phrog_encoding.get(i) for i in training_data.get(key).get('phrogs')] for key in training_keys] 
+    
+    #write a function to remove duplicates in the training data 
+    training_str = [''.join([str(j) for j in i]) for i in training_encodings]
+    training_sense = [''.join(training_data.get(p).get('sense')) for p in training_keys]
+    training_hash = [training_sense[i] + training_str[i] for i in range(len(training_keys))]
 
-def format_data(training_data): 
+    #get the dereplicated keys 
+    dedup_keys = list(dict(zip(training_hash, training_keys)).values())
+
+    return dict(zip(dedup_keys, [training_data.get(d) for d in dedup_keys]))
+
+def format_data(training_data, phrog_encoding): 
     """ 
     Intial function to generate training data.
     Currently only includes genomes which start or end with an integrase. This is hard coded and will likely need changing. 
     
     :param training_data: dictionary which contains details for each genome 
-    :param 
-    :param
+    :param phrog_encoding: dictionary which converts phrogs to cateogory integer encoding 
     :return: training encodings one-hot encoding each genome 
     :return: list of features 
     """
@@ -71,6 +93,7 @@ def format_data(training_data):
             #intergenic distances 
             intergenic = [training_data.get(key).get('position')[i+1][0] -  training_data.get(key).get('position')[i][1]  for i in range(len(training_data.get(key).get('position'))-1)]  
             intergenic.insert(0, 0)
+            
 
         #update the features 
         training_encodings.append(encoding) 
@@ -99,7 +122,6 @@ def format_data(training_data):
     features = [strand1s, strand2s, length_encodings, start_encodings, intergenic_encodings] 
 
     return training_encodings, features 
-
 
 def one_hot_encode(sequence, n_features):
     """ 
@@ -150,9 +172,9 @@ def generate_example(sequence, features, num_functions, n_features, max_length):
     Convert a sequence of PHROG functions and associated features to a supervised learning problem 
     
     :param sequence: integer encoded list of PHROG categories in a sequence
-    :param features: list of features to0 include in problem 
-    :num_functions: number of possible PHROG categories  
-    :max_length: maximum length of a sequence 
+    :param features: list of features to include in problem 
+    :param num_functions: number of possible PHROG categories  
+    :param max_length: maximum length of a sequence 
     :return: training or test example separated as X and y matrices 
     """
 
@@ -176,6 +198,30 @@ def generate_example(sequence, features, num_functions, n_features, max_length):
     
     return X.reshape((1, max_length, n_features)) , y.reshape((1, max_length, num_functions))
     
+def generate_prediction(sequence, features, num_functions, n_features, max_length): 
+    """ 
+    Predict the function of all unknown genes in a sequence 
+    
+    :param sequence: inteer enoded list of PHROG categories in a sequence 
+    :param features: list of features to include 
+    :param num_functions: number of possible PHROG categories 
+    :param max_length: maximum length of a sequence 
+    :return: encoded matrix which can be parsed to the model
+    """ 
+    
+    #construct features 
+    seq_len = len(sequence) 
+    padded_sequence = pad_sequences([sequence], padding = 'post', maxlen = max_length)[0]
+    X =  np.array(one_hot_encode(padded_sequence, n_features ))
+    for f in range(len(features)): 
+        X = encode_feature(X, features[f], num_functions + f)
+
+    #mask each unknown in the sequence  
+    unknown_idx = [i for i, x in enumerate(sequence) if x == 0]
+    for unk in unknown_idx: 
+        X[unk, 0:num_functions] = np.zeros(num_functions) 
+ 
+    return X.reshape((1, max_length, n_features))
     
 def generate_dataset(sequences, all_features, num_functions, n_features, max_length): 
     """" 
