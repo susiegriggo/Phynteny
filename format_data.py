@@ -167,7 +167,7 @@ def one_hot_decode(encoded_seq):
     return [np.argmax(vector) for vector in encoded_seq]
 
 
-def generate_example(sequence, features, num_functions, n_features, max_length): 
+def generate_example(sequence, features, num_functions, n_features, max_length, func): 
     """ 
     Convert a sequence of PHROG functions and associated features to a supervised learning problem 
     
@@ -182,25 +182,45 @@ def generate_example(sequence, features, num_functions, n_features, max_length):
     padded_sequence = pad_sequences([sequence], padding = 'post', maxlen = max_length)[0]
     y = np.array(one_hot_encode(padded_sequence, num_functions))
 
-    #introduce a single masked value into the sequence 
-    idx = random.randint(1, seq_len -1) #don't include ends
-
-    while padded_sequence[idx] == 0: 
-        idx = random.randint(1, seq_len -1)
-
-    X =  np.array(one_hot_encode(padded_sequence, n_features ))
+    if func in padded_sequence:
+     
+        occurence = [i for i, x in enumerate(padded_sequence) if x == func]
+        idx = random.choice(occurence) 
+        func = padded_sequence[idx] 
     
-    for f in range(len(features)): 
-        X = encode_feature(X, features[f], num_functions + f) 
-
-    #replace the function encoding for the masked sequence 
-    X[idx, 0:num_functions] = np.zeros(num_functions) 
     
-    return X.reshape((1, max_length, n_features)) , y.reshape((1, max_length, num_functions))
+        """
+        #introduce a single masked value into the sequence 
+        idx = random.randint(1, seq_len -1) #don't include ends
+
+
+        while padded_sequence[idx] == 0: 
+            idx = random.randint(1, seq_len -1)
+        """ 
+    
+        X =  np.array(one_hot_encode(padded_sequence, n_features ))
+
+        for f in range(len(features)): 
+            X = encode_feature(X, features[f], num_functions + f) 
+
+        #replace the function encoding for the masked sequence 
+        X[idx, 0:num_functions] = np.zeros(num_functions) 
+        
+        #reshape the matrices 
+        X = X.reshape((1, max_length, n_features))
+        y = y.reshape((1, max_length, num_functions))
+        
+    else: 
+        
+        X = None 
+        y = None 
+        func = None 
+    
+    return X, y, func
     
 def generate_prediction(sequence, features, num_functions, n_features, max_length): 
     """ 
-    Predict the function of all unknown genes in a sequence 
+    Prepare data to predict the function of all hypothetical genes in a sequence 
     
     :param sequence: inteer enoded list of PHROG categories in a sequence 
     :param features: list of features to include 
@@ -221,7 +241,8 @@ def generate_prediction(sequence, features, num_functions, n_features, max_lengt
     for unk in unknown_idx: 
         X[unk, 0:num_functions] = np.zeros(num_functions) 
  
-    return X.reshape((1, max_length, n_features))
+    return X.reshape((1, max_length, n_features)) 
+
     
 def generate_dataset(sequences, all_features, num_functions, n_features, max_length): 
     """" 
@@ -238,16 +259,26 @@ def generate_dataset(sequences, all_features, num_functions, n_features, max_len
     #features is a list of list objects 
     X = [] 
     y = [] 
+    masked_idx = [] 
 
+    #generate the function to mask in this genome 
+    func = random.randint(1, num_functions-1)
+        
     for i in range(len(sequences)): 
-        this_X, this_y = generate_example(sequences[i], all_features[i], num_functions, n_features, max_length) 
-        X.append(this_X) 
-        y.append(this_y) 
+        
+        this_X, this_y, idx = generate_example(sequences[i], all_features[i], num_functions, n_features, max_length, func) 
+        
 
-    X = np.array(X).reshape(len(sequences),max_length,n_features)
-    y = np.array(y).reshape(len(sequences), max_length, num_functions)
+        if this_X is not None: 
+           
+            X.append(this_X) 
+            y.append(this_y)
+            masked_idx.append(idx) 
+            
+            #generate a new function for the next training example 
+            func = random.randint(1, num_functions-1)
+
+    X = np.array(X).reshape(len(masked_idx),max_length,n_features)
+    y = np.array(y).reshape(len(masked_idx), max_length, num_functions)
     
-    return X, y
-
-
-
+    return X, y, masked_idx 
