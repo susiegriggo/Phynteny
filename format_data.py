@@ -6,6 +6,92 @@ Functions to prepare data for training with the LSTM viral gene organisation mod
 import numpy as np 
 import random 
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+import pickle 
+import glob 
+
+def generate_data(data): 
+    """
+    
+    :param data: directory containing dictionaries of phispy genomes
+    :return dictionary 
+    """
+    
+    #get the directorys containing the genomes 
+    levelone = glob.glob(data)
+
+    #counters to campare the sizes of the training datasets
+    included = 0
+    not_included = 0
+
+    #dictionary to store the filtered data 
+    data = {}
+
+    #loop through each genome 
+    for l1 in levelone:
+        leveltwo = glob.glob(l1+'/*')
+
+        for l2 in leveltwo:
+
+            files = glob.glob(l2+'/*')
+
+            for file in files: 
+                with open(file, 'rb') as handle:
+                    genomes = pickle.load(handle)
+
+                for g in list(genomes.keys()):
+                    this_genome = genomes.get(g)
+                    categories = [phrog_encoding.get(i) for i in this_genome.get('phrogs')]
+
+                    categories_present = set(categories)
+                    if 0 in categories_present:
+                        categories_present.remove(0)
+
+                    #Take genomes which contain at least four different phrog categories 
+                    if len(categories_present) >= 4:
+
+                        #only consider genomes which contain a gene belonging to 'integration and excision' at either the start or end of the genome
+                        if categories[0] == 1 or categories[-1] == 1: #look into whether to include this 
+                            included += 1
+                            data[g] = this_genome
+
+                        else:
+                            not_included += 1
+
+    print('Number of genomes after filtering: ' + str(included) + ' sequences')
+    print('Number of genomes removed during filtering: ' + str(not_included) + ' sequences')
+
+    #dereplicate the filtered data such that genome has unique gene organisation and orientation 
+    data_derep = derep_trainingdata(data, phrog_encoding) 
+    
+    return data_derep 
+
+def test_train_data(data, test_portion): 
+    """
+    Separate data in testing and training data 
+    
+    :param data: directory containing dictionaries of phispy genomes
+    :param test_portion: portion as a decimal of the data reserved as test data 
+    :return dictionary of training data 
+    :return dictionary of testing data 
+    """
+    
+    #obtain data 
+    genome_data = generate_data(data) 
+    keys = list(genome_data.keys()) 
+    
+    #shuffle 
+    random.shuffle(keys) 
+    
+    #separate into training and testing data 
+    test_num = int(len(keys) * test_num)
+    test_keys = keys[:test_num] 
+    train_keys = keys[test_num:] 
+ 
+    #get dictionaries 
+    train_data = dict(zip(train_keys, [data.get(key) for key in train_keys])) 
+    test_data = dict(zip(test_keys, [data.get(key) for key in test_keys]))
+
+    return train_data, test_data
 
 def encode_strand(strand): 
     """ 
@@ -64,6 +150,70 @@ def format_data(training_data, phrog_encoding):
         encoding = [phrog_encoding.get(i) for i in training_data.get(key).get('phrogs')]
         length = np.array([i[1] - i[0] for i in training_data.get(key).get('position')])
 
+        #encode the strand 
+        sense = np.array([2 if i == '+' else 1 for i in training_data.get(key).get('sense')])
+
+        #start position of each gene 
+        start = np.array([i[0] - training_data.get(key).get('position')[0][0] + 1 for i in training_data.get(key).get('position')])
+
+        #intergenic distances 
+        intergenic = [training_data.get(key).get('position')[i+1][0] -  training_data.get(key).get('position')[i][1]  for i in range(len(training_data.get(key).get('position'))-1)]  
+        intergenic.insert(0, 0)
+            
+        #update the features 
+        training_encodings.append(encoding) 
+        sense_encodings.append(sense) 
+        start_encodings.append(start) 
+        intergenic_encodings.append(intergenic) 
+        length_encodings.append(length)
+
+    #scale the lengths such that the maximum length is 1 
+    max_length = np.max([np.max(l) for l in length_encodings])
+    length_encodings = [l/max_length for l in length_encodings]
+
+    #divide intergenic distance by the absolute maximum 
+    max_intergenic = np.max([np.max(np.abs(i)) for i in intergenic_encodings]) 
+    intergenic_encodings = [i/max_intergenic for i in intergenic_encodings]
+
+    #scale the start positions according to the length of the genome 
+    start_encodings = [s/np.max(s) for s in start_encodings] #simply divide starts by the length of the sequence 
+
+    #split the sense into two separate features as it is categorical data 
+    sense_encodings = [encode_strand(s) for s in sense_encodings]
+    strand1s = [s[0] for s in sense_encodings]
+    strand2s = [s[1] for s in sense_encodings] 
+
+    #return a set of features to train the LSTM 
+    features = [strand1s, strand2s, length_encodings, start_encodings, intergenic_encodings] 
+    features = [[f[j] for f in features] for j in range(len(features))]
+
+    return training_encodings, features 
+
+
+def format_data_flipped(training_data, phrog_encoding): 
+    """ 
+    Intial function to generate training data. Flips sequences with an integrase at one end so that the integrase is at the start of the sequence. 
+    Currently only includes genomes which start or end with an integrase. This is hard coded and will likely need changing. 
+    
+    :param training_data: dictionary which contains details for each genome 
+    :param phrog_encoding: dictionary which converts phrogs to cateogory integer encoding 
+    :return: training encodings one-hot encoding each genome 
+    :return: list of features 
+    """
+    
+    training_encodings = []
+    sense_encodings = []
+    start_encodings = []
+    length_encodings = []
+    intergenic_encodings = [] 
+
+    training_keys = list(training_data.keys()) 
+
+    for key in training_keys: 
+
+        encoding = [phrog_encoding.get(i) for i in training_data.get(key).get('phrogs')]
+        length = np.array([i[1] - i[0] for i in training_data.get(key).get('position')])
+
         #if the integrase is at the end then reverse the sequence 
         if encoding[-1] == 1: 
 
@@ -82,8 +232,9 @@ def format_data(training_data, phrog_encoding):
             #intergenic distances 
             intergenic = [training_data.get(key).get('position')[i+1][0] - training_data.get(key).get('position')[i][1]  for i in range(len(training_data.get(key).get('position')[::-1]) -1 )]
             intergenic.insert(0,0) 
-
+        
         else: 
+        
             #encode the strand 
             sense = np.array([2 if i == '+' else 1 for i in training_data.get(key).get('sense')])
 
@@ -120,8 +271,10 @@ def format_data(training_data, phrog_encoding):
 
     #return a set of features to train the LSTM 
     features = [strand1s, strand2s, length_encodings, start_encodings, intergenic_encodings] 
+    features = [[f[j] for f in features] for j in range(len(features))]
 
     return training_encodings, features 
+
 
 def one_hot_encode(sequence, n_features):
     """ 
@@ -140,7 +293,6 @@ def one_hot_encode(sequence, n_features):
         
     return np.array(encoding)
     
-    
 def encode_feature(encoding, feature, column): 
     """ 
     Add a feature to sequence feature matrix 
@@ -156,7 +308,6 @@ def encode_feature(encoding, feature, column):
 
     return encoding 
 
-
 def one_hot_decode(encoded_seq):
     """ 
     Return one-hot encoding of PHROG category to its original numeral value 
@@ -166,6 +317,18 @@ def one_hot_decode(encoded_seq):
     """ 
     return [np.argmax(vector) for vector in encoded_seq]
 
+def shuffle_dict(dictionary): 
+    """ 
+    Shuffles a dictionary into random order. Use to generate randomised training datasets 
+    
+    :param dictionary: dictionary object to be shuffle 
+    :return shuffled dictionary 
+    """
+    
+    keys = dictionary.keys()
+    random.shuffle(dkeys) 
+    
+    return dict(zip(keys, [dictionary.get(key) for key in keys]))
 
 def generate_example(sequence, features, num_functions, n_features, max_length, func): 
     """ 
@@ -187,7 +350,6 @@ def generate_example(sequence, features, num_functions, n_features, max_length, 
         occurence = [i for i, x in enumerate(padded_sequence) if x == func]
         idx = random.choice(occurence) 
         func = padded_sequence[idx] 
-    
     
         """
         #introduce a single masked value into the sequence 
@@ -232,6 +394,7 @@ def generate_prediction(sequence, features, num_functions, n_features, max_lengt
     #construct features 
     seq_len = len(sequence) 
     padded_sequence = pad_sequences([sequence], padding = 'post', maxlen = max_length)[0]
+    
     X =  np.array(one_hot_encode(padded_sequence, n_features ))
     for f in range(len(features)): 
         X = encode_feature(X, features[f], num_functions + f)
@@ -244,11 +407,12 @@ def generate_prediction(sequence, features, num_functions, n_features, max_lengt
     return X.reshape((1, max_length, n_features)) 
 
     
-def generate_dataset(sequences, all_features, num_functions, n_features, max_length): 
+def generate_dataset_ubiased_category(sequences, all_features, dataset_size, num_functions, n_features, max_length): 
     """" 
     Generate a dataset to train LSTM model 
     
     :param sequences: set of sequences encoded as integers for each PHROG
+    :param dataset_size: number of sequences in the dataset  
     :param all_features:  set of features to include in the encodings 
     :param num_functions: number of possible PHROG categories 
     :param n_features: total number of features 
@@ -264,10 +428,9 @@ def generate_dataset(sequences, all_features, num_functions, n_features, max_len
     #generate the function to mask in this genome 
     func = random.randint(1, num_functions-1)
         
-    for i in range(len(sequences)): 
+    for i in range(dataset_size): 
         
         this_X, this_y, idx = generate_example(sequences[i], all_features[i], num_functions, n_features, max_length, func) 
-        
 
         if this_X is not None: 
            
@@ -277,6 +440,41 @@ def generate_dataset(sequences, all_features, num_functions, n_features, max_len
             
             #generate a new function for the next training example 
             func = random.randint(1, num_functions-1)
+
+    X = np.array(X).reshape(len(masked_idx),max_length,n_features)
+    y = np.array(y).reshape(len(masked_idx), max_length, num_functions)
+    
+    return X, y, masked_idx 
+
+
+def generate_dataset(sequences, all_features, dataset_size, num_functions, n_features, max_length): 
+    """" 
+    Generate a dataset to train LSTM model 
+    
+    :param sequences: set of sequences encoded as integers for each PHROG
+    :param dataset_size: number of sequences in the dataset  
+    :param all_features:  set of features to include in the encodings 
+    :param num_functions: number of possible PHROG categories 
+    :param n_features: total number of features 
+    :param max_length: maximum length of a sequence 
+    :return: Dataset of training or test data reprsented as X and y matrices 
+    """
+    
+    #features is a list of list objects 
+    X = [] 
+    y = [] 
+    masked_idx = [] 
+        
+    for i in range(dataset_size): 
+        
+        #take a function to mask 
+        idx = random.randint(1, len(sequences[i]) -1) #don't include ends
+        
+        #make sure that these sequences are not unknowns  
+        while sequences[i][idx] == 0: 
+            idx = random.randint(1, len(sequences[i]) -1)
+        
+        this_X, this_y, idx = generate_example(sequences[i], all_features[i], num_functions, n_features, max_length, idx) 
 
     X = np.array(X).reshape(len(masked_idx),max_length,n_features)
     y = np.array(y).reshape(len(masked_idx), max_length, num_functions)
