@@ -6,9 +6,11 @@ This should be given just a dictionary of training data
 import train_model 
 import format_data
 import argparse 
+import pickle5
 
 parser = argparse.ArgumentParser(description='Train LSTM on PHROG orders')
 parser.add_argument('-t','--training_data', help='Training data', required=True)
+parser.add_argument('-f', '--flip_genomes', help='Flip genomes to ensure that an integrase is at the start of each sequence', required = True) 
 parser.add_argument('-m', '--memory_cells', help = 'Number of memory cells to use', required = True) 
 parser.add_argument('-b', '--batch_size', help = 'Batch size', required = True) 
 parser.add_argument('-e', '--epochs', help = 'Number of epochs', required = True) 
@@ -20,8 +22,8 @@ parser.add_argument('-portion', '--training_portion', help = 'Portion of the dat
 args = vars(parser.parse_args())
 
 #need to read in training genomes - manipulate such that we are reading in just some consistent set of training data 
-file = open(args.t,'rb')
-training_data = pickle.load(file)
+file = open(args['training_data'],'rb')
+training_data = pickle5.load(file)
 file.close()
 
 training_keys = list(training_data.keys())
@@ -47,6 +49,10 @@ phrog_encoding = dict(zip([str(i) for i in annot['phrog']], [one_letter.get(c) f
 #add a None object to this dictionary which is consist with the unknown 
 phrog_encoding[None] = one_letter.get('unknown function') 
 
+#flip the genome if there is an integrase at the end of the sequence 
+if args['flip_genomes']: 
+    training_data = format_data.flip_genomes(training_encoding, phrog_encoding)
+
 #derepicate training data 
 training_data_derep = format_data.derep_trainingdata(training_data, phrog_encoding)
 
@@ -60,12 +66,12 @@ max_length = np.max([len(t) for t in training_encodings])
 n_features = num_functions + len(features) 
 
 #generate dataset 
-if args.bias = True: 
+if args['biased_categories']: 
 
     X, y, genome_included, masked_idx = format_data.generate_dataset_unbiased_category(training_encodings, features, dataset_size, num_functions, n_features, max_length) 
     
     #split into train and test before or after generating the dataset - work on this - may not be much difference anyway 
-    train_num = args.portion*len(masked_idx)
+    train_num = args['training_portion']*len(masked_idx)
     X_train = X[:train_num] 
     y_train = y[:train_num] 
     
@@ -76,21 +82,21 @@ if args.bias = True:
         
 else: 
     
-    train_num = args.portion*len(training_encodings)
+    train_num = args['training_portion']*len(training_encodings)
     X_train, y_train, masked_idx = format_data.generate_dataset(training_encodings[:train_num], features[:train_num], dataset_size, num_functions, n_features, max_length) 
     
     #get the ids of the sequences for the test data 
     test_ids = training_keys[train_num:] 
     
 print('TRAINING STARTED', flush = True)
-model_file = args.out + 'trainedLSTM.md5' 
-history_file = args.out + 'history.pkl' 
+model_file = args['out_file_prefix'] + 'trainedLSTM.md5' 
+history_file = args['out_file_prefix'] + 'history.pkl' 
 
 train_model.train_model(X_train, y_train, model_file, history_file, args.m, args.b, args.e, args.p, args.d)
 print('TRAINING COMPLETED', flush = True) 
 
 #Save the ids of the data in the test dataset 
-test_id_filename = args.out + 'test_prophage_ids.txt' 
+test_id_filename = args['out_file_prefix'] + 'test_prophage_ids.txt' 
 with open(test_id_filename, 'w') as f:
     for line in test_ids:
         f.write(f"{line}\n")
