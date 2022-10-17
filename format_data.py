@@ -112,6 +112,7 @@ def derep_trainingdata(training_data, phrog_encoding):
     :return: dereplicated training dictionary 
     """
     
+    
     #get the training keys and encodings 
     training_keys = list(training_data.keys()) 
     training_encodings = [[phrog_encoding.get(i) for i in training_data.get(key).get('phrogs')] for key in training_keys] 
@@ -125,6 +126,45 @@ def derep_trainingdata(training_data, phrog_encoding):
     dedup_keys = list(dict(zip(training_hash, training_keys)).values())
 
     return dict(zip(dedup_keys, [training_data.get(d) for d in dedup_keys]))
+
+
+def flip_genomes(training_data, phrog_encoding): 
+    """ 
+    If an integrase has an integrase at the end of a sequence flip so that it is at the start of the sequence 
+    
+    :param training_data: dictionary which contains details for each genome 
+    :param phrog_encoding: dictionary nwhich converts phrogs to category integer encoding 
+    :return: dictionary containing genomes which are flipped if needed 
+    """ 
+    
+    data = dict() 
+    
+    training_keys = list(training_data.keys()) 
+
+    for key in training_keys: 
+        
+        genome = training_data.get(key) 
+        encoding = [phrog_encoding.get(i) for i in genome.get('phrogs')]
+        
+        if encoding[-1] == 1: 
+            
+            #adjust the positions for the reverse order 
+            length = genome.get('length')
+            positions = [(np.abs(i[1] - length), np.abs(i[0] - length)) for i in genome.get('position')[::-1]]
+            
+            sense = ['-' if i == '+' else '+' for i in genome.get('sense')[::-1]]
+            
+            #add to the dictionary 
+            data[key] = {'length': genome.get('length'), 
+                         'phrogs': genome.get('phrogs')[::-1], 
+                         'protein_id': genome.get('protein_id')[::-1], 
+                         'sense': sense, 
+                         'position': positions}
+        else: 
+           
+            data[key] = genome 
+        
+    return data
 
 def format_data(training_data, phrog_encoding): 
     """ 
@@ -188,7 +228,6 @@ def format_data(training_data, phrog_encoding):
     features = [[f[j] for f in features] for j in range(len(training_encodings))]
 
     return training_encodings, features 
-
 
 def format_data_flipped(training_data, phrog_encoding): 
     """ 
@@ -326,7 +365,7 @@ def shuffle_dict(dictionary):
     """
     
     keys = dictionary.keys()
-    random.shuffle(dkeys) 
+    random.shuffle(keys) 
     
     return dict(zip(keys, [dictionary.get(key) for key in keys]))
 
