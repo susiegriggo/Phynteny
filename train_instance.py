@@ -26,7 +26,7 @@ def parse_args():
     parser.add_argument('-e', '--epochs', help = 'Number of epochs', required = True) 
     parser.add_argument('-p', '--patience', help = 'Early stopping condition patience', required = True) 
     parser.add_argument('-d', '--min_delta', help = 'Early stopping condition min delta', required = True)
-    parser.add_argument('-bias', '--biased_categories', help = 'If True ensures that there is an equal amount of data for each PHROG category', required = True) 
+    parser.add_argument('-unbias', '--unbiased_categories', help = 'If True ensures that there is an equal amount of data for each PHROG category', required = True) 
     parser.add_argument('-out', '--out_file_prefix', help = 'Prefix used for the output files', required = True)
     parser.add_argument('-portion', '--training_portion', help = 'Portion of the data to use to train the model', required = True) 
     
@@ -43,6 +43,7 @@ def main():
     training_data = pickle5.load(file)
     file.close()
 
+    #generate dictionary 
     training_keys = list(training_data.keys())
     annot = pd.read_csv(args['phrog_annotations'], sep = '\t')
     cat_dict = dict(zip([str(i) for i in annot['phrog']], annot['category']))
@@ -82,15 +83,17 @@ def main():
     training_encodings, features = format_data.format_data(training_data_derep, phrog_encoding) 
     num_functions = len(one_letter)
     max_length = np.max([len(t) for t in training_encodings])
-    n_features = num_functions + len(features) 
+    n_features = num_functions + len(features[0])
 
     #generate dataset 
-    if args['biased_categories']: 
+    if args['unbiased_categories']: 
 
+        print('Generating training data with unbiased cateogries', flush = True)
+        
         X, y, genome_included, masked_idx = format_data.generate_dataset_unbiased_category(training_encodings, features, num_functions, n_features, max_length) 
 
         #split into train and test before or after generating the dataset - work on this - may not be much difference anyway 
-        train_num = args['training_portion']*len(masked_idx)
+        train_num = int(args['training_portion']*len(masked_idx)) 
         X_train = X[:train_num] 
         y_train = y[:train_num] 
 
@@ -99,9 +102,11 @@ def main():
         j = list(genome_included_sum).index(train_num)
         test_ids = training_keys[j:]
 
-    else: 
+    else:
+        
+        print('Generating training data without unbiased cateogories', flush = True) 
 
-        train_num = args['training_portion']*len(training_encodings)
+        train_num = int(args['training_portion']*len(training_encodings)) 
         X_train, y_train, masked_idx = format_data.generate_dataset(training_encodings[:train_num], features[:train_num], dataset_size, num_functions, n_features, max_length) 
 
         #get the ids of the sequences for the test data 
@@ -119,7 +124,6 @@ def main():
     with open(test_id_filename, 'w') as f:
         for line in test_ids:
             f.write(f"{line}\n")
-            
             
 if __name__ == "__main__":
     main()
