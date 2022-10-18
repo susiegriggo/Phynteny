@@ -120,16 +120,17 @@ def main():
     history_file = args['out_file_prefix'] + '_history.pkl' 
 
     train_model.train_model(X_train, 
-                            y_train, max_length, 
+                            y_train, 
+                            max_length, 
                             n_features, 
                             num_functions, 
                             model_file, 
                             history_file, 
                             args['memory_cells'], 
                             args['batch_size'], 
+                            args['epochs'], 
                             args['dropout'], 
                             args['learning_rate'],
-                            args['epochs'], 
                             args['early_stopping'],
                             args['patience'], 
                             args['min_delta'])

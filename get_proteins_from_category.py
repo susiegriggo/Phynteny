@@ -41,8 +41,12 @@ not_included = 0
 #dictionary to store the filtered data
 data = {}
 
+
+
+#make from below here into a separate function 
+
 #make separate text files for the proteins which can be considered as 
-with open('/home/grig0076/phispy_phrog_pickles/protein_IDs/PHROG_transcription_category_proteinIDs.txt', 'w') as f:
+with open('/home/grig0076/phispy_phrog_pickles/protein_IDs/PHROG_other_category_proteinIDs.txt', 'w') as f:
     
     #loop through each genome
     for l1 in levelone:
@@ -61,10 +65,13 @@ with open('/home/grig0076/phispy_phrog_pickles/protein_IDs/PHROG_transcription_c
                     this_genome = genomes.get(g)
                     categories = [phrog_encoding.get(i) for i in this_genome.get('phrogs')]
 
-                    category_idx = [i for i, x in enumerate(categories) if x == one_letter.get('transcription regulation')]
+                    category_idx = [i for i, x in enumerate(categories) if x == one_letter.get('other')]
                     protein_id = [this_genome.get('protein_id')[c] for c in category_idx]
                     
                     for protein in protein_id:
-                        f.write(protein)
+                        f.write(g + '_' + protein)
                         f.write('\n')
 f.close()
+
+
+

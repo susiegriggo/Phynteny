@@ -31,9 +31,10 @@ def train_model(X_train, y_train, max_length, n_features, num_functions, model_f
     
     #build model
     model = Sequential() 
-    model.add(Bidirectional(LSTM(memory_cells, return_sequences=True, dropout = dropout),input_shape = (max_length, n_features) ))
+    model.add(Bidirectional(LSTM(memory_cells, return_sequences=True, dropout = dropout),input_shape = (max_length, n_features )))
     model.add(Bidirectional(LSTM(memory_cells, return_sequences = True, dropout = dropout)))
     model.add(Bidirectional(LSTM(memory_cells, return_sequences = True, dropout = dropout)))
+
     model.add(TimeDistributed(Dense(num_functions, activation='softmax')))
     optimizer = Adam(lr=lr)
     model.compile(loss='categorical_crossentropy', optimizer = optimizer, metrics = ['acc']) 

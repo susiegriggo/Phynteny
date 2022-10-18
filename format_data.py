@@ -239,7 +239,6 @@ def format_data_flipped(training_data, phrog_encoding):
     :return: training encodings one-hot encoding each genome 
     :return: list of features 
     """
-    
     training_encodings = []
     sense_encodings = []
     start_encodings = []
@@ -363,8 +362,8 @@ def shuffle_dict(dictionary):
     :param dictionary: dictionary object to be shuffle 
     :return shuffled dictionary 
     """
-    
-    keys = dictionary.keys()
+
+    keys = list(dictionary.keys())
     random.shuffle(keys) 
     
     return dict(zip(keys, [dictionary.get(key) for key in keys]))
