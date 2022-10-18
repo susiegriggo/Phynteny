@@ -20,15 +20,18 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Train LSTM on PHROG orders')
     parser.add_argument('-t','--training_data', help='Training data', required=True)
     parser.add_argument('-f', '--flip_genomes', help='Flip genomes to ensure that an integrase is at the start of each sequence', required = True) 
-    parser.add_argument('-m', '--memory_cells', help = 'Number of memory cells to use', required = True) 
-    parser.add_argument('-b', '--batch_size', help = 'Batch size', required = True) 
+    parser.add_argument('-m', '--memory_cells', help = 'Number of memory cells to use', type = int, default = 20) 
+    parser.add_argument('-b', '--batch_size', help = 'Batch size', type = int, default = 128) 
     parser.add_argument('-phrogs', '--phrog_annotations', help = 'csv file containing the annotation and category of each phrog', required = True) 
-    parser.add_argument('-e', '--epochs', help = 'Number of epochs', required = True) 
-    parser.add_argument('-p', '--patience', help = 'Early stopping condition patience', required = True) 
-    parser.add_argument('-d', '--min_delta', help = 'Early stopping condition min delta', required = True)
+    parser.add_argument('-e', '--epochs', help = 'Number of epochs', type = int, default = 120) 
+    parser.add_argument('-dropout', '--dropout', help = 'Dropout for LSTM', type = float, default = 0.2) 
+    parser.add_argument('-lr', '--learning_rate', help = 'Learning rate for the Adam optimizer', type = float, default = 0.001) 
+    parser.add_argument('-p', '--patience', help = 'Early stopping condition patience', type = int, default = 3) 
+    parser.add_argument('-early', '--early_stopping', help = 'Whether to include an early stopping condition in the model', type = bool, default = True)
+    parser.add_argument('-d', '--min_delta', help = 'Early stopping condition min delta', type = float, default = 1e-5)
     parser.add_argument('-unbias', '--unbiased_categories', help = 'If True ensures that there is an equal amount of data for each PHROG category', required = True) 
     parser.add_argument('-out', '--out_file_prefix', help = 'Prefix used for the output files', required = True)
-    parser.add_argument('-portion', '--training_portion', help = 'Portion of the data to use to train the model', required = True) 
+    parser.add_argument('-portion', '--training_portion', help = 'Portion of the data to use to train the model', type = float, default = 0.5) 
     
     return vars(parser.parse_args())
 
@@ -69,7 +72,7 @@ def main():
 
     print('filtering data', flush = True) 
     #flip the genome if there is an integrase at the end of the sequence 
-    if args['flip_genomes']: 
+    if args['flip_genomes'] == True: 
         training_data = format_data.flip_genomes(training_data, phrog_encoding)
 
     #derepicate training data 
@@ -86,9 +89,9 @@ def main():
     n_features = num_functions + len(features[0])
 
     #generate dataset 
-    if args['unbiased_categories']: 
+    if args['unbiased_categories'] == True: 
 
-        print('Generating training data with unbiased cateogries', flush = True)
+        print('Generating training data with unbiased categories', flush = True)
         
         X, y, genome_included, masked_idx = format_data.generate_dataset_unbiased_category(training_encodings, features, num_functions, n_features, max_length) 
 
@@ -97,17 +100,17 @@ def main():
         X_train = X[:train_num] 
         y_train = y[:train_num] 
 
-        #get the test protein ids 
+        #get the genome ids for the test data 
         genome_included_sum = np.cumsum(genome_included) 
         j = list(genome_included_sum).index(train_num)
         test_ids = training_keys[j:]
 
     else:
         
-        print('Generating training data without unbiased cateogories', flush = True) 
+        print('Generating training data without unbiased categories', flush = True) 
 
         train_num = int(args['training_portion']*len(training_encodings)) 
-        X_train, y_train, masked_idx = format_data.generate_dataset(training_encodings[:train_num], features[:train_num], dataset_size, num_functions, n_features, max_length) 
+        X_train, y_train, masked_idx = format_data.generate_dataset(training_encodings[:train_num], features[:train_num], num_functions, n_features, max_length) 
 
         #get the ids of the sequences for the test data 
         test_ids = training_keys[train_num:] 
@@ -116,7 +119,20 @@ def main():
     model_file = args['out_file_prefix'] + '_trained_LSTM.md5' 
     history_file = args['out_file_prefix'] + '_history.pkl' 
 
-    train_model.train_model(X_train, y_train, model_file, history_file, args['memory_cells'], args['batch_size'], args['epochs'], args['patience'], args['min_delta'])
+    train_model.train_model(X_train, 
+                            y_train, max_length, 
+                            n_features, 
+                            num_functions, 
+                            model_file, 
+                            history_file, 
+                            args['memory_cells'], 
+                            args['batch_size'], 
+                            args['dropout'], 
+                            args['learning_rate'],
+                            args['epochs'], 
+                            args['early_stopping'],
+                            args['patience'], 
+                            args['min_delta'])
     print('TRAINING COMPLETED', flush = True) 
 
     #Save the ids of the data in the test dataset 
