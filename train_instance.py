@@ -25,6 +25,7 @@ def parse_args():
     parser.add_argument('-phrogs', '--phrog_annotations', help = 'csv file containing the annotation and category of each phrog', required = True) 
     parser.add_argument('-e', '--epochs', help = 'Number of epochs', type = int, default = 120) 
     parser.add_argument('-dropout', '--dropout', help = 'Dropout for LSTM', type = float, default = 0.2) 
+    parser.add_argument('-recurrent', '--recurrent_dropout', help = 'Recurrent dropout for LSTM', type = float, default = 0) 
     parser.add_argument('-lr', '--learning_rate', help = 'Learning rate for the Adam optimizer', type = float, default = 0.001) 
     parser.add_argument('-p', '--patience', help = 'Early stopping condition patience', type = int, default = 3) 
     parser.add_argument('-early', '--early_stopping', help = 'Whether to include an early stopping condition in the model', type = bool, default = True)
@@ -99,6 +100,8 @@ def main():
         train_num = int(args['training_portion']*len(masked_idx)) 
         X_train = X[:train_num] 
         y_train = y[:train_num] 
+        X_test = X[train_num:] 
+        y_test = y[train_num:] 
 
         #get the genome ids for the test data 
         genome_included_sum = np.cumsum(genome_included) 
@@ -111,6 +114,7 @@ def main():
 
         train_num = int(args['training_portion']*len(training_encodings)) 
         X_train, y_train, masked_idx = format_data.generate_dataset(training_encodings[:train_num], features[:train_num], num_functions, n_features, max_length) 
+        X_test, y_test, masked_idx = format_data.generate_dataset(training_encodings[train_num:], features[train_num:], num_functions, n_features, max_length) 
 
         #get the ids of the sequences for the test data 
         test_ids = training_keys[train_num:] 
@@ -119,8 +123,10 @@ def main():
     model_file = args['out_file_prefix'] + '_trained_LSTM.md5' 
     history_file = args['out_file_prefix'] + '_history.pkl' 
 
-    train_model.train_model(X_train, 
-                            y_train, 
+    train_model.train_model(X_train,
+                            y_train,
+                            X_test, 
+                            y_test, 
                             max_length, 
                             n_features, 
                             num_functions, 
@@ -130,6 +136,7 @@ def main():
                             args['batch_size'], 
                             args['epochs'], 
                             args['dropout'], 
+                            args['recurrent_dropout'],
                             args['learning_rate'],
                             args['early_stopping'],
                             args['patience'], 

@@ -7,14 +7,14 @@ Use to parameter sweep to determine optimal batch size, epochs, dropout, memory 
 #imports 
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Bidirectional, TimeDistributed, Dense, LSTM
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.optimizers import Adam
 import tensorflow as tf
 import pickle 
 import argparse 
 
 
-def train_model(X_train, y_train, max_length, n_features, num_functions, model_file_out, history_file_out, memory_cells, batch_size, epochs, dropout, lr, early, patience, min_delta ): 
+def train_model(X_train, y_train, X_test, y_test, max_length, n_features, num_functions, model_file_out, history_file_out, memory_cells, batch_size, epochs, dropout, recurrent, lr, early, patience, min_delta ): 
     """ 
     Train and save model and training history 
     
@@ -29,20 +29,25 @@ def train_model(X_train, y_train, max_length, n_features, num_functions, model_f
     :param min_delta: Stopping condition loss value
     """
     
-    #build model
     model = Sequential() 
     model.add(Bidirectional(LSTM(memory_cells, return_sequences=True, dropout = dropout),input_shape = (max_length, n_features )))
     model.add(Bidirectional(LSTM(memory_cells, return_sequences = True, dropout = dropout)))
     model.add(Bidirectional(LSTM(memory_cells, return_sequences = True, dropout = dropout)))
 
     model.add(TimeDistributed(Dense(num_functions, activation='softmax')))
-    optimizer = Adam(lr=lr)
-    model.compile(loss='categorical_crossentropy', optimizer = optimizer, metrics = ['acc']) 
+    optimizer = Adam(learning_rate=lr)
+    model.compile(loss='categorical_crossentropy', optimizer = optimizer, metrics = ['accuracy']) 
     print(model.summary(), flush = True)
+    
+    
+    mc = ModelCheckpoint(model_file_out + 'best_val_accuracy.h5',
+                        monitor='val_loss', mode='min', save_best_only=True, verbose=1) #model with the best validation loss therefore minimise 
+    mc2 = ModelCheckpoint(model_file_out + 'best_val_loss.h5',
+                        monitor='val_accuracy', mode='max', save_best_only=True, verbose=1) #model with the best validation set accuracy therefore maximise 
     
     if early == True: 
         es = EarlyStopping(monitor='loss', mode='min', verbose=2, patience=patience, min_delta=min_delta) #use a set number of epoch when adjusting the memory cells and batch size 
-        history = model.fit(X_train, y_train, epochs = epochs, batch_size = batch_size, callbacks = [es], validation_split = 0.1)
+        history = model.fit(X_train, y_train, epochs = epochs, batch_size = batch_size, callbacks = [es, mc, mc2], validation_data = (X_test, y_test))
     else: 
         history = model.fit(X_train, y_train, epochs = epochs, batch_size = batch_size, validation_split = 0.1)
         
@@ -51,7 +56,7 @@ def train_model(X_train, y_train, max_length, n_features, num_functions, model_f
     
     #save the history dictionary as a pickle 
     with open(history_file_out, 'wb') as handle:
-        pickle.dump(history, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(history.history, handle, protocol=pickle.HIGHEST_PROTOCOL)
         
         
 def evaluate_predictions(test_encodings, test_features, num_functions, n_features, max_length, model):
