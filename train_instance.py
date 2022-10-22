@@ -81,6 +81,7 @@ def main():
 
     #shuffle the data 
     training_data_derep = format_data.shuffle_dict(training_data_derep)
+    training_derep_keys = list(training_data_derep.keys())  
 
     #generate features 
     print('generating features', flush = True) 
@@ -106,7 +107,7 @@ def main():
         #get the genome ids for the test data 
         genome_included_sum = np.cumsum(genome_included) 
         j = list(genome_included_sum).index(train_num)
-        test_ids = training_keys[j:]
+        test_ids = training_derep_keys[j:]
 
     else:
         
@@ -117,7 +118,7 @@ def main():
         X_test, y_test, masked_idx = format_data.generate_dataset(training_encodings[train_num:], features[train_num:], num_functions, n_features, max_length) 
 
         #get the ids of the sequences for the test data 
-        test_ids = training_keys[train_num:] 
+        test_ids = training_derep_keys[train_num:] 
 
     print('TRAINING STARTED', flush = True)
     model_file = args['out_file_prefix'] + '_trained_LSTM.md5' 
