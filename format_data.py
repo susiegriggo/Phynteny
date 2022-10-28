@@ -166,6 +166,26 @@ def flip_genomes(training_data, phrog_encoding):
         
     return data
 
+def filter_genes(training_data, threshold): 
+    """ 
+    Filter training date to only contain prophages with a number of genes below some threshold 
+    
+    :param training_data: dictionary containing the training data 
+    :param threshold: the maximum number of genes for a prophage 
+    :return: dictionary containing training data without prophages with too many genes excluded 
+    """ 
+    
+    keys= list(training_data.keys())
+    
+    num_genes = [len(training_data.get(keys[i]).get('phrogs')) for i in range(len(keys))] 
+    
+    index = [i for i in range(len(keys)) if num_genes[i] < threshold]
+
+    filtered_keys = [training_keys_derep[i] for i in index] 
+
+    return dict(zip(filtered_keys, [training_data.get(k) for k in filtered_keys]))
+
+
 def format_data(training_data, phrog_encoding): 
     """ 
     Intial function to generate training data.
@@ -229,89 +249,6 @@ def format_data(training_data, phrog_encoding):
 
     return training_encodings, features 
 
-def format_data_flipped(training_data, phrog_encoding): 
-    """ 
-    Intial function to generate training data. Flips sequences with an integrase at one end so that the integrase is at the start of the sequence. 
-    Currently only includes genomes which start or end with an integrase. This is hard coded and will likely need changing. 
-    
-    :param training_data: dictionary which contains details for each genome 
-    :param phrog_encoding: dictionary which converts phrogs to cateogory integer encoding 
-    :return: training encodings one-hot encoding each genome 
-    :return: list of features 
-    """
-    training_encodings = []
-    sense_encodings = []
-    start_encodings = []
-    length_encodings = []
-    intergenic_encodings = [] 
-
-    training_keys = list(training_data.keys()) 
-
-    for key in training_keys: 
-
-        encoding = [phrog_encoding.get(i) for i in training_data.get(key).get('phrogs')]
-        length = np.array([i[1] - i[0] for i in training_data.get(key).get('position')])
-
-        #if the integrase is at the end then reverse the sequence 
-        if encoding[-1] == 1: 
-
-            #flip the order and gene lengths 
-            encoding = encoding[::-1]
-            length = length[::-1] 
-
-            #encode the strand  
-            sense = np.array([1 if i == '+' else 2 for i in training_data.get(key).get('sense')])
-            sense = sense[::-1]
-
-            #get the start positions 
-            start = np.array([training_data.get(key).get('length') - i[1] + 1for i in training_data.get(key).get('position')])
-            start = start[::-1]
-
-            #intergenic distances 
-            intergenic = [training_data.get(key).get('position')[i+1][0] - training_data.get(key).get('position')[i][1]  for i in range(len(training_data.get(key).get('position')[::-1]) -1 )]
-            intergenic.insert(0,0) 
-        
-        else: 
-        
-            #encode the strand 
-            sense = np.array([2 if i == '+' else 1 for i in training_data.get(key).get('sense')])
-
-            #start position of each gene 
-            start = np.array([i[0] - training_data.get(key).get('position')[0][0] + 1 for i in training_data.get(key).get('position')])
-
-            #intergenic distances 
-            intergenic = [training_data.get(key).get('position')[i+1][0] -  training_data.get(key).get('position')[i][1]  for i in range(len(training_data.get(key).get('position'))-1)]  
-            intergenic.insert(0, 0)
-            
-
-        #update the features 
-        training_encodings.append(encoding) 
-        sense_encodings.append(sense) 
-        start_encodings.append(start) 
-        intergenic_encodings.append(intergenic) 
-        length_encodings.append(length)
-
-    #scale the lengths such that the maximum length is 1 
-    max_length = np.max([np.max(l) for l in length_encodings])
-    length_encodings = [l/max_length for l in length_encodings]
-
-    #divide intergenic distance by the absolute maximum 
-    max_intergenic = np.max([np.max(np.abs(i)) for i in intergenic_encodings]) 
-    intergenic_encodings = [i/max_intergenic for i in intergenic_encodings]
-
-    #scale the start positions according to the length of the genome 
-    start_encodings = [s/np.max(s) for s in start_encodings] #simply divide starts by the length of the sequence 
-
-    #split the sense into two separate features as it is categorical data 
-    sense_encodings = [encode_strand(s) for s in sense_encodings]
-    strand1s = [s[0] for s in sense_encodings]
-    strand2s = [s[1] for s in sense_encodings] 
-
-    #return a set of features to train the LSTM 
-    features = [strand1s, strand2s, length_encodings, start_encodings, intergenic_encodings] 
-    features = [[f[j] for f in features] for j in range(len(training_encodings))]
-
-    return training_encodings, features 
 
 
 def one_hot_encode(sequence, n_features):
