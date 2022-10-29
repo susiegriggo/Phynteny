@@ -9,10 +9,14 @@ from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Bidirectional, TimeDistributed, Dense, LSTM
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.regularizers import L1L2
 import tensorflow as tf
+
 import pickle 
 import argparse 
-
+import random 
+import format_data
+import numpy as np 
 
 def train_model(X_train, y_train, X_test, y_test, max_length, n_features, num_functions, model_file_out, history_file_out, memory_cells, batch_size, epochs, dropout, recurrent, lr, early, patience, min_delta ): 
     """ 
@@ -30,9 +34,9 @@ def train_model(X_train, y_train, X_test, y_test, max_length, n_features, num_fu
     """
     
     model = Sequential() 
-    model.add(Bidirectional(LSTM(memory_cells, return_sequences=True, dropout = dropout),input_shape = (max_length, n_features )))
-    model.add(Bidirectional(LSTM(memory_cells, return_sequences = True, dropout = dropout)))
-    model.add(Bidirectional(LSTM(memory_cells, return_sequences = True, dropout = dropout)))
+    model.add(Bidirectional(LSTM(memory_cells, return_sequences=True, dropout = dropout, kernel_regularizer=L1L2(0, 0)),input_shape = (max_length, n_features )))
+    model.add(Bidirectional(LSTM(memory_cells, return_sequences = True, dropout = dropout, kernel_regularizer=L1L2(0, 0))))
+    model.add(Bidirectional(LSTM(memory_cells, return_sequences = True, dropout = dropout, kernel_regularizer=L1L2(0, 0))))
 
     model.add(TimeDistributed(Dense(num_functions, activation='softmax')))
     optimizer = Adam(learning_rate=lr)
@@ -40,9 +44,9 @@ def train_model(X_train, y_train, X_test, y_test, max_length, n_features, num_fu
     print(model.summary(), flush = True)
     
     
-    mc = ModelCheckpoint(model_file_out + 'best_val_accuracy.h5',
+    mc = ModelCheckpoint(model_file_out[:-3] + 'best_val_accuracy.h5',
                         monitor='val_loss', mode='min', save_best_only=True, verbose=1) #model with the best validation loss therefore minimise 
-    mc2 = ModelCheckpoint(model_file_out + 'best_val_loss.h5',
+    mc2 = ModelCheckpoint(model_file_out[:-3] + 'best_val_loss.h5',
                         monitor='val_accuracy', mode='max', save_best_only=True, verbose=1) #model with the best validation set accuracy therefore maximise 
     
     if early == True: 
