@@ -179,9 +179,9 @@ def filter_genes(training_data, threshold):
     
     num_genes = [len(training_data.get(keys[i]).get('phrogs')) for i in range(len(keys))] 
     
-    index = [i for i in range(len(keys)) if num_genes[i] < threshold]
+    index = [i for i in range(len(keys)) if num_genes[i] <= threshold]
 
-    filtered_keys = [training_keys_derep[i] for i in index] 
+    filtered_keys = [keys[i] for i in index] 
 
     return dict(zip(filtered_keys, [training_data.get(k) for k in filtered_keys]))
 
@@ -227,14 +227,6 @@ def format_data(training_data, phrog_encoding):
         intergenic_encodings.append(intergenic) 
         length_encodings.append(length)
 
-    #scale the lengths such that the maximum length is 1 
-    max_length = np.max([np.max(l) for l in length_encodings])
-    length_encodings = [l/max_length for l in length_encodings]
-
-    #divide intergenic distance by the absolute maximum 
-    max_intergenic = np.max([np.max(np.abs(i)) for i in intergenic_encodings]) 
-    intergenic_encodings = [i/max_intergenic for i in intergenic_encodings]
-
     #scale the start positions according to the length of the genome 
     start_encodings = [s/np.max(s) for s in start_encodings] #simply divide starts by the length of the sequence 
 
@@ -248,8 +240,6 @@ def format_data(training_data, phrog_encoding):
     features = [[f[j] for f in features] for j in range(len(training_encodings))]
 
     return training_encodings, features 
-
-
 
 def one_hot_encode(sequence, n_features):
     """ 
