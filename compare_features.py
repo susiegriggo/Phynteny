@@ -91,28 +91,35 @@ def main():
     n_features = num_functions + len(features[0])
 
     #generate test and training datasets
-    train_num = int(args['portion']*len(training_encodings)) 
+    train_num = int(args['training_portion']*len(training_encodings)) 
 
     #generate features 
     if args['features'] == 'all': 
         X_train, y_train, masked_idx = format_data.generate_dataset(training_encodings[:train_num], features[:train_num], num_functions, n_features, max_length) 
         X_test, y_test, masked_idx = format_data.generate_dataset(training_encodings[train_num:], features[train_num:], num_functions, n_features, max_length) 
         
+        model_file = args['out_file_prefix'] + '_all_features_trained_LSTM.h5' 
+        history_file = args['out_file_prefix'] + '_all_features_history.pkl' 
+    
     elif args['features'] == 'strand': 
         X_train, y_train, masked_idx = format_data.generate_dataset(training_encodings[:train_num], [f[:2] for f in features[:train_num]], num_functions, n_features, max_length) 
         X_test, y_test, masked_idx = format_data.generate_dataset(training_encodings[train_num:], [f[:2] for f in features[train_num:]], num_functions, n_features, max_length) 
         n_features = num_functions + 2
         
+        model_file = args['out_file_prefix'] + '_strand_features_trained_LSTM.h5' 
+        history_file = args['out_file_prefix'] + '_strand_features_history.pkl' 
+    
     elif args['features'] == 'none': 
         X_train, y_train, masked_idx = format_data.generate_dataset(training_encodings[:train_num], [[] for i in range(train_num)], num_functions, n_features, max_length) 
         X_test, y_test, masked_idx = format_data.generate_dataset(training_encodings[train_num:],[[] for i in range(len(training_encodings) - train_num)] , num_functions, n_features, max_length) 
         n_features = num_functions
         
+        model_file = args['out_file_prefix'] + '_none_features_trained_LSTM.h5' 
+        history_file = args['out_file_prefix'] + '_none_features_history.pkl' 
+        
     else: 
         print('ERROR') 
 
-    model_file = 'all_features' + '_trained_LSTM.h5' 
-    history_file = 'all_features' + '_history.pkl' 
 
     train_model.train_model(X_train,
                             y_train,
