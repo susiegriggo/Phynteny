@@ -100,6 +100,7 @@ def main():
         
         model_file = args['out_file_prefix'] + '_all_features_trained_LSTM.h5' 
         history_file = args['out_file_prefix'] + '_all_features_history.pkl' 
+        test_id_filename = args['out_file_prefix'] + '_all_test_prophage_ids.txt' 
     
     elif args['features'] == 'strand': 
         X_train, y_train, masked_idx = format_data.generate_dataset(training_encodings[:train_num], [f[:2] for f in features[:train_num]], num_functions, n_features, max_length) 
@@ -108,6 +109,7 @@ def main():
         
         model_file = args['out_file_prefix'] + '_strand_features_trained_LSTM.h5' 
         history_file = args['out_file_prefix'] + '_strand_features_history.pkl' 
+        test_id_filename = args['out_file_prefix'] + '_strand_test_prophage_ids.txt
     
     elif args['features'] == 'none': 
         X_train, y_train, masked_idx = format_data.generate_dataset(training_encodings[:train_num], [[] for i in range(train_num)], num_functions, n_features, max_length) 
@@ -116,11 +118,15 @@ def main():
         
         model_file = args['out_file_prefix'] + '_none_features_trained_LSTM.h5' 
         history_file = args['out_file_prefix'] + '_none_features_history.pkl' 
+        test_id_filename = args['out_file_prefix'] + '_none_test_prophage_ids.txt
         
     else: 
         print('ERROR') 
 
-
+    #get test ids 
+    test_ids = keys_shuffled[train_num:]
+    
+    #train the model 
     train_model.train_model(X_train,
                             y_train,
                             X_test, 
@@ -141,7 +147,6 @@ def main():
                             args['min_delta'])
 
     #Save the ids of the data in the test dataset 
-    test_id_filename = args['out_file_prefix'] + '_test_prophage_ids.txt' 
     with open(test_id_filename, 'w') as f:
         for line in test_ids:
             f.write(f"{line}\n")
