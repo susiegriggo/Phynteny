@@ -103,28 +103,39 @@ def main():
         test_id_filename = args['out_file_prefix'] + '_all_test_prophage_ids.txt' 
     
     elif args['features'] == 'strand': 
+        
+        n_features = num_functions + 2
         X_train, y_train, masked_idx = format_data.generate_dataset(training_encodings[:train_num], [f[:2] for f in features[:train_num]], num_functions, n_features, max_length) 
         X_test, y_test, masked_idx = format_data.generate_dataset(training_encodings[train_num:], [f[:2] for f in features[train_num:]], num_functions, n_features, max_length) 
-        n_features = num_functions + 2
+        
         
         model_file = args['out_file_prefix'] + '_strand_features_trained_LSTM.h5' 
         history_file = args['out_file_prefix'] + '_strand_features_history.pkl' 
-        test_id_filename = args['out_file_prefix'] + '_strand_test_prophage_ids.txt
+        test_id_filename = args['out_file_prefix'] + '_strand_test_prophage_ids.txt'
     
     elif args['features'] == 'none': 
+        
+        n_features = num_functions
         X_train, y_train, masked_idx = format_data.generate_dataset(training_encodings[:train_num], [[] for i in range(train_num)], num_functions, n_features, max_length) 
         X_test, y_test, masked_idx = format_data.generate_dataset(training_encodings[train_num:],[[] for i in range(len(training_encodings) - train_num)] , num_functions, n_features, max_length) 
-        n_features = num_functions
+        
+        
+        print(X_train.shape) 
+        print(y_train.shape) 
+        print(X_test.shape) 
+        print(y_test.shape) 
         
         model_file = args['out_file_prefix'] + '_none_features_trained_LSTM.h5' 
         history_file = args['out_file_prefix'] + '_none_features_history.pkl' 
-        test_id_filename = args['out_file_prefix'] + '_none_test_prophage_ids.txt
+        test_id_filename = args['out_file_prefix'] + '_none_test_prophage_ids.txt'
         
     else: 
         print('ERROR') 
 
     #get test ids 
     test_ids = keys_shuffled[train_num:]
+    
+    print('training the model ' + model_file) 
     
     #train the model 
     train_model.train_model(X_train,
