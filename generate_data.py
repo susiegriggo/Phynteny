@@ -11,7 +11,7 @@ import pickle
 import glob
 import format_data 
 
-output_filname = '/home/grig0076/phispy_phrog_pickles/cross_validated/prophage_phrog_data_derep_fourormore.pkl'
+base = '/home/grig0076/phispy_phrog_pickles/cross_validated/prophage_phrog_data_derep_fourormore.pkl'
 k = 11
 
 #read in the phrog annotations 
@@ -75,20 +75,20 @@ data_derep_shuffle = format_data.shuffle_dict(data_derep)
 
 print('Data includes: ' + str(len(data_derep_shuffle)) + ' prophages after dereplication') 
 
-with open(filename, 'wb') as handle:
+with open(base, 'wb') as handle:
             pickle.dump(data_derep_shuffle, handle, protocol=pickle.HIGHEST_PROTOCOL)
         
 #generate chunks of data for cross validation 
 k = 11 
-n = int(len(all_data)/11)
+n = int(len(data_derep_shuffle)/11)
 suffix = [i for i in range(k-1)]
 suffix.append('test') 
 
 for i in range(k): 
     
-    fold = dict(list(all_data.items())[:i*n])
+    fold = dict(list(data_derep_shuffle.items())[:i*n])
     
-    filename = data[:-4] + suffix[i] + 'chunk.pkl'
+    filename = base[:-4] + suffix[i] + 'chunk.pkl'
     filehandler = open(filename,"wb")
     pickle.dump(fold, filehandler)
 
