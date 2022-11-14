@@ -17,8 +17,70 @@ import argparse
 import random 
 import format_data
 import numpy as np 
+from collections import ChainMap
 
-def train_model(X_train, y_train, X_test, y_test, max_length, n_features, num_functions, model_file_out, history_file_out, memory_cells, batch_size, epochs, dropout, recurrent, lr, early, patience, min_delta ): 
+
+def train_kfold(base, phrog_encoding, k, num_functions, n_features, max_length, file_out,  memory_cells, batch_size, epochs, dropout, recurrent, lr, early, patience, min_delta, features = 'all'): 
+    """ 
+    Separate training data into 
+    
+    :param k: Number of folds to train over 
+    :param base: base string of location of the data chunks 
+    :param phrog_encoding: dictionary mapping proteins to phrog categories 
+    :param num functions: number of possible functions inlcuded in data 
+    :param n_features: number of possible features included in data
+    :param max_length: maximum number of genes included in a single prophage 
+    :param file_out: destination to save model outputs 
+    :param memory cells: Number of memory cells to use for each LSTM layer
+    :param batch_size: Batch size for training
+    :param epochs: Number of epochs to use for training
+    :param patience: Stopping condition - how many epochs without loss increasing to stop training 
+    :param min_delta: Stopping condition loss value
+    """ 
+    
+    #loop through the training chunks 
+    kk = np.array(range(k))
+    for i in kk: 
+    
+        chunks = [base + str(f) + '_chunk.pkl' for f in kk[kk!=i]]
+        print('reading chunks', flush = True) 
+        training_chunks = [pickle.load(open(f, 'rb')) for f in chunks]
+        
+        print('merging chunks', flush = True)
+        train_data = ChainMap(*training_chunks)
+            
+        #generate the training data
+        print('generating data', flush = True) 
+        train_encodings, train_features = format_data.format_data(train_data, phrog_encoding) 
+        X_train, y_train, masked_idx = format_data.generate_dataset(train_encodings, train_features, num_functions, n_features, max_length, features)
+        
+        #generate the test data 
+        test_data = pickle.load(open(base + str(i) + '_chunk.pkl', 'rb'))
+            
+        test_encodings, test_features = format_data.format_data(test_data, phrog_encoding) 
+        X_test, y_test, masked_idx = format_data.generate_dataset(test_encodings, test_features, num_functions, n_features, max_length, features) 
+
+        #file names of the data 
+        model_file_out = file_out + str(i) + '_' + features + '_chunk_trained_LSTM.h5' 
+        history_file_out = file_out + str(i) + '_' + features + '_chunk_history.pkl' 
+    
+        print('Training for chunk: ' + str(i), flush = True) 
+        
+        #train the model 
+        train_model(X_train, y_train, X_test, y_test, max_length, n_features, num_functions, model_file_out, history_file_out, memory_cells, batch_size, epochs, dropout, recurrent, lr, early, patience, min_delta)
+        
+        del X_train 
+        del y_train 
+        del train_encodings 
+        del train_features 
+        
+        del X_test
+        del y_test 
+        del test_encodings 
+        del test_features 
+    
+    
+def train_model(X_train, y_train, X_test, y_test, max_length, n_features, num_functions, model_file_out, history_file_out, memory_cells, batch_size, epochs, dropout, recurrent, lr, early, patience, min_delta): 
     """ 
     Train and save model and training history 
     
@@ -49,11 +111,9 @@ def train_model(X_train, y_train, X_test, y_test, max_length, n_features, num_fu
     mc2 = ModelCheckpoint(model_file_out[:-3] + 'best_val_loss.h5',
                         monitor='val_accuracy', mode='max', save_best_only=True, verbose=1) #model with the best validation set accuracy therefore maximise 
     
-    if early == True: 
-        es = EarlyStopping(monitor='loss', mode='min', verbose=2, patience=patience, min_delta=min_delta) #use a set number of epoch when adjusting the memory cells and batch size 
-        history = model.fit(X_train, y_train, epochs = epochs, batch_size = batch_size, callbacks = [es, mc, mc2], validation_data = (X_test, y_test))
-    else: 
-        history = model.fit(X_train, y_train, epochs = epochs, batch_size = batch_size, validation_split = 0.1)
+
+    es = EarlyStopping(monitor='loss', mode='min', verbose=2, patience=patience, min_delta=min_delta) #use a set number of epoch when adjusting the memory cells and batch size 
+    history = model.fit(X_train, y_train, epochs = epochs, batch_size = batch_size, callbacks = [es, mc, mc2], validation_data = (X_test, y_test))
         
     #save the model 
     model.save(model_file_out) 
@@ -62,74 +122,3 @@ def train_model(X_train, y_train, X_test, y_test, max_length, n_features, num_fu
     with open(history_file_out, 'wb') as handle:
         pickle.dump(history.history, handle, protocol=pickle.HIGHEST_PROTOCOL)
         
-        
-def evaluate_predictions(test_encodings, test_features, num_functions, n_features, max_length, model):
-    """
-    Evaluate the accuracy of a trained LSTM. Does not use unbiased category predictions 
-    
-    :param test_encodings: encoded gene orders of a testing set of genomes 
-    :param test_features: encoded features for a set of testing genomes 
-    :param num_functions: number of possible functional categories 
-    :param n_features: number of features in addition to the functional categories 
-    :param max_length: maximum number of genes in a seqeunces 
-    :param model: trained model 
-    :return % score of the accuracy of the model 
-    """ 
-    
-    correct = 0 
-    
-    for i in range(len(test_encodings)): 
-
-        idx = random.randint(1, len(test_encodings[i]) -1) #don't include ends
-
-        #make sure that the mask is not an uknown category 
-        while test_encodings[i][idx] == 0: 
-            idx = random.randint(1, len(test_encodings[i]) -1)
-
-        X, y = format_data.generate_example(test_encodings[i], test_features[i], num_functions, n_features, max_length, idx) 
-        yhat = model.predict(X) 
-
-        #the pre decoded sequences from softmax act as probabilities 
-        if [np.argmax(i) for i in yhat[0]] == [np.argmax(i) for i in y[0]]: 
-            correct += 1 
-        
-    return (correct/len(test_encodings))*100.0
-    
-def evaluate_predictions_unbiased_categories(test_encodings, test_features, num_functions, n_features, max_length, model): 
-    """ 
-    Evaluate the accuracy of a trained LSTM. Uses an equal number of each category for predictions. 
-    
-    :param test_encodings: encoded gene orders of a testing set of genomes 
-    :param test_features: encoded features for a set of testing genomes 
-    :param num_functions: number of possible functional categories 
-    :param n_features: number of features in addition to the functional categories 
-    :param max_length: maximum number of genes in a seqeunces 
-    :param model: trained model 
-    :return % score of the accuracy of the model 
-    """
-    
-    #evaluate the model for an unbiased category 
-    correct = 0 
-    predictions = 0 
-    func = random.randint(1, num_functions-1)
-    
-    for i in range(len(test_encodings)): 
-
-        if func in test_encodings[i]:
-
-            occurence = [i for i, x in enumerate(test_encodings[i]) if x == func]
-            idx = random.choice(occurence) 
-
-            X, y = format_data.generate_example(training_encodings[i], features[i], num_functions, n_features, max_length, idx) 
-            yhat = model.predict(X) 
-
-            #the pre decoded sequences from softmax act as probabilities 
-            if [np.argmax(i) for i in yhat[0]] == [np.argmax(i) for i in y[0]]: 
-                correct += 1 
-
-            #prepare for the next prediction 
-            func = random.randint(1, num_functions-1)
-            predictions += 1 
-
-    print('Accuracy: %f' % ((correct/predictions)*100.0))
-
