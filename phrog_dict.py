@@ -18,7 +18,7 @@ def check_df(phrog_file):
     """
     Check that the dataframe exists
     """ 
-
+    
     try:
 
         phrog_output = pd.read_csv(phrog_file, sep = '\t', compression='gzip', header = None)
@@ -109,10 +109,11 @@ for l1 in level_one:
                                 sense = [re.split(']',str(this_CDS[i].location))[1][1] for i in range(len(this_CDS))] 
                                 protein_id = [this_CDS[i].qualifiers.get('protein_id') for i in range(len(this_CDS))] 
                                 protein_id = [p[0] if p is not None else None for p in protein_id]
+                                translation = [this_CDS[i].qualifiers.get('translation') for i in range(len(this_CDS))] 
                                 phrogs = [phrog_dict.get(p) for p in protein_id]
 
                                 #formulate a dictionary with this information 
-                                contig_dict = {'length': contig_length, 'phrogs' : phrogs, "protein_id": protein_id, "sense": sense, "position": position}
+                                contig_dict = {'length': contig_length, 'phrogs' : phrogs, "protein_id": protein_id, "sense": sense, "position": position, "translation": translation}
 
                                 #update dictionary with this one 
                                 l2_genome_dict[this_file + '_' + key] = contig_dict
@@ -121,7 +122,7 @@ for l1 in level_one:
         dict_name = 'GCA' + '_' + file_parts[8] + file_parts[9] +  file_parts[10] + '.pkl'  
         
         #create location 
-        dict_location = '../phispy_phrog_pickles/GCA/' + file_parts[8] + '/' + file_parts[9]
+        dict_location = '../phispy_phrog_pickles/GCA_inc_translation/' + file_parts[8] + '/' + file_parts[9]
         pathlib.Path(dict_location).mkdir(parents=True, exist_ok=True) 
         dict_name = dict_location + '/' + dict_name
         
