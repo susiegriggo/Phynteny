@@ -11,7 +11,7 @@ import pickle
 import glob
 import format_data 
 
-base = '/home/grig0076/phispy_phrog_pickles/cross_validated/prophage_phrog_data_derep_fourormore.pkl'
+base = '/home/grig0076/phispy_phrog_pickles/cross_validated/prophage_phrog_data_derep_fourormore_lessthan121.pkl'
 k = 11
 
 #read in the phrog annotations 
@@ -62,7 +62,7 @@ for l1 in levelone:
                 categories_present.remove(0)
                 
             #consider only prophages which have at least four of the different annotations 
-            if len(categories_present) >= 4: 
+            if len(categories_present) >= 4 and len(categories) <= 120: 
                 
                     data[g] = this_prophage  
 
@@ -86,9 +86,9 @@ suffix.append('test')
 
 for i in range(k): 
     
-    fold = dict(list(data_derep_shuffle.items())[:i*n])
+    fold = dict(list(data_derep_shuffle.items())[i*n: (i+1)*n])
     
-    filename = base[:-4] + suffix[i] + 'chunk.pkl'
+    filename = base[:-4] + '_' + str(suffix[i]) + '_chunk.pkl'
     filehandler = open(filename,"wb")
     pickle.dump(fold, filehandler)
 
