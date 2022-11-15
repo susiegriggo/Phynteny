@@ -19,8 +19,16 @@ import format_data
 import numpy as np 
 from collections import ChainMap
 
-
-def train_kfold(base, phrog_encoding, k, num_functions, n_features, max_length, file_out,  memory_cells, batch_size, epochs, dropout, recurrent, lr, early, patience, min_delta, features = 'all'): 
+def select_features(data, features): 
+    
+    if features == 'all': 
+        return data 
+    elif features == 'strand': 
+        return [data[i][:2] for i in range(len(data))]
+    else: 
+        return [[] for i in range(len(data))]
+    
+def train_kfold(base, phrog_encoding, k, num_functions, n_features, max_length, file_out,  memory_cells, batch_size, epochs, dropout, recurrent, lr, patience, min_delta, features): 
     """ 
     Separate training data into 
     
@@ -50,16 +58,23 @@ def train_kfold(base, phrog_encoding, k, num_functions, n_features, max_length, 
         train_data = ChainMap(*training_chunks)
             
         #generate the training data
-        print('generating data', flush = True) 
+        print('generating training features', flush = True) 
+        print('features used: ' + features, flush = True) 
         train_encodings, train_features = format_data.format_data(train_data, phrog_encoding) 
-        X_train, y_train, masked_idx = format_data.generate_dataset(train_encodings, train_features, num_functions, n_features, max_length, features)
+        train_features = select_features(train_features, features) 
+        print('creating training dataset', flush = True) 
+        X_train, y_train, masked_idx = format_data.generate_dataset(train_encodings, train_features, num_functions, n_features, max_length)
+        print('training size: ' + str(y_train.shape), flush = True) 
         
         #generate the test data 
-        test_data = pickle.load(open(base + str(i) + '_chunk.pkl', 'rb'))
-            
+        test_data = pickle.load(open(base + str(i) + '_chunk.pkl', 'rb')) 
+        print('generating test features', flush = True) 
         test_encodings, test_features = format_data.format_data(test_data, phrog_encoding) 
-        X_test, y_test, masked_idx = format_data.generate_dataset(test_encodings, test_features, num_functions, n_features, max_length, features) 
-
+        test_features = select_features(test_features, features) 
+        print('creating test dataset', flush = True) 
+        X_test, y_test, masked_idx = format_data.generate_dataset(test_encodings, test_features, num_functions, n_features, max_length) 
+        print('test size: ' + str(y_test.shape), flush = True) 
+        
         #file names of the data 
         model_file_out = file_out + str(i) + '_' + features + '_chunk_trained_LSTM.h5' 
         history_file_out = file_out + str(i) + '_' + features + '_chunk_history.pkl' 
@@ -67,7 +82,7 @@ def train_kfold(base, phrog_encoding, k, num_functions, n_features, max_length, 
         print('Training for chunk: ' + str(i), flush = True) 
         
         #train the model 
-        train_model(X_train, y_train, X_test, y_test, max_length, n_features, num_functions, model_file_out, history_file_out, memory_cells, batch_size, epochs, dropout, recurrent, lr, early, patience, min_delta)
+        train_model(X_train, y_train, X_test, y_test, max_length, n_features, num_functions, model_file_out, history_file_out, memory_cells, batch_size, epochs, dropout, recurrent, lr, patience, min_delta)
         
         del X_train 
         del y_train 
@@ -80,7 +95,7 @@ def train_kfold(base, phrog_encoding, k, num_functions, n_features, max_length, 
         del test_features 
     
     
-def train_model(X_train, y_train, X_test, y_test, max_length, n_features, num_functions, model_file_out, history_file_out, memory_cells, batch_size, epochs, dropout, recurrent, lr, early, patience, min_delta): 
+def train_model(X_train, y_train, X_test, y_test, max_length, n_features, num_functions, model_file_out, history_file_out, memory_cells, batch_size, epochs, dropout, recurrent, lr, patience, min_delta): 
     """ 
     Train and save model and training history 
     
@@ -99,20 +114,18 @@ def train_model(X_train, y_train, X_test, y_test, max_length, n_features, num_fu
     model.add(Bidirectional(LSTM(memory_cells, return_sequences=True, dropout = dropout, kernel_regularizer=L1L2(0, 0)),input_shape = (max_length, n_features )))
     model.add(Bidirectional(LSTM(memory_cells, return_sequences = True, dropout = dropout, kernel_regularizer=L1L2(0, 0))))
     model.add(Bidirectional(LSTM(memory_cells, return_sequences = True, dropout = dropout, kernel_regularizer=L1L2(0, 0))))
-
     model.add(TimeDistributed(Dense(num_functions, activation='softmax')))
+    
     optimizer = Adam(learning_rate=lr)
     model.compile(loss='categorical_crossentropy', optimizer = optimizer, metrics = ['accuracy']) 
     print(model.summary(), flush = True)
     
-    
+    es = EarlyStopping(monitor= 'loss', mode='min', verbose=2, patience=patience, min_delta=min_delta) #use a set number of epoch when adjusting the memory cells and batch size 
     mc = ModelCheckpoint(model_file_out[:-3] + 'best_val_accuracy.h5',
-                        monitor='val_loss', mode='min', save_best_only=True, verbose=1) #model with the best validation loss therefore minimise 
+                        monitor='val_loss', mode='min', save_best_only=True, verbose=1, save_freq = 'epoch') #model with the best validation loss therefore minimise 
     mc2 = ModelCheckpoint(model_file_out[:-3] + 'best_val_loss.h5',
-                        monitor='val_accuracy', mode='max', save_best_only=True, verbose=1) #model with the best validation set accuracy therefore maximise 
+                        monitor='val_accuracy', mode='max', save_best_only=True, verbose=1, save_freq = 'epoch') #model with the best validation set accuracy therefore maximise 
     
-
-    es = EarlyStopping(monitor='loss', mode='min', verbose=2, patience=patience, min_delta=min_delta) #use a set number of epoch when adjusting the memory cells and batch size 
     history = model.fit(X_train, y_train, epochs = epochs, batch_size = batch_size, callbacks = [es, mc, mc2], validation_data = (X_test, y_test))
         
     #save the model 
