@@ -66,15 +66,13 @@ def main():
     phrog_encoding[None] = one_letter.get('unknown function') 
         
     num_functions = len(one_letter)
+    n_features = num_functions 
     
     if args['features'] == 'all': 
         n_features = num_functions + 5
         
     elif args['features'] == 'strand':
         n_features = num_functions + 2
-        
-    else: 
-        n_features = num_functions
         
     print('finished set up', flush = True) 
     train_model.train_kfold(args['out_file_prefix'], 
@@ -96,3 +94,4 @@ def main():
     
 if __name__ == "__main__":
     main()
+
