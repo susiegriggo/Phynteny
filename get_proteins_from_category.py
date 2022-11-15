@@ -1,18 +1,20 @@
 """ 
 Script which gets the phispy proteins from a specific PHROG 
+
+TODO - adapt this such that instead 
+- make into a loop for each category 
+- instead read the translation given and convert to the checksum 
 """ 
 #imports 
 import pandas as pd
 import glob
 import pickle5 as pickle
 import re
-from Bio import SeqIO 
 import gzip
 from crc64iso.crc64iso import crc64
+import os 
 
-base = '/home/edwa0468/phage/Prophage/phispy/fasta_protein/GCA' #where fasta files are located 
-file_out = '/home/grig0076/phispy_phrog_pickles/protein_IDs/PHROG_connector_proteinIDs.txt'
-category = 'connector' 
+file_out = '/home/grig0076/phispy_phrog_pickles/protein_IDs/'
 
 #read in the phrog annotations
 annot = pd.read_csv('/home/grig0076/LSTMs/phrog_annot_v4.tsv', sep = '\t')
@@ -31,6 +33,8 @@ one_letter = {'DNA, RNA and nucleotide metabolism' : 4,
  'transcription regulation' : 9,
  'unknown function' :  0 ,}
 
+print(annot) 
+
 #use this dictionary to generate an encoding of each phrog
 phrog_encoding = dict(zip([str(i) for i in annot['phrog']], [one_letter.get(c) for c in annot['category']]))
 
@@ -38,42 +42,44 @@ phrog_encoding = dict(zip([str(i) for i in annot['phrog']], [one_letter.get(c) f
 phrog_encoding[None] = one_letter.get('unknown function')
 
 #get the directorys containing the genomes
-levelone = glob.glob('/home/grig0076/phispy_phrog_pickles/GCA/*')
+levelone = glob.glob('/home/grig0076/phispy_phrog_pickles/GCA_inc_translation/*')
 
-with open(file_out, 'w') as f:
+#get each of the possible phrog categories 
+all_categories = [dict(zip(list(one_letter.values()), list(one_letter.keys()))).get(i) for i in range(1,len(one_letter))]
 
-    for l1 in levelone:
-        leveltwo = glob.glob(l1+'/*')
+for c in all_categories: 
+    
+    print('processing ' + c, flush = True)
 
-        for l2 in leveltwo:
+    category_file_out = file_out + 'PHROG_' + c + '_proteinIDs.txt'
 
-            files = glob.glob(l2+'/*') 
+    with open(category_file_out, 'w') as f:
 
-            for file in files: 
+        for l1 in levelone:
+            leveltwo = glob.glob(l1+'/*')
 
-                with open(file, 'rb') as handle:
-                    genomes = pickle.load(handle)
+            for l2 in leveltwo:
 
-                for g in list(genomes.keys()):
+                files = glob.glob(l2+'/*') 
 
-                    #get the corresponding protein fasta file 
-                    fasta_file = glob.glob(base + '/' + re.split('_', g)[1][0:3] + '/' + re.split('_', g)[1][3:6] + '/' + re.split('_', g)[1][6:] + '/*')[0] 
-                    proteins =  SeqIO.to_dict(SeqIO.parse(gzip.open(fasta_file, "rt"), "fasta"))
+                for file in files: 
 
-                    #get the phrog categories
-                    this_genome = genomes.get(g)
-                    categories = [phrog_encoding.get(i) for i in this_genome.get('phrogs')]
+                    with open(file, 'rb') as handle:
+                        genomes = pickle.load(handle)
 
-                    #get the proteins 
-                    category_idx = [i for i, x in enumerate(categories) if x == one_letter.get(category)]
-                    protein_id = [this_genome.get('protein_id')[c] for c in category_idx]
+                    for g in list(genomes.keys()):
 
-                    #calcuate the checksum for each protein 
+                        #get the phrog categories
+                        this_genome = genomes.get(g)
+                        categories = [phrog_encoding.get(i) for i in this_genome.get('phrogs')]
 
-                    for p in protein_id: 
-                        seq = proteins.get(p)
-                        f.write(p) 
-                        f.write('\t') 
-                        f.write(crc64(str(seq.seq)))
-                        f.write('\n')
-f.close() 
+                        #get the proteins of the current category  
+                        category_idx = [i for i, x in enumerate(categories) if x == one_letter.get(c)]
+                        translation = [this_genome.get('translation')[c] for c in category_idx]
+
+                        for t in translation: 
+                            f.write(crc64(str(t)))
+                            f.write('\n')
+    f.close() 
+
+#go through and remove duplicate checksums 
