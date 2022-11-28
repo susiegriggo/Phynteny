@@ -1,3 +1,11 @@
+#imports 
+import pickle 
+import pickle5
+import format_data 
+import random
+import tensorflow as tf
+import numpy as np
+
 def cutoff_youdens_j(fpr,tpr,thresholds):
     """
     Calculate Youdens J for selecting the optimal threshold for predictions 
@@ -11,7 +19,43 @@ def cutoff_youdens_j(fpr,tpr,thresholds):
     j_ordered = sorted(zip(j_scores,thresholds))
     return j_ordered[-1][1]
 
-def get_predictions(encodings, features, model, num_functions, n_features, max_length):
+
+def generate_test_instance(encoding, feature_list, num_functions, n_features, max_length): 
+    """ 
+    Mask a a function to make predictions 
+    """
+
+    idx = random.randint(1, len(encoding) -1) #don't include ends
+
+    #make sure that the mask is not an uknown category 
+    while encoding[idx] == 0: 
+        idx = random.randint(1, len(encoding) -1)
+
+    X, y = format_data.generate_example(encoding, feature_list, num_functions, n_features, max_length, idx)
+        
+    return X, y, idx 
+
+
+def prepare_test_data(encodings, features, num_functions, n_features, max_length):
+    """
+    """
+    
+    X_list = [] 
+    y_list = [] 
+    idx_list = [] 
+    
+    for i in range(0, len(encodings)): 
+        
+        X, y, idx = generate_test_instance(encodings[i], features[i], num_functions, n_features, max_length)
+        
+        X_list.append(X) 
+        y_list.append(y)
+        idx_list.append(idx) 
+    
+    return X_list, y_list, idx_list 
+    
+
+def get_predictions(X_list, y_list, idx_list, model, num_functions, n_features, max_length):
     """ 
     For a set of encoded prophages, maska single a gene and predict its function. 
     
@@ -31,24 +75,21 @@ def get_predictions(encodings, features, model, num_functions, n_features, max_l
     all_cat_list = [] 
 
     
-    #for i in range(0,len(encodings)): 
-    for i in range(0,len(encodings)): 
-
-        idx = random.randint(1, len(encodings[i]) -1) #don't include ends
-
-        #make sure that the mask is not an uknown category 
-        while encodings[i][idx] == 0: 
-            idx = random.randint(1, len(encodings[i]) -1)
-
-        X, y = format_data.generate_example(encodings[i], features[i], num_functions, n_features, max_length, idx) 
-        yhat = model.predict(X, verbose = 0) 
+    #for i in range(0,1000): 
+    for i in range(0,len(idx_list)): 
         
-        #rescore so that the unknown probabilities are not included 
+        if i % 1000 == 0: 
+            print(str(round(i*100/len(idx_list), 2)) + '% of the way through', flush = True)
+         
+        yhat = model.predict(X_list[i], verbose = 0) 
+        
+        #resccale so that the unknown probabilities are not included 
         softmax = np.zeros(num_functions)
-        softmax[1:] = yhat[0][idx][1:]/np.sum(yhat[0][idx][1:]) 
+        softmax[1:] = yhat[0][idx_list[i]][1:]/np.sum(yhat[0][idx_list[i]][1:]) 
+        #softmax = yhat[0][idx_list[i]]
         
         #update with the correct probability 
-        correct_category = np.argmax(y[0][idx])
+        correct_category = np.argmax(y_list[i][0][idx_list[i]])
         cat_list[correct_category-1].append(1) 
         prob_list[correct_category-1].append(softmax[correct_category]) 
 
@@ -180,12 +221,15 @@ def plot_loss(history):
         file = open(h, 'rb') 
         h_dict = pickle5.load(file) 
         file.close() 
+        
+        epochs = np.array([i for i in range(1,len(h_dict.get('loss'))+1)])
 
-        plt.plot(h_dict[ 'loss' ][1:], color = 'blue')
-        plt.plot(h_dict[ 'val_loss' ][1:], color = 'red')
+        plt.plot(epochs - 0.5, h_dict[ 'loss' ], color = 'blue')
+        plt.plot(epochs, h_dict[ 'val_loss' ], color = 'red')
 
         plt.xlabel( 'epoch' )
         plt.ylabel('loss') 
+        plt.ylim(0,0.02)
         plt.legend([ 'train' , 'validation' ], loc= 'upper right' )
 
         if np.min(h_dict[ 'val_loss' ][1:]) < best_loss: 
@@ -219,7 +263,7 @@ def plot_ROC(cat_list, prob_list, one_letter, num_functions):
 
     for line in leg.get_lines():
         line.set_linewidth(4.0)
-
+   
     plt.xlabel('False Positive Rate')
     plt.ylabel('False Negative Rate')
-    plt.show()
+    plt.show() 

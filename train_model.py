@@ -10,6 +10,8 @@ from tensorflow.keras.layers import Bidirectional, TimeDistributed, Dense, LSTM
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import L1L2
+from keras.layers.core import Lambda
+from keras import backend as K
 import tensorflow as tf
 
 import pickle 
@@ -46,10 +48,11 @@ def PermaDropout(rate):
     return Lambda(lambda x: K.dropout(x, level=rate))
 
     
-def train_kfold(base, phrog_encoding, k, num_functions, n_features, max_length, file_out,  memory_cells, batch_size, epochs, dropout, recurrent, lr, patience, min_delta, features): 
+def train_kfold( base, phrog_encoding, k, num_functions, n_features, max_length, file_out,  memory_cells, batch_size, epochs, dropout, recurrent, lr, patience, min_delta, features, model = 'LSTM', permadropout = False): 
     """ 
     Separate training data into 
     
+    :param train_type: Whether to include dropout on validation data 
     :param k: Number of folds to train over 
     :param base: base string of location of the data chunks 
     :param phrog_encoding: dictionary mapping proteins to phrog categories 
@@ -62,11 +65,13 @@ def train_kfold(base, phrog_encoding, k, num_functions, n_features, max_length, 
     :param epochs: Number of epochs to use for training
     :param patience: Stopping condition - how many epochs without loss increasing to stop training 
     :param min_delta: Stopping condition loss value
+    :param model: Type of model to train - either LSTM or ANN 
+    :param permadropout: If true applies dropout to validation data 
     """ 
     
     #loop through the training chunks 
     kk = np.array(range(k))
-    for i in range(0,k): 
+    for i in range(k): 
     
         chunks = [base + str(f) + '_chunk.pkl' for f in kk[kk!=i]]
         print('reading chunks', flush = True) 
@@ -99,8 +104,73 @@ def train_kfold(base, phrog_encoding, k, num_functions, n_features, max_length, 
     
         print('Training for chunk: ' + str(i), flush = True) 
         
-        #train the model 
-        train_LSTM(X_train, y_train, X_test, y_test, max_length, n_features, num_functions, model_file_out, history_file_out, memory_cells, batch_size, epochs, dropout, recurrent, lr, patience, min_delta)
+        #train model 
+        if permadropout == False: 
+            
+            print('Not including dropout on validation', flush = True) 
+            
+            if model == 'LSTM': 
+        
+                train_LSTM(X_train, 
+                           y_train, 
+                           X_test, 
+                           y_test, 
+                           max_length, 
+                           n_features, 
+                           num_functions, 
+                           model_file_out, 
+                           history_file_out, 
+                           memory_cells, 
+                           batch_size, 
+                           epochs, 
+                           dropout, 
+                           recurrent, 
+                           lr, 
+                           patience, 
+                           min_delta)
+        
+            if model == 'ANN': 
+                
+                train_ANN(X_train, 
+                          y_train, 
+                          X_test, 
+                          y_test, 
+                          max_length, 
+                          n_features, 
+                          num_functions, 
+                          model_file_out, 
+                          history_file_out, 
+                          memory_cells, 
+                          batch_size, 
+                          epochs, 
+                          dropout, 
+                          recurrent, 
+                          lr, 
+                          patience, 
+                          min_delta)
+                
+                print('Training with ANN', flush = True) 
+                
+        elif permadropout == True: 
+            print('Including dropout on validation', flush = True) 
+            
+            train_LSTM_permadropout(X_train, 
+                                    y_train, 
+                                    X_test, 
+                                    y_test, 
+                                    max_length, 
+                                    n_features, 
+                                    num_functions, 
+                                    model_file_out, 
+                                    history_file_out, 
+                                    memory_cells, 
+                                    batch_size, 
+                                    epochs, 
+                                    dropout, 
+                                    recurrent, 
+                                    lr, 
+                                    patience, 
+                                    min_delta)
         
         del X_train 
         del y_train 

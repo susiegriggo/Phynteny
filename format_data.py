@@ -267,7 +267,6 @@ def encode_feature(encoding, feature, column):
     :param column: column to add feature 
     :return: feature matrix including the new feature  
     """ 
-
     encoding = encoding.astype('float64')
     encoding[:len(feature), column] = feature
 
@@ -311,8 +310,11 @@ def generate_example(sequence, features, num_functions, n_features, max_length, 
     y = np.array(one_hot_encode(padded_sequence, num_functions))
     X =  np.array(one_hot_encode(padded_sequence, n_features ))
 
-    for f in range(len(features)): #maybe this line has to change 
-        X = encode_feature(X, features[f], num_functions + f) 
+   
+    if len(features) > 0: 
+    
+        for f in range(len(features)): 
+            X = encode_feature(X, features[f], num_functions + f) 
 
     #replace the function encoding for the masked sequence 
     X[idx, 0:num_functions] = np.zeros(num_functions) 
@@ -327,7 +329,7 @@ def generate_prediction(sequence, features, num_functions, n_features, max_lengt
     """ 
     Prepare data to predict the function of all hypothetical genes in a sequence 
     
-    :param sequence: inteer enoded list of PHROG categories in a sequence 
+    :param sequence: integer enoded list of PHROG categories in a sequence 
     :param features: list of features to include 
     :param num_functions: number of possible PHROG categories 
     :param max_length: maximum length of a sequence 
@@ -410,7 +412,8 @@ def generate_dataset(sequences, all_features, num_functions, n_features, max_len
     :param num_functions: number of possible PHROG categories 
     :param n_features: total number of features 
     :param max_length: maximum length of a sequence 
-    :return: Dataset of training or test data reprsented as X and y matrices 
+    :param features: state what selection of features to include 
+    :return: Dataset of training or test data reprsented as X and y matrices
     """
     
     #features is a list of list objects 
