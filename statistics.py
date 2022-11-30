@@ -1,10 +1,11 @@
 #imports 
 import pickle 
-import pickle5
+import pickle
 import format_data 
 import random
 import tensorflow as tf
 import numpy as np
+from sklearn.metrics import roc_auc_score, roc_curve
 
 def cutoff_youdens_j(fpr,tpr,thresholds):
     """
@@ -38,6 +39,7 @@ def generate_test_instance(encoding, feature_list, num_functions, n_features, ma
 
 def prepare_test_data(encodings, features, num_functions, n_features, max_length):
     """
+    Generate a set of predictions to evaluate the model 
     """
     
     X_list = [] 
@@ -103,7 +105,7 @@ def get_predictions(X_list, y_list, idx_list, model, num_functions, n_features, 
     
     return all_prob_list, all_cat_list, cat_list, prob_list
     
-def calculate_thresholds(cat_list, prob_list, category_list):
+def calculate_thresholds(cat_list, prob_list,  categories):
     """
     Calculate cutoff for each PHROG category using Youden's J
     
@@ -123,7 +125,7 @@ def calculate_thresholds(cat_list, prob_list, category_list):
     return dict(zip(categories, thresholds))
 
 
-def calculate_category_AUC(cat_list, prob_list, category_list): 
+def calculate_category_AUC(cat_list, prob_list, categories): 
     """
     Calculate the AUC for each functional category. 
     
@@ -141,7 +143,7 @@ def calculate_category_AUC(cat_list, prob_list, category_list):
         
     return dict(zip(categories, aucs))
     
-def calculate_metrics(all_cat_list, all_prob_list, thresholds, categories): 
+def calculate_metrics(all_cat_list, all_prob_list, thresholds, categories, num_functions): 
     """
     Calculate the precision, recall and f1 score for a set of category predictions 
     
@@ -219,7 +221,7 @@ def plot_loss(history):
 
     for h in history: 
         file = open(h, 'rb') 
-        h_dict = pickle5.load(file) 
+        h_dict = pickle.load(file) 
         file.close() 
         
         epochs = np.array([i for i in range(1,len(h_dict.get('loss'))+1)])
