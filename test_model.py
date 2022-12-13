@@ -6,6 +6,7 @@ test a single model
 import statistics 
 import format_data 
 import argparse
+import train_model
 import pandas as pd
 import pickle 
 from collections import Counter 
@@ -54,11 +55,15 @@ def main():
 
     #set parameters used for the model
     num_functions = len(one_letter)
-    n_features = num_functions + len(test_features[0]) 
+    n_features = num_functions #+2
     max_length = 120
     categories = [dict(zip(list(one_letter.values()), list(one_letter.keys()))).get(i) for i in range(1,num_functions)]
-
+    
+    #select relevant features 
+    test_features = train_model.select_features(test_features, 'none')
+    
     #generate the testing data 
+    print('N FEATURES: ' + str(n_features))  
     X_list, y_list, idx_list =  statistics.prepare_test_data(test_encodings, test_features, num_functions, n_features, max_length)
 
     #determine the number of proteins for each phrog category  #TODO fix names 
@@ -85,8 +90,7 @@ def main():
         fpr, tpr, threshold = roc_curve(cat_list[j], prob_list[j])
         tpr = np.interp(mean_fpr, fpr, tpr)
         tpr[0] = 0.0
-        tpr_list[:,j] = tpr
-        
+        tpr_list[:,j] = tpr     
         
     #Save ROC CURVE
     ROC_df = pd.DataFrame(tpr_list)
@@ -94,7 +98,6 @@ def main():
     ROC_df.columns = categories + ['FPR']
     ROC_df.to_csv(args['model'][:-3] + '_ROC.tsv', sep = '\t') 
     
-
     print('analysing..', flush = True) 
 
     #calcualte AUC 

@@ -10,8 +10,8 @@ from tensorflow.keras.layers import Bidirectional, TimeDistributed, Dense, LSTM
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import L1L2
-from keras.layers.core import Lambda
-from keras import backend as K
+#from keras.layers.core import Lambda
+#from keras import backend as K
 import tensorflow as tf
 
 import pickle 
@@ -69,9 +69,12 @@ def train_kfold( base, phrog_encoding, k, num_functions, n_features, max_length,
     :param permadropout: If true applies dropout to validation data 
     """ 
     
+    #REMOVE 
+    print('NUMBER OF FEATURES PARSED:' + str(n_features), flush = True)  
+    
     #loop through the training chunks 
     kk = np.array(range(k))
-    for i in range(k): 
+    for i in range(k-2,k): 
     
         chunks = [base + str(f) + '_chunk.pkl' for f in kk[kk!=i]]
         print('reading chunks', flush = True) 
@@ -84,10 +87,15 @@ def train_kfold( base, phrog_encoding, k, num_functions, n_features, max_length,
         print('generating training features', flush = True) 
         print('features used: ' + features, flush = True) 
         train_encodings, train_features = format_data.format_data(train_data, phrog_encoding) 
+        
+        print('before select there are : ' + str(len(train_features[0]))) 
         train_features = select_features(train_features, features) 
+        print('after select there are : ' + str(len(train_features[0]))) 
+        
         print('creating training dataset', flush = True) 
         X_train, y_train, masked_idx = format_data.generate_dataset(train_encodings, train_features, num_functions, n_features, max_length)
-        print('training size: ' + str(y_train.shape), flush = True) 
+        print('training X size: ' + str(X_train.shape), flush = True)
+        print('training y size: ' + str(y_train.shape), flush = True) 
         
         #generate the test data 
         test_data = pickle.load(open(base + str(i) + '_chunk.pkl', 'rb')) 
@@ -95,6 +103,7 @@ def train_kfold( base, phrog_encoding, k, num_functions, n_features, max_length,
         test_encodings, test_features = format_data.format_data(test_data, phrog_encoding) 
         test_features = select_features(test_features, features) 
         print('creating test dataset', flush = True) 
+        
         X_test, y_test, masked_idx = format_data.generate_dataset(test_encodings, test_features, num_functions, n_features, max_length) 
         print('test size: ' + str(y_test.shape), flush = True) 
         

@@ -32,10 +32,11 @@ def parse_args():
     parser.add_argument('-lr', '--learning_rate', help = 'Learning rate for the Adam optimizer', type = float, default = 0.001) 
     parser.add_argument('-p', '--patience', help = 'Early stopping condition patience', type = int, default = 3) 
     parser.add_argument('-d', '--min_delta', help = 'Early stopping condition min delta', type = float, default = 1e-5)
+    parser.add_argument('-model', '--model', help = 'Type of model to use to train model', type = str, default = 'LSTM') 
+    parser.add_argument('-vd', '--validation_dropout', help = 'Apply dropout to validation data',  type = bool, default = False) 
     parser.add_argument('-out', '--out_file_prefix', help = 'Prefix used for the output files', required = True)
     
     return vars(parser.parse_args())
-
 
 def main(): 
     
@@ -91,7 +92,9 @@ def main():
                             args['learning_rate'], 
                             args['patience'], 
                             args['min_delta'], 
-                            args['features'])
+                            args['features'],
+                            args['model'], 
+                            args['validation_dropout'])
     
 if __name__ == "__main__":
     main()

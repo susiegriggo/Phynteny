@@ -1,9 +1,7 @@
 """ 
 Script which gets the phispy proteins from a specific PHROG 
 
-TODO - adapt this such that instead 
-- make into a loop for each category 
-- instead read the translation given and convert to the checksum 
+Used to compare which alphafold protein structures are known 
 """ 
 #imports 
 import pandas as pd
@@ -14,7 +12,7 @@ import gzip
 from crc64iso.crc64iso import crc64
 import os 
 
-file_out = '/home/grig0076/phispy_phrog_pickles/protein_IDs/'
+file_out = '/home/grig0076/phispy_phrog_pickles/protein_IDs/protein_IDs'
 
 #read in the phrog annotations
 annot = pd.read_csv('/home/grig0076/LSTMs/phrog_annot_v4.tsv', sep = '\t')
@@ -32,8 +30,6 @@ one_letter = {'DNA, RNA and nucleotide metabolism' : 4,
  'tail' : 8,
  'transcription regulation' : 9,
  'unknown function' :  0 ,}
-
-print(annot) 
 
 #use this dictionary to generate an encoding of each phrog
 phrog_encoding = dict(zip([str(i) for i in annot['phrog']], [one_letter.get(c) for c in annot['category']]))
@@ -75,11 +71,11 @@ for c in all_categories:
 
                         #get the proteins of the current category  
                         category_idx = [i for i, x in enumerate(categories) if x == one_letter.get(c)]
-                        translation = [this_genome.get('translation')[c] for c in category_idx]
+                        #translation = [this_genome.get('translation')[c] for c in category_idx]
+                        protein_ids = [this_genome.get('protein_id')[c] for c in category_idx]
 
-                        for t in translation: 
-                            f.write(crc64(str(t)))
-                            f.write('\n')
+                        for p in protein_ids: 
+                            if p != None: 
+                                f.write(p)
+                                f.write('\n')
     f.close() 
-
-#go through and remove duplicate checksums 

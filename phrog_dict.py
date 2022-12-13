@@ -1,5 +1,7 @@
 """
 Convert phispy and mmseqs output to a single pickle for each prophage which contains information to generate features 
+
+This version includes the tranlsation of the sequence 
 """ 
 
 #imports 

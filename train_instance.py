@@ -20,6 +20,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Train LSTM on PHROG orders')
     parser.add_argument('-t','--training_data', help='Training data', required=True)
     parser.add_argument('-f', '--flip_genomes', help='Flip genomes to ensure that an integrase is at the start of each sequence', required = True) 
+    parser.add_argument('-num_genes', '--num_genes', help = 'Maximum number of genes considered in a training instance. Genomes with a number of genes above this will not be included', default = 120, type = int)  
     parser.add_argument('-m', '--memory_cells', help = 'Number of memory cells to use', type = int, default = 20) 
     parser.add_argument('-b', '--batch_size', help = 'Batch size', type = int, default = 128) 
     parser.add_argument('-phrogs', '--phrog_annotations', help = 'csv file containing the annotation and category of each phrog', required = True) 
@@ -78,16 +79,20 @@ def main():
 
     #derepicate training data 
     training_data_derep = format_data.derep_trainingdata(training_data, phrog_encoding)
+    
+    #filter training data to remove prophages with too many genes 
+    training_data_derep_numgenes = format_data.filter_genes(training_data_derep, args['num_genes']) 
+    training_keys_derep_numgenes = list(training_data_derep_numgenes.keys())
 
     #shuffle the data 
-    training_data_derep = format_data.shuffle_dict(training_data_derep)
-    training_derep_keys = list(training_data_derep.keys())  
+    data_shuffled = format_data.shuffle_dict(training_data_derep_numgenes)
+    keys_shuffled = list(data_shuffled.keys())  
 
     #generate features 
     print('generating features', flush = True) 
-    training_encodings, features = format_data.format_data(training_data_derep, phrog_encoding) 
+    training_encodings, features = format_data.format_data(data_shuffled, phrog_encoding) 
     num_functions = len(one_letter)
-    max_length = np.max([len(t) for t in training_encodings])
+    max_length = args['num_genes']
     n_features = num_functions + len(features[0])
 
     #generate dataset 
@@ -107,8 +112,8 @@ def main():
         #get the genome ids for the test data 
         genome_included_sum = np.cumsum(genome_included) 
         j = list(genome_included_sum).index(train_num)
-        test_ids = training_derep_keys[j:]
-
+        test_ids = keys_shuffled[j:]
+        
     else:
         
         print('Generating training data without unbiased categories', flush = True) 
@@ -118,10 +123,10 @@ def main():
         X_test, y_test, masked_idx = format_data.generate_dataset(training_encodings[train_num:], features[train_num:], num_functions, n_features, max_length) 
 
         #get the ids of the sequences for the test data 
-        test_ids = training_derep_keys[train_num:] 
+        test_ids = keys_shuffled[train_num:] 
 
     print('TRAINING STARTED', flush = True)
-    model_file = args['out_file_prefix'] + '_trained_LSTM.md5' 
+    model_file = args['out_file_prefix'] + '_trained_LSTM.h5' 
     history_file = args['out_file_prefix'] + '_history.pkl' 
 
     train_model.train_model(X_train,

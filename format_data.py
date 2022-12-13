@@ -105,13 +105,13 @@ def encode_strand(strand):
 
 def derep_trainingdata(training_data, phrog_encoding): 
     """ 
-    Ensure there is only one copy of each phrog order and sense order 
+    Ensure there is only one copy of each phrog order and sense order. 
+    Dereplication is based on the unique position and direction of genes. 
     
     :param training_data: dictionary containing training data 
     :param phrog_encoding: dictionary which converts phrogs to category integer encoding 
     :return: dereplicated training dictionary 
     """
-    
     
     #get the training keys and encodings 
     training_keys = list(training_data.keys()) 
@@ -120,13 +120,12 @@ def derep_trainingdata(training_data, phrog_encoding):
     #write a function to remove duplicates in the training data 
     training_str = [''.join([str(j) for j in i]) for i in training_encodings]
     training_sense = [''.join(training_data.get(p).get('sense')) for p in training_keys]
-    training_hash = [training_sense[i] + training_str[i] for i in range(len(training_keys))]
+    training_hash = [training_sense[i] + training_str[i] for i in range(len(training_keys))] 
 
     #get the dereplicated keys 
     dedup_keys = list(dict(zip(training_hash, training_keys)).values())
 
     return dict(zip(dedup_keys, [training_data.get(d) for d in dedup_keys]))
-
 
 def flip_genomes(training_data, phrog_encoding): 
     """ 
@@ -415,6 +414,8 @@ def generate_dataset(sequences, all_features, num_functions, n_features, max_len
     :param features: state what selection of features to include 
     :return: Dataset of training or test data reprsented as X and y matrices
     """
+    
+    print('n_features: ' + str(n_features), flush = True)
     
     #features is a list of list objects 
     X = [] 
