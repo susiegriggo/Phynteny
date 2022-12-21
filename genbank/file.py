@@ -81,7 +81,7 @@ class File(dict):
 					current = locus.read_feature(line)
 				else:
 					while line.count('"') == 1:
-						line += " " + next(fp).decode('utf-8').strip()
+						line += " " + next(iter(fp)).decode('utf-8').strip()
 					tag,_,value = line[22:].partition('=')
 					#current.tags[tag] = value #.replace('"', '')
 					current.tags.setdefault(tag, []).append(value)
