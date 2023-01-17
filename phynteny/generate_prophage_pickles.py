@@ -1,20 +1,23 @@
 """
 Convert PHROG mmseqs annotations to dictionaries to train LSTM 
 
-Combines prophage in genbank file and mmseqs PHROGs annotation into a dictionary which contains details of each prophage  
+Combines prophage in genbank file and mmseqs PHROGs annotation into a dictionary which contains details of each prophage
+
+Working progress. Needs to be able to take Phispy with mmseqs or just genbank files
+
+Make a separate script which inserts the phrog annotations into the genbank files
 """ 
 
 #imports 
 import pandas as pd 
 from pandas.errors  import EmptyDataError
-import glob
-from Bio import SeqIO 
-import gzip 
+import glob2
+from Bio import SeqIO
 import re
 import gzip 
 import pickle
 import pathlib
-import os
+
 
 def check_df(phrog_file):
     """
@@ -49,7 +52,20 @@ def get_PHROGs(phrog_output):
     
     return dict(zip(phrog_output['seq'], phrog_output['phrog'])) 
 
-#read through each genome 
+#read through each genome
+base = 'glob.glob('/home/edwa0468/phage/Prophage/phispy/phispy/GCA' #TODO - hardcoded - have as something which can be parsed in
+all_files = glob2.glob(base + '/**',  recursive=True)
+
+#only consider dictionaries or zipped dictionaries
+dict = [i for i in all_files if i[-4:] == '.gbk']
+zipped_dict = [i for i in all_files if i[-6:] == 'gbk.gz']
+
+
+
+#match this to mmseqs output
+
+
+""""""
 level_one = glob.glob('/home/edwa0468/phage/Prophage/phispy/phispy/GCA/*')
 for l1 in level_one: 
     
@@ -124,3 +140,5 @@ for l1 in level_one:
         
         with open(dict_name, 'wb') as handle:
             pickle.dump(l2_genome_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+""" 
+Save this as one greate big dictionary

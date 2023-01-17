@@ -292,10 +292,10 @@ def format_data(training_data, phrog_encoding):
     strand2s = [s[1] for s in sense_encodings]
 
     #get the number of genes in the same direction
-    direction_sum = [count_direction(s) for s in strand1s]
+    #direction_sum = [count_direction(s) for s in strand1s]
 
     # return a set of features to train the LSTM
-    features = [strand1s, strand2s, length_encodings, start_encodings, intergenic_encodings, direction_sum]
+    features = [strand1s, strand2s, length_encodings, start_encodings, intergenic_encodings]#, direction_sum]
     features = [[f[j] for f in features] for j in range(len(training_encodings))]
 
     return training_encodings, features

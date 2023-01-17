@@ -61,7 +61,7 @@ def main():
          'other' : 7,
          'tail' : 8,
          'transcription regulation' : 9,
-         'unknown function' :  10} #changed unknown function to 10 so that a masked sequence is different from an unknown sequence
+         'unknown function' :  0} #changed unknown function to 10 so that a masked sequence is different from an unknown sequence
 
     #use this dictionary to generate an encoding of each phrog
     phrog_encoding = dict(zip([str(i) for i in annot['phrog']], [one_letter.get(c) for c in annot['category']]))
@@ -73,7 +73,7 @@ def main():
     n_features = num_functions 
     
     if args['features'] == 'all': 
-        n_features = num_functions + 6
+        n_features = num_functions + 5 #TODO update this accordingly. Find a way to automate and make a function
         
     elif args['features'] == 'strand':
         n_features = num_functions + 2
