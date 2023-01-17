@@ -278,9 +278,6 @@ def format_data(training_data, phrog_encoding):
                       for i in range(len(training_data.get(key).get('position')) - 1)]
         intergenic.insert(0, 0)
 
-        # get the number of sequences in the existing direction
-        # needs to count the number before switching the direction
-
         # update the features
         training_encodings.append(encoding)
         sense_encodings.append(sense)
@@ -296,12 +293,14 @@ def format_data(training_data, phrog_encoding):
     strand1s = [s[0] for s in sense_encodings]
     strand2s = [s[1] for s in sense_encodings]
 
+    #get the number of genes in the same direction
+    direction_sum = [count_direction(s) for s in sense_encodings] #TODO watch this for now
+
     # return a set of features to train the LSTM
-    features = [strand1s, strand2s, length_encodings, start_encodings, intergenic_encodings]
+    features = [strand1s, strand2s, length_encodings, start_encodings, intergenic_encodings, direction_sum]
     features = [[f[j] for f in features] for j in range(len(training_encodings))]
 
     return training_encodings, features
-
 
 def one_hot_encode(sequence, n_features):
     """ 

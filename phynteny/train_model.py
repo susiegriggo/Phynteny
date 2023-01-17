@@ -31,7 +31,7 @@ def select_features(data, features):
     """
     
     if features == 'all': 
-        return data 
+        return [data[i][:5] for i in range(len(data))] #TODO update this later to correctly reflect the number of features to train with
     elif features == 'strand': 
         return [data[i][:2] for i in range(len(data))]
     else: 

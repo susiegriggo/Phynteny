@@ -19,7 +19,9 @@ def parse_args():
     """
     
     parser = argparse.ArgumentParser(description='Train LSTM on PHROG orders')
-    parser.add_argument('-features', '--features', help = 'Number of features to include')
+    parser.add_argument('-features', '--features',
+                        help =
+                        'Which features to include. If not specified all features will be used for trainining \n all: train using all features \n none: no features - use gene order only \n strand - use gene direction features only ')
     parser.add_argument('-base', '--base_file', help = 'Prefix used for the input files', required = True)
     parser.add_argument('-num_genes', '--num_genes', help = 'Maximum number of genes considered in a training instance. Genomes with a number of genes above this will not be included', default = 120, type = int)  
     parser.add_argument('-k', '--k', help = 'Value to use for cross validation', default = 10, type = int) 

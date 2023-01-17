@@ -53,7 +53,6 @@ def get_PHROGs(phrog_output):
     
     return dict(zip(phrog_output['seq'], phrog_output['phrog'])) 
 
-
 #read through each genome 
 level_one = glob.glob('/home/edwa0468/phage/Prophage/phispy/phispy/GCA/*')
 for l1 in level_one: 
