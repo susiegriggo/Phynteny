@@ -56,13 +56,13 @@ for l1 in level_one:
     level_two = glob.glob(l1+ '/*')
     
     
-    for l2 in level_two: vi
+    for l2 in level_two:
         
         l2_genome_dict = {} 
         level_three = glob.glob(l2+'/*') 
         
         for l3 in level_three: 
-          cd 110
+
             #get path to genbank file 
             genbank = [i for i in glob.glob(l3 + '/*') if 'VOGS_phage.gbk.gz' in i]
 

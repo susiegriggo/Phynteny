@@ -218,7 +218,6 @@ def filter_genes(training_data, threshold):
 
     return dict(zip(filtered_keys, [training_data.get(k) for k in filtered_keys]))
 
-
 def count_direction(sense):
     """ 
     Count the number of genes which have occured with the same orientation
@@ -230,9 +229,9 @@ def count_direction(sense):
     direction_count = []
     counter = 0
 
-    for i in range(len(sense)):
+    for i in range(len(sense) - 1):
 
-        if sense[i] == sense[i - 1]:
+        if sense[i] == sense[i + 1]:
             counter += 1
 
         else:
@@ -293,7 +292,7 @@ def format_data(training_data, phrog_encoding):
     strand2s = [s[1] for s in sense_encodings]
 
     #get the number of genes in the same direction
-    direction_sum = [count_direction(s) for s in sense_encodings] #TODO watch this for now
+    direction_sum = [count_direction(s) for s in strand1s]
 
     # return a set of features to train the LSTM
     features = [strand1s, strand2s, length_encodings, start_encodings, intergenic_encodings, direction_sum]
