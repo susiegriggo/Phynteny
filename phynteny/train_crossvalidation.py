@@ -73,7 +73,7 @@ def main():
     n_features = num_functions 
     
     if args['features'] == 'all': 
-        n_features = num_functions + 5
+        n_features = num_functions + 6
         
     elif args['features'] == 'strand':
         n_features = num_functions + 2
