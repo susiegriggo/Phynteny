@@ -39,6 +39,7 @@ def get_features(genbank):
             "position": [(int(i.location.start) - 1, int(i.location.end)) for i in features],
             "phrog": [i.qualifiers.get('phrog') for i in features]}
 
+#TODO add feature with the number of genes in the current oreintation to denote strand switches
 def generate_data(data):
     """
     :param data: directory containing dictionaries of phispy genomes
@@ -334,7 +335,6 @@ def encode_feature(encoding, feature, column):
 
     return encoding
 
-
 def one_hot_decode(encoded_seq):
     """ 
     Return one-hot encoding of PHROG category to its original numeral value 
@@ -415,59 +415,6 @@ def generate_prediction(sequence, features, num_functions, n_features, max_lengt
         X[unk, 0:num_functions] = np.zeros(num_functions)
 
     return X.reshape((1, max_length, n_features))
-
-
-def generate_dataset_unbiased_category(sequences, all_features, num_functions, n_features, max_length):
-    """" 
-    Generate a dataset to train LSTM model 
-    
-    :param sequences: set of sequences encoded as integers for each PHROG
-    :param dataset_size: number of sequences in the dataset  
-    :param all_features:  set of features to include in the encodings 
-    :param num_functions: number of possible PHROG categories 
-    :param n_features: total number of features 
-    :param max_length: maximum length of a sequence 
-    :return: Dataset of training or test data reprsented as X and y matrices 
-    :return: list of which sequences are included and which are not included 
-    :return: list stating which function is masked for each genome in the dataset 
-    """
-
-    # features is a list of list objects
-    X = []
-    y = []
-    masked_func = []
-    genome_included = []
-
-    # generate the function to mask in this genome
-    func = random.randint(1, num_functions - 1)
-
-    for i in range(len(sequences)):
-
-        if func in sequences[i]:
-
-            occurence = [i for i, x in enumerate(sequences[i]) if x == func]
-            idx = random.choice(occurence)
-
-            this_X, this_y = generate_example(sequences[i], all_features[i], num_functions, n_features, max_length, idx)
-
-            X.append(this_X)
-            y.append(this_y)
-            masked_func.append(func)
-
-            # generate a new function for the next training example
-            func = random.randint(1, num_functions - 1)
-
-            # update inclusion list
-            genome_included.append(1)
-
-        else:
-            genome_included.append(0)
-
-    X = np.array(X).reshape(len(masked_func), max_length, n_features)
-    y = np.array(y).reshape(len(masked_func), max_length, num_functions)
-
-    return X, y, genome_included, masked_func
-
 
 def generate_dataset(sequences, all_features, num_functions, n_features, max_length):
     """" 
