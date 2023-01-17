@@ -2,7 +2,6 @@ from itertools import zip_longest, chain
 import textwrap
 import copy
 
-
 def rev_comp(dna):
 	a = 'acgtrykmbvdh'
 	b = 'tgcayrmkvbhd'
@@ -35,7 +34,8 @@ class Feature():
 	def seq(self):
 		seq = ''
 		for n in self.base_locations():
-			seq += self.locus.seq(n,n, self.strand)
+			seq += self.locus.seq(n,n, self.strand) #TODO this doesn't work because selecting from n to n
+			print(self.locus.seq)
 		if self.strand > 0:
 			return seq
 		else:

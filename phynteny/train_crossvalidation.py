@@ -59,7 +59,7 @@ def main():
          'other' : 7,
          'tail' : 8,
          'transcription regulation' : 9,
-         'unknown function' :  0}
+         'unknown function' :  10} #changed unknown function to 10 so that a masked sequence is different from an unknown sequence
 
     #use this dictionary to generate an encoding of each phrog
     phrog_encoding = dict(zip([str(i) for i in annot['phrog']], [one_letter.get(c) for c in annot['category']]))

@@ -39,10 +39,8 @@ def get_features(genbank):
             "position": [(int(i.location.start) - 1, int(i.location.end)) for i in features],
             "phrog": [i.qualifiers.get('phrog') for i in features]}
 
-
 def generate_data(data):
     """
-    
     :param data: directory containing dictionaries of phispy genomes
     :return dictionary 
     """
@@ -96,7 +94,6 @@ def generate_data(data):
 
     return data_derep
 
-
 def test_train_data(data, test_portion):
     """
     Separate data in testing and training data 
@@ -124,7 +121,6 @@ def test_train_data(data, test_portion):
     test_data = dict(zip(test_keys, [data.get(key) for key in test_keys]))
 
     return train_data, test_data
-
 
 def encode_strand(strand):
     """ 
@@ -317,7 +313,7 @@ def one_hot_encode(sequence, n_features):
 
     encoding = list()
     for value in sequence:
-        vector = [0 for _ in range(n_features)]
+        vector = [0 for i in range(n_features)]
         vector[value] = 1
         encoding.append(vector)
 
