@@ -1,8 +1,10 @@
 """ 
-Generate training data. 
+Generate training data from a set of processed genomes
 Each instance included must include at least four different PHROG categories. 
 Resulting instances are dereplicated such that each prophage included has a unique permutation of gene orders 
-Dictionary is saved into 11 different chunks of the same size for subsequent 10-fold cross validation 
+Dictionary is saved into 11 different chunks of the same size for subsequent 10-fold cross validation
+
+Incorporate this with the other script
 """
 
 #imports
@@ -12,7 +14,7 @@ import glob
 import format_data 
 
 base = '/home/grig0076/phispy_phrog_pickles/cross_validated/prophage_phrog_data_derep_fourormore_lessthan121.pkl'
-k = 11
+k = 11 #TODO don't have this hardcoded
 
 #read in the phrog annotations 
 annot = pd.read_csv('/home/grig0076/LSTMs/phrog_annot_v4.tsv', sep = '\t') 
@@ -29,7 +31,7 @@ one_letter = {'DNA, RNA and nucleotide metabolism' : 4,
  'other' : 7,
  'tail' : 8,
  'transcription regulation' : 9,
- 'unknown function' :  0 ,}
+ 'unknown function' :  10,}
 
 #use this dictionary to generate an encoding of each phrog
 phrog_encoding = dict(zip([str(i) for i in annot['phrog']], [one_letter.get(c) for c in annot['category']]))
@@ -58,8 +60,8 @@ for l1 in levelone:
             categories = [phrog_encoding.get(i) for i in this_prophage.get('phrogs')]
             
             categories_present = set(categories) 
-            if 0 in categories_present: 
-                categories_present.remove(0)
+            if 10 in categories_present:
+                categories_present.remove(10)
                 
             #consider only prophages which have at least four of the different annotations 
             if len(categories_present) >= 4 and len(categories) <= 120: 

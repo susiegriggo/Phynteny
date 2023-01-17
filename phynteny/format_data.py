@@ -232,7 +232,7 @@ def count_direction(sense):
 
     for i in range(len(sense)):
 
-        if ii[i] == sense[i - 1]:
+        if sense[i] == sense[i - 1]:
             counter += 1
 
         else:
@@ -241,7 +241,6 @@ def count_direction(sense):
         direction_count.append(counter)
 
     return direction_count
-
 
 def format_data(training_data, phrog_encoding):
     """ 

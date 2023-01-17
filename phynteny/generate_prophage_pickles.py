@@ -19,8 +19,7 @@ import os
 def check_df(phrog_file):
     """
     Check that the dataframe exists
-    """ 
-
+    """
     try:
 
         phrog_output = pd.read_csv(phrog_file, sep = '\t', compression='gzip', header = None)
@@ -30,15 +29,12 @@ def check_df(phrog_file):
         phrog_output = pd.DataFrame()
         print('empty mmseqs file: ' + phrog_file)
     
-    return phrog_output 
-
+    return phrog_output
 
 def get_PHROGs(phrog_output): 
     """ 
     Function to filter the phogs mmseqs output 
     """
-
-    #phrog_output = pd.read_csv(phrog_mmseqs, sep = '\t', compression='gzip', header = None)
 
     #rename the headers
     phrog_output.columns = ['phrog', 'seq', 'alnScore', 'seqIdentity', 'eVal', 'qStart', 'qEnd', 'qLen', 'tStart', 'tEnd', 'tLen']
