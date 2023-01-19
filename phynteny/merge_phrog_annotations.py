@@ -59,34 +59,37 @@ def filter_mmseqs(phrog_output, Eval = 1e-5):
     return dict(zip(phrog_output['seq'].values, phrog_output['phrog'].values)) 
 
 #read through each genome
-base = glob.glob('/home/edwa0468/phage/Prophage/phispy/phispy/GCA') #TODO - hardcoded - have as something which can be parsed in
-all_files = glob2.glob('/home/edwa0468/phage/Prophage/phispy/phispy/GCA/000/' + '/**',  recursive=True)
+directories = glob2.glob('/home/edwa0468/phage/Prophage/phispy/phispy/GCA/' + '/*',  recursive=True)
 
-zipped_gdict = [i for i in all_files if i[-6:] == 'gbk.gz'] 
-
-for file in zipped_gdict: 
-
-    #read in the genbank file 
-    with gzip.open(file, 'rt') as handle: 
-        gb_dict =   SeqIO.to_dict(SeqIO.parse(handle, 'gb'))
-        gb_keys = list(gb_dict.keys())
-
-    handle.close() 
+for d in directories: 
+    e = glob2.glob(d + '/**', recursive=True)
+    zipped_gdict = [i for i in e if i[-6:] == 'gbk.gz'] 
     
-    file_parts = re.split('/',file)
-    genbank_parts = re.split('_', file_parts[11])
-    mmseqs = '/home/edwa0468/phage/Prophage/phispy/phispy_phrogs/GCA/' + file_parts[8] + '/' + file_parts[9] + '/' + file_parts[10] 
-    mmseqs_fetch= glob2.glob(mmseqs + '/*')
+    for file in zipped_gdict: 
+        
+        print(file, flush = True)  
 
-    if len(mmseqs_fetch) > 0: 
+        #read in the genbank file 
+        with gzip.open(file, 'rt') as handle: 
+            gb_dict =   SeqIO.to_dict(SeqIO.parse(handle, 'gb'))
+            gb_keys = list(gb_dict.keys())
 
-        mmseqs_output  = get_mmseqs(mmseqs_fetch[0]) 
+        handle.close() 
 
-        phrogs = filter_mmseqs(mmseqs_output)
+        file_parts = re.split('/',file)
+        genbank_parts = re.split('_', file_parts[11])
+        mmseqs = '/home/edwa0468/phage/Prophage/phispy/phispy_phrogs/GCA/' + file_parts[8] + '/' + file_parts[9] + '/' + file_parts[10] 
+        mmseqs_fetch= glob2.glob(mmseqs + '/*')
 
-        genbank_name = '/home/grig0076/scratch/phispy_phrogs/GCA/' +  file_parts[8] + '/' + file_parts[9] + '/' + file_parts[10] + '/'  + genbank_parts[0] + '_' + genbank_parts[1] + '_phrogs_' + genbank_parts[3]
+        if len(mmseqs_fetch) > 0: 
 
-        with gzip.open(genbank_name, 'w') as handle: 
+            mmseqs_output  = get_mmseqs(mmseqs_fetch[0]) 
+
+            phrogs = filter_mmseqs(mmseqs_output)
+
+            genbank_name = '/home/grig0076/scratch/phispy_phrogs/GCA/' +  file_parts[8] + '/' + file_parts[9] + '/' + file_parts[10] + '/'  + genbank_parts[0] + '_' + genbank_parts[1] + '_phrogs_' + genbank_parts[3]
+
+            handle = gzip.open(genbank_name, 'wt')
 
             for key in gb_keys: 
 
@@ -97,14 +100,17 @@ for file in zipped_gdict:
 
                 #replace the phrogs 
                 for c in cds: 
-                    pid = c.qualifiers.get('protein_id')
 
-                    if phrogs.get(pid[0]) == None: 
-                        c.qualifiers['phrog'] = 'No_PHROG'
-                    else: 
-                        c.qualifiers['phrog'] = phrogs.get(pid[0])
+                    if 'protein_id' in c.qualifiers.keys(): 
 
-                #write to the genbank file 
-                SeqIO.write(gb_dict.get(key), handle, 'genbank')
+                        pid = c.qualifiers.get('protein_id')
 
-        handle.close() 
+                        if phrogs.get(pid[0]) == None: 
+                            c.qualifiers['phrog'] = 'No_PHROG'
+                        else: 
+                            c.qualifiers['phrog'] = phrogs.get(pid[0])
+
+            #write to the genbank file 
+            SeqIO.write(gb_dict.get(key), handle, 'genbank')
+
+            handle.close() 
