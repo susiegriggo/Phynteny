@@ -56,7 +56,7 @@ def main():
     #set parameters used for the model
     num_functions = len(one_letter)
     n_features = num_functions #+2
-    max_length = 120
+    max_length = 120 
     categories = [dict(zip(list(one_letter.values()), list(one_letter.keys()))).get(i) for i in range(1,num_functions)]
     
     #select relevant features 

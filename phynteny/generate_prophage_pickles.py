@@ -64,8 +64,6 @@ zipped_dict = [i for i in all_files if i[-6:] == 'gbk.gz']
 
 #match this to mmseqs output
 
-
-""""""
 level_one = glob.glob('/home/edwa0468/phage/Prophage/phispy/phispy/GCA/*')
 for l1 in level_one: 
     
