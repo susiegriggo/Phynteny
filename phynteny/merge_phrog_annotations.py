@@ -7,7 +7,7 @@ import glob2
 from Bio import SeqIO, bgzf 
 import re
 import gzip
-import mmseqs_output
+import handle_genbank
 
 #read through each genome
 directories = glob2.glob('/home/edwa0468/phage/Prophage/phispy/phispy/GCA/' + '/*',  recursive=True)
@@ -16,14 +16,13 @@ for d in directories:
 
     e = glob2.glob(d + '/**', recursive=True)
     zipped_gdict = [i for i in e if i[-6:] == 'gbk.gz'] 
-    
-    for file in zipped_gdict: 
 
-        #read in the genbank file 
-        with gzip.open(file, 'rt') as handle: 
-            gb_dict =   SeqIO.to_dict(SeqIO.parse(handle, 'gb'))
-            gb_keys = list(gb_dict.keys())
-        handle.close() 
+
+    for file in zipped_gdict:
+
+        # convert genbank to a dictionary
+        gb_dict = handle_genbank.get_genbank()
+        gb_keys = list(gb_dict.keys())
 
         file_parts = re.split('/',file)
         genbank_parts = re.split('_', file_parts[11])
@@ -32,14 +31,12 @@ for d in directories:
 
         if len(mmseqs_fetch) > 0: 
 
-            annotations  = mmseqs_output.get_mmseqs(mmseqs_fetch[0])
+            annotations  = handle_genbank.get_mmseqs(mmseqs_fetch[0])
             
             if len(annotations) > 0: 
                 
-                phrogs = mmseqs_output.filter_mmseqs(annotations)
+                phrogs = handle_genbank.filter_mmseqs(annotations)
                 genbank_name = '/home/grig0076/scratch/phispy_phrogs/GCA/' +  file_parts[8] + '/' + file_parts[9] + '/' + file_parts[10] + '/'  + genbank_parts[0] + '_' + genbank_parts[1] + '_phrogs_' + genbank_parts[3]
-                
-                #handle = gzip.open(genbank_name, 'wt')
 
                 #loop through each prophage
                 for key in gb_keys: 

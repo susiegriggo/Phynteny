@@ -1,10 +1,12 @@
 """
 Module for manipulating genbank files
 """
-#imports
+# imports
 import pandas as pd
-from pandas.errors  import EmptyDataError
+from pandas.errors import EmptyDataError
 import re
+from Bio import SeqIO
+import gzip
 
 
 def get_mmseqs(phrog_file):
@@ -25,6 +27,55 @@ def get_mmseqs(phrog_file):
 
     return phrog_output
 
+
+def get_genbank(genbank_path):
+    """
+    Convert genbank file to a dictionary
+
+    param:
+    return: genbank file as a dictionary
+    """
+
+    for genbank in file:
+
+        if genbank.strip()[-3:] == '.gz':
+            try:
+                with gzip.open(genbank_path.strip(), 'rt') as handle:
+                    gb_dict = SeqIO.to_dict(SeqIO.parse(handle, 'gb'))
+            except ValueError:
+                print('ERROR: ' + genbank.strip() + ' is not a genbank file!')
+                raise
+
+        else:
+            try:
+                with open(genbank_path.strip(), 'rt') as handle:
+                    gb_dict = SeqIO.to_dict(SeqIO.parse(handle, 'gb'))
+            except ValueError:
+                print('ERROR: ' + genbank.strip() + ' is not a genbank file!')
+                raise
+
+    return gb_dict
+
+def extract_features(this_phage):
+    """
+    Extract the required features and format as a dictionary
+
+    param this_phage: phage genome extracted from genbank file
+    return: dictionary with the features for this specific phage
+    """
+
+    phage_length = len(this_phage.seq)
+    this_CDS = [i for i in this_phage.features if i.type == 'CDS']  # coding sequences
+
+    position = [(int(this_CDS[i].location.start), int(this_CDS[i].location.end)) for i in range(len(this_CDS))]
+    sense = [re.split(']', str(this_CDS[i].location))[1][1] for i in range(len(this_CDS))]
+    protein_id = [this_CDS[i].qualifiers.get('protein_id') for i in range(len(this_CDS))]
+    protein_id = [p[0] if p is not None else None for p in protein_id]
+    phrogs = [this_CDS[i].qualifiers.get('phrog') for i in range(len(this_CDS))]
+    phrogs = ['No_PHROG' if i is None else i[0] for i in phrogs]
+
+    return {'length': phage_length, 'phrogs': phrogs, "protein_id": protein_id, "sense": sense,
+                  "position": position}
 
 def filter_mmseqs(phrog_output, Eval=1e-5):
     """
@@ -55,4 +106,3 @@ def filter_mmseqs(phrog_output, Eval=1e-5):
         phrog_output)  # hit with the shortest query length
 
     return dict(zip(phrog_output['seq'].values, phrog_output['phrog'].values))
-
