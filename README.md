@@ -15,10 +15,11 @@ Phynteny is trained using genbank files containing PHROG annotations such as tho
 Use `-i` as a text file with the paths to the genbank files 
 
 ```
-python generate_training_data.py -i genbank_files.txt -o training_dataset.pkl 
+python generate_training_data.py -i genbank_files.txt -o training_dataset.pkl -max_genes 120 -gene_cat 4 -c 11 
 ```
+This command generates training data including prophages with a maximum of 120 genes where each contains at least four different PHROG categories. The output data is separated into 11 different chunks which can be used for training with k-fold validation. 
 
-
+Using this data, the model can be trained using the script #TODO 
 
 **WARNING** Without a GPU training will take a very very long time! 
 
