@@ -135,35 +135,6 @@ def encode_strand(strand):
 
     return np.array([1 if i == 1 else 0 for i in strand]), np.array([1 if i == 2 else 0 for i in strand])
 
-
-def derep_trainingdata(training_data):
-    """ 
-    Ensure there is only one copy of each phrog order and sense order. 
-    Dereplication is based on the unique position and direction of genes. 
-    
-    :param training_data: dictionary containing training data 
-    :param phrog_encoding: dictionary which converts phrogs to category integer encoding 
-    :return: dereplicated training dictionary 
-    """
-
-    # get the training keys and encodings
-    training_keys = list(training_data.keys())
-    #training_encodings = [[phrog_encoding.get(i) for i in training_data.get(key).get('phrogs')] for key in
-                          training_keys]
-
-    training_encodings = [training_data.get(k).get('categories') for k in training_keys]
-
-    # write a function to remove duplicates in the training data
-    training_str = [''.join([str(j) for j in i]) for i in training_encodings]
-    training_sense = [''.join(training_data.get(p).get('sense')) for p in training_keys]
-    training_hash = [training_sense[i] + training_str[i] for i in range(len(training_keys))]
-
-    # get the dereplicated keys
-    dedup_keys = list(dict(zip(training_hash, training_keys)).values())
-
-    return dict(zip(dedup_keys, [training_data.get(d) for d in dedup_keys]))
-
-
 def flip_genomes(training_data, phrog_encoding):
     """ 
     If an integrase has an integrase at the end of a sequence flip so that it is at the start of the sequence 
@@ -344,20 +315,6 @@ def one_hot_decode(encoded_seq):
     :return: integer encoding of the PHROG cateogries present in a sequence 
     """
     return [np.argmax(vector) for vector in encoded_seq]
-
-
-def shuffle_dict(dictionary):
-    """ 
-    Shuffles a dictionary into random order. Use to generate randomised training datasets 
-    
-    :param dictionary: dictionary object to be shuffle 
-    :return shuffled dictionary 
-    """
-
-    keys = list(dictionary.keys())
-    random.shuffle(keys)
-
-    return dict(zip(keys, [dictionary.get(key) for key in keys]))
 
 
 def generate_example(sequence, features, num_functions, n_features, max_length, idx):

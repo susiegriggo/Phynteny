@@ -8,6 +8,7 @@ import re
 from Bio import SeqIO
 import gzip
 import pickle
+import random 
 
 def get_mmseqs(phrog_file):
     """
@@ -28,7 +29,7 @@ def get_mmseqs(phrog_file):
     return phrog_output
 
 
-def get_genbank(genbank_path):
+def get_genbank(genbank):
     """
     Convert genbank file to a dictionary
 
@@ -36,23 +37,23 @@ def get_genbank(genbank_path):
     return: genbank file as a dictionary
     """
 
-    for genbank in file:
+    
 
-        if genbank.strip()[-3:] == '.gz':
-            try:
-                with gzip.open(genbank_path.strip(), 'rt') as handle:
-                    gb_dict = SeqIO.to_dict(SeqIO.parse(handle, 'gb'))
-            except ValueError:
-                print('ERROR: ' + genbank.strip() + ' is not a genbank file!')
-                raise
+    if genbank.strip()[-3:] == '.gz':
+        try:
+            with gzip.open(genbank.strip(), 'rt') as handle:
+                gb_dict = SeqIO.to_dict(SeqIO.parse(handle, 'gb'))
+        except ValueError:
+            print('ERROR: ' + genbank.strip() + ' is not a genbank file!')
+            raise
 
-        else:
-            try:
-                with open(genbank_path.strip(), 'rt') as handle:
-                    gb_dict = SeqIO.to_dict(SeqIO.parse(handle, 'gb'))
-            except ValueError:
-                print('ERROR: ' + genbank.strip() + ' is not a genbank file!')
-                raise
+    else:
+        try:
+            with open(genbank.strip(), 'rt') as handle:
+                gb_dict = SeqIO.to_dict(SeqIO.parse(handle, 'gb'))
+        except ValueError:
+            print('ERROR: ' + genbank.strip() + ' is not a genbank file!')
+            raise
 
     return gb_dict
 
@@ -60,7 +61,6 @@ def phrog_to_integer(phrog_annot, phrog_integer):
     """
     Converts phrog annotation to its integer representation
     """
-
     return [phrog_integer.get(i) for i in phrog_annot]
 
 def integer_to_category():
@@ -119,3 +119,45 @@ def filter_mmseqs(phrog_output, Eval=1e-5):
         phrog_output)  # hit with the shortest query length
 
     return dict(zip(phrog_output['seq'].values, phrog_output['phrog'].values))
+
+def shuffle_dict(dictionary):
+    """
+    Shuffles a dictionary into random order. Use to generate randomised training datasets
+
+    :param dictionary: dictionary object to be shuffle
+    :return shuffled dictionary
+    """
+
+    keys = list(dictionary.keys())
+    random.shuffle(keys)
+
+    return dict(zip(keys, [dictionary.get(key) for key in keys]))
+
+
+def derep_trainingdata(training_data):
+    """
+    Ensure there is only one copy of each phrog order and sense order.
+    Dereplication is based on the unique position and direction of genes.
+
+    :param training_data: dictionary containing training data
+    :param phrog_encoding: dictionary which converts phrogs to category integer encoding
+    :return: dereplicated training dictionary
+    """
+
+    # get the training keys and encodings
+    training_keys = list(training_data.keys())
+    #training_encodings = [[phrog_encoding.get(i) for i in training_data.get(key).get('phrogs')] for key in
+                          #training_keys]
+
+    training_encodings = [training_data.get(k).get('categories') for k in training_keys]
+
+    # write a function to remove duplicates in the training data
+    training_str = [''.join([str(j) for j in i]) for i in training_encodings]
+    training_sense = [''.join(training_data.get(p).get('sense')) for p in training_keys]
+    training_hash = [training_sense[i] + training_str[i] for i in range(len(training_keys))]
+
+    # get the dereplicated keys
+    dedup_keys = list(dict(zip(training_hash, training_keys)).values())
+
+    return dict(zip(dedup_keys, [training_data.get(d) for d in dedup_keys]))
+

@@ -6,8 +6,7 @@ Generate training data for the model
 import pickle
 import argparse
 import re
-from phynteny import handle_genbank
-from phynteny import format_data
+import handle_genbank
 
 
 def check_positive(arg):
@@ -28,27 +27,31 @@ parser.add_argument('-c', '--chunks', type=check_positive, help='Number of chunk
 args = vars(parser.parse_args())
 
 #read in annotations
-with open('../phrog_annotation_info/phrog_integer.pkl', 'rb') as handle:
-    phrog_integer = pickle.load(handle)
+with open('phrog_annotation_info/phrog_integer.pkl', 'rb') as handle:
+    phrog_integer = pickle.load(handle) 
+    phrog_integer = dict(zip([str(i) for i in list(phrog_integer.keys())], phrog_integer.values()))
 handle.close()
 
 training_data = {} #dictionary to store all of the training data
 
 #takes a text file where each line is the file path to genbank files of phages to train a model
-with open(args['input']) as file:
-
-    for genbank in file:
+print('Extracting...', flush = True) 
+with open(args['input'], 'r') as file:
+    
+    genbank_files = file.readlines()
+    
+    for genbank in genbank_files:
 
         #convert genbank to a dictionary
-        gb_dict = handle_genbank.get_genbank()
+        gb_dict = handle_genbank.get_genbank(genbank)
         gb_keys = list(gb_dict.keys())
 
         for key in gb_keys:
 
                 #extract the relevant features
-                phage_dict = handle_genbank.extract_features(gb_dict.get(key)
-
-                #integer encoding of phrog categories
+                phage_dict = handle_genbank.extract_features(gb_dict.get(key))
+                 
+                #integer encoding of phrog categories 
                 integer = handle_genbank.phrog_to_integer(phage_dict.get('phrogs'), phrog_integer)
                 phage_dict['categories'] = integer
 
@@ -57,28 +60,30 @@ with open(args['input']) as file:
                 if 0 in categories_present:
                     categories_present.remove(0)
 
-                #if above the minimum number of categories are included
-                if len(phage_dict.get('phrogs')) <= args['maximum_genes'] and categories_present >= args['gene_categories']:
+                #if above the minimum number of categories are included 
+                if len(phage_dict.get('phrogs')) <= args['maximum_genes'] and len(categories_present) >= args['gene_categories']:
 
                     # update dictionary with this one
                     g = re.split(',|\.', re.split('/', genbank.strip())[-1])[0]
                     training_data[g + '_' + key] = phage_dict
 
 #save the training data dictionary
-print('Done Processing!'))
+print('Done Processing!')
 print('Removing duplicate phrog category orders')
 
-derep_data = format_data.derep_trainingdata(training_data)
-data_derep_shuffle = format_data.shuffle_dict(derep_data)
+derep_data = handle_genbank.derep_trainingdata(training_data)
+data_derep_shuffle = handle_genbank.shuffle_dict(derep_data)
 
 with open(args['output'] + '_all_data.pkl', 'wb') as handle:
     pickle.dump(data_derep_shuffle, handle, protocol=pickle.HIGHEST_PROTOCOL)
 handle.close()
 
-print('\nTraining data save to ' + str(args['output'])
+print('\nTraining data save to ' + str(args['output'] + '_all_data.pkl'))
 
 print('\nGenerating subsets for k-fold cross validation')
 k = args['chunks']
+n = int(len(data_derep_shuffle)/11)
+
 if args['chunks'] > 0:
     suffix = [i for i in range(k - 1)]
     suffix.append('test')
@@ -91,4 +96,4 @@ if args['chunks'] > 0:
         pickle.dump(fold, filehandler)
 
 print('Complete!')
-print(str(len(training_data)) + ' phages parsed. ' + str(len(data_derep_shuffle)) + 'used')
+print(str(len(training_data)) + ' phages parsed. ' + str(len(data_derep_shuffle)) + ' phages used')
