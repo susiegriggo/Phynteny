@@ -10,6 +10,8 @@ import pickle
 from Bio import SeqIO
 import glob
 
+from phynteny.generate_training_data import training_data
+
 
 def get_genbank(filename):
     """
@@ -134,7 +136,7 @@ def encode_strand(strand):
     return np.array([1 if i == 1 else 0 for i in strand]), np.array([1 if i == 2 else 0 for i in strand])
 
 
-def derep_trainingdata(training_data, phrog_encoding):
+def derep_trainingdata(training_data):
     """ 
     Ensure there is only one copy of each phrog order and sense order. 
     Dereplication is based on the unique position and direction of genes. 
@@ -146,8 +148,10 @@ def derep_trainingdata(training_data, phrog_encoding):
 
     # get the training keys and encodings
     training_keys = list(training_data.keys())
-    training_encodings = [[phrog_encoding.get(i) for i in training_data.get(key).get('phrogs')] for key in
+    #training_encodings = [[phrog_encoding.get(i) for i in training_data.get(key).get('phrogs')] for key in
                           training_keys]
+
+    training_encodings = [training_data.get(k).get('categories') for k in training_keys]
 
     # write a function to remove duplicates in the training data
     training_str = [''.join([str(j) for j in i]) for i in training_encodings]

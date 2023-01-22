@@ -7,7 +7,7 @@ from pandas.errors import EmptyDataError
 import re
 from Bio import SeqIO
 import gzip
-
+import pickle
 
 def get_mmseqs(phrog_file):
     """
@@ -55,6 +55,19 @@ def get_genbank(genbank_path):
                 raise
 
     return gb_dict
+
+def phrog_to_integer(phrog_annot, phrog_integer):
+    """
+    Converts phrog annotation to its integer representation
+    """
+
+    return [phrog_integer.get(i) for i in phrog_annot]
+
+def integer_to_category():
+    """
+    Converts integer encoding to its relevant phrog category
+    """
+
 
 def extract_features(this_phage):
     """
