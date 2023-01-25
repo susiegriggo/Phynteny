@@ -39,6 +39,16 @@ if not gb_dict:
 
 # Run Phynteny
 # ---------------------------------------------------
+one_letter = {'DNA, RNA and nucleotide metabolism': 4,
+                  'connector': 2,
+                  'head and packaging': 3,
+                  'integration and excision': 1,
+                  'lysis': 5,
+                  'moron, auxiliary metabolic gene and host takeover': 6,
+                  'other': 7,
+                  'tail': 8,
+                  'transcription regulation': 9,
+                  'unknown function': 0}
 
 # loop through the phages in the genbank file
 keys = list(gb_dict.keys())
@@ -55,7 +65,9 @@ with open(args.outfile, 'wt') as handle:
 
         # format the genbank file - file to make predictions
         extracted_features = handle_genbank.extract_features(this_phage) #TODO find other way to arrange this information
-        data = format_data.generate_prediction(this_phage.get('phrogs'), extracted_features, 10, 15, 120)
+        encoding, features = format_data.format_data(this_phage, one_letter)
+        """
+        data = format_data.generate_prediction(extracted_features.get('phrogs'), extracted_features, 10, 15, 120)
 
         # use lstm model to make some predictions
         yhat = predict.predict(data, args['model'])
@@ -69,5 +81,6 @@ with open(args.outfile, 'wt') as handle:
         # write output to a genbank file
         SeqIO.write(out_dict, handle, 'genbank')
         #handle_genbank.write_genbank(out_dict, args['outfile'])
+        """
 
 handle.close()
