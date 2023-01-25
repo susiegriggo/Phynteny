@@ -9,6 +9,7 @@ from phynteny import handle_genbank
 from phynteny import format_data
 from phynteny import predict
 from argparse import RawTextHelpFormatter
+from Bio import SeqIO
 
 __author__ = "Susanna Grigson"
 __maintainer__ = "Susanna Grigson"
@@ -39,18 +40,32 @@ if not gb_dict:
 # Run Phynteny
 # ---------------------------------------------------
 
-# format the genbank file - file to make predictions
-input = handle_genbank.extract_features(gb_dict)
-data = format_data.generate_prediction(input)
+# loop through the phages in the genbank file
+keys = list(gb_dict.keys())
 
-# use lstm model to make some predictions
-yhat = predict.predict(data, args['model'])
+# open the genbank file to write to
+with open(args['outfile'], 'wt') as handle:
 
-# use thresholds to determine which predictions to keep
-predictions = predict.threshold(yhat, args['thresholds'])
+    for key in keys:
 
-# update the existing phage with the predictions
-out_dict = handle_genbank.add_predictions(gb_dict, predictions)
+        # extract a single phage
+        this_phage = gb_dict.get(key)
 
-# write output to a genbank file
-handle_genbank.write_genbank(out_dict, args['outfile'])
+        # format the genbank file - file to make predictions
+        extracted_features = handle_genbank.extract_features(this_phage)
+        data = format_data.generate_prediction(extracted_features)
+
+        # use lstm model to make some predictions
+        yhat = predict.predict(data, args['model'])
+
+        # use thresholds to determine which predictions to keep
+        predictions = predict.threshold(yhat, args['thresholds'])
+
+        # update the existing phage with the predictions
+        out_dict = handle_genbank.add_predictions(this_phage, predictions)
+
+        # write output to a genbank file
+        SeqIO.write(out_dict, handle, 'genbank')
+        #handle_genbank.write_genbank(out_dict, args['outfile'])
+
+handle.close()
