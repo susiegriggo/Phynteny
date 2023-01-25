@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(description='Phynteny: synteny-based annotation
                                  formatter_class=RawTextHelpFormatter)
 
 parser.add_argument('infile', help='input file in genbank format')
-parser.add_argument('-o', '--outfile', action='store', default=sys.stdout, type=argparse.FileType('w'),
+parser.add_argument('-o', '--outfile', action='store', default=sys.stdout, type=str,
                     help='where to write the output genbank file')
 parser.add_argument('-m', '--model', action='store', help='Path to custom LSTM model',
                     default='model/all_chunk_trained_LSTMbest_val_loss.h5')
@@ -44,16 +44,18 @@ if not gb_dict:
 keys = list(gb_dict.keys())
 
 # open the genbank file to write to
-with open(args['outfile'], 'wt') as handle:
+with open(args.outfile, 'wt') as handle:
 
     for key in keys:
 
         # extract a single phage
         this_phage = gb_dict.get(key)
 
+        #add a step to extract phrogs here 
+
         # format the genbank file - file to make predictions
-        extracted_features = handle_genbank.extract_features(this_phage)
-        data = format_data.generate_prediction(extracted_features)
+        extracted_features = handle_genbank.extract_features(this_phage) #TODO find other way to arrange this information
+        data = format_data.generate_prediction(this_phage.get('phrogs'), extracted_features, 10, 15, 120)
 
         # use lstm model to make some predictions
         yhat = predict.predict(data, args['model'])
