@@ -26,4 +26,7 @@ def rescale():
 def apply_thresholds():
     """
     Apply thresholds to determine which predictions to report
+
+    #have thresholds stored as a dictionary that are read in
     """
+

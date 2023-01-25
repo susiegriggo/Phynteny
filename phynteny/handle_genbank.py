@@ -8,7 +8,8 @@ import re
 from Bio import SeqIO
 import gzip
 import pickle
-import random 
+import random
+
 
 def get_mmseqs(phrog_file):
     """
@@ -37,8 +38,6 @@ def get_genbank(genbank):
     return: genbank file as a dictionary
     """
 
-    
-
     if genbank.strip()[-3:] == '.gz':
         try:
             with gzip.open(genbank.strip(), 'rt') as handle:
@@ -57,11 +56,13 @@ def get_genbank(genbank):
 
     return gb_dict
 
+
 def phrog_to_integer(phrog_annot, phrog_integer):
     """
     Converts phrog annotation to its integer representation
     """
     return [phrog_integer.get(i) for i in phrog_annot]
+
 
 def integer_to_category():
     """
@@ -88,7 +89,8 @@ def extract_features(this_phage):
     phrogs = ['No_PHROG' if i is None else i[0] for i in phrogs]
 
     return {'length': phage_length, 'phrogs': phrogs, "protein_id": protein_id, "sense": sense,
-                  "position": position}
+            "position": position}
+
 
 def filter_mmseqs(phrog_output, Eval=1e-5):
     """
@@ -120,6 +122,7 @@ def filter_mmseqs(phrog_output, Eval=1e-5):
 
     return dict(zip(phrog_output['seq'].values, phrog_output['phrog'].values))
 
+
 def shuffle_dict(dictionary):
     """
     Shuffles a dictionary into random order. Use to generate randomised training datasets
@@ -146,8 +149,8 @@ def derep_trainingdata(training_data):
 
     # get the training keys and encodings
     training_keys = list(training_data.keys())
-    #training_encodings = [[phrog_encoding.get(i) for i in training_data.get(key).get('phrogs')] for key in
-                          #training_keys]
+    # training_encodings = [[phrog_encoding.get(i) for i in training_data.get(key).get('phrogs')] for key in
+    # training_keys]
 
     training_encodings = [training_data.get(k).get('categories') for k in training_keys]
 
@@ -161,3 +164,40 @@ def derep_trainingdata(training_data):
 
     return dict(zip(dedup_keys, [training_data.get(d) for d in dedup_keys]))
 
+
+def add_predictions(gb_dict, predictions):
+    """
+    Add predictions to the genbank dictionary
+
+    param gb_dict: genbank file as a dictionary
+    param predictions: predictions to add to the genbank file
+    return updated dictionary with features
+    """
+
+    keys = list(gb_dict.keys())
+
+    for i in range(len(predictions)):
+        gb_dict[keys[i]]["phynteny"] = predictions[i]
+    return gb_dict
+
+def write_genbank(gb_dict, filename):
+    """
+    write genbank dictionary to a file
+    """
+
+    keys = list(gb_dict.keys())
+
+    # check for gzip
+    if filename.strip()[-3:] == '.gz':
+
+        with gzip.open(filename, 'wt') as handle:
+            for key in keys:
+                SeqIO.write(gb_dict.get(key), handle, 'genbank')
+        handle.close()
+
+    else:
+
+        with open(filename, 'wt') as handle:
+            for key in keys:
+                SeqIO.write(gb_dict.get(key), handle, 'genbank')
+        handle.close()
