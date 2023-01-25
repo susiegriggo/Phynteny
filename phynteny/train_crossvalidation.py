@@ -69,7 +69,7 @@ def main():
     #add a None object to this dictionary which is consist with the unknown 
     phrog_encoding[None] = one_letter.get('unknown function') 
         
-    num_functions = len(one_letter) + 1
+    num_functions = len(one_letter)
     n_features = num_functions 
     
     if args['features'] == 'all': 

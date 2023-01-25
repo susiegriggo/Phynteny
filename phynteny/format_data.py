@@ -10,7 +10,7 @@ import pickle
 from Bio import SeqIO
 import glob
 
-from phynteny.generate_training_data import training_data
+#from phynteny.generate_training_data import training_data
 
 
 def get_genbank(filename):

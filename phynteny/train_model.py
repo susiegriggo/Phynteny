@@ -17,7 +17,7 @@ import tensorflow as tf
 import pickle 
 import argparse 
 import random 
-import format_data
+from phynteny import format_data
 import numpy as np 
 from collections import ChainMap
 

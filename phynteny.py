@@ -8,6 +8,7 @@ import sys
 from phynteny import handle_genbank
 from phynteny import format_data
 from phynteny import predict
+from argparse import RawTextHelpFormatter
 
 __author__ = "Susanna Grigson"
 __maintainer__ = "Susanna Grigson"
@@ -19,7 +20,7 @@ __status__ = "development"
 parser = argparse.ArgumentParser(description='Phynteny: synteny-based annotation of phage genes',
                                  formatter_class=RawTextHelpFormatter)
 
-parser = argparse.add_argument('infile', type=is_valid_file, help='input file in genbank format')
+parser.add_argument('infile', help='input file in genbank format')
 parser.add_argument('-o', '--outfile', action='store', default=sys.stdout, type=argparse.FileType('w'),
                     help='where to write the output genbank file')
 parser.add_argument('-m', '--model', action='store', help='Path to custom LSTM model',
@@ -39,7 +40,7 @@ if not gb_dict:
 # ---------------------------------------------------
 
 # format the genbank file - file to make predictions
-input = format_data.extract_features(gb_dict)
+input = handle_genbank.extract_features(gb_dict)
 data = format_data.generate_prediction(input)
 
 # use lstm model to make some predictions

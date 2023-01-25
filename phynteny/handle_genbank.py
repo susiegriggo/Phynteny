@@ -77,7 +77,7 @@ def extract_features(this_phage):
     param this_phage: phage genome extracted from genbank file
     return: dictionary with the features for this specific phage
     """
-
+ 
     phage_length = len(this_phage.seq)
     this_CDS = [i for i in this_phage.features if i.type == 'CDS']  # coding sequences
 
