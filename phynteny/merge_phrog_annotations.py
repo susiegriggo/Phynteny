@@ -26,11 +26,12 @@ for d in directories:
 
         file_parts = re.split('/',file)
         genbank_parts = re.split('_', file_parts[11])
-        mmseqs = '/home/edwa0468/phage/Prophage/phispy/phispy_phrogs/GCA/' + file_parts[8] + '/' + file_parts[9] + '/' + file_parts[10] 
+        mmseqs = '/home/edwa0468/phage/Prophage/phispy/phispy_phrogs/GCA/' + file_parts[8] + '/' + file_parts[9] + '/' + file_parts[10]
         mmseqs_fetch= glob2.glob(mmseqs + '/*')
 
         if len(mmseqs_fetch) > 0: 
 
+            #if os.path.getsize(filename):
             annotations  = handle_genbank.get_mmseqs(mmseqs_fetch[0])
             
             if len(annotations) > 0: 

@@ -53,6 +53,9 @@ one_letter = {'DNA, RNA and nucleotide metabolism': 4,
 # loop through the phages in the genbank file
 keys = list(gb_dict.keys())
 
+print(gb_dict) 
+format_data.format_data(gb_dict, one_letter)
+
 # open the genbank file to write to
 with open(args.outfile, 'wt') as handle:
 
@@ -63,9 +66,10 @@ with open(args.outfile, 'wt') as handle:
 
         #add a step to extract phrogs here 
 
-        # format the genbank file - file to make predictions
-        extracted_features = handle_genbank.extract_features(this_phage) #TODO find other way to arrange this information
-        encoding, features = format_data.format_data(this_phage, one_letter)
+        #format the genbank file - file to make predictions
+        #extracted_features = handle_genbank.extract_features(this_phage) #TODO find other way to arrange this information
+        #encoding, features = format_data.format_data(this_phage, one_letter)
+        
         """
         data = format_data.generate_prediction(extracted_features.get('phrogs'), extracted_features, 10, 15, 120)
 

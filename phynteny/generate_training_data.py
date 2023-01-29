@@ -27,7 +27,7 @@ parser.add_argument('-c', '--chunks', type=check_positive, help='Number of chunk
 args = vars(parser.parse_args())
 
 #read in annotations
-with open('phrog_annotation_info/phrog_integer.pkl', 'rb') as handle:
+with open('/home/grig0076/GitHubs/Phynteny/phrog_annotation_info/phrog_integer.pkl', 'rb') as handle:
     phrog_integer = pickle.load(handle) 
     phrog_integer = dict(zip([str(i) for i in list(phrog_integer.keys())], phrog_integer.values()))
 handle.close()
@@ -35,13 +35,14 @@ handle.close()
 training_data = {} #dictionary to store all of the training data
 
 #takes a text file where each line is the file path to genbank files of phages to train a model
-print('Extracting...', flush = True) 
+print('Extracting...', flush = True)
+print(args['input'], flush = True) 
 with open(args['input'], 'r') as file:
     
     genbank_files = file.readlines()
-    
+    #print(genbank_files) 
     for genbank in genbank_files:
-
+        print(genbank) 
         #convert genbank to a dictionary
         gb_dict = handle_genbank.get_genbank(genbank)
         gb_keys = list(gb_dict.keys())
