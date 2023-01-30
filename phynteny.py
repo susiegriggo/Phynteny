@@ -50,10 +50,19 @@ one_letter = {'DNA, RNA and nucleotide metabolism': 4,
                   'transcription regulation': 9,
                   'unknown function': 0}
 
+
+
 # loop through the phages in the genbank file
 keys = list(gb_dict.keys())
 
-print(gb_dict) 
+#get relevant information from dictionaries
+phages = {} 
+for key in keys:
+    phages[key] =  extract_features(gb_dict.get(key)) 
+
+
+#convert to relevate gb_dict 
+
 format_data.format_data(gb_dict, one_letter)
 
 # open the genbank file to write to

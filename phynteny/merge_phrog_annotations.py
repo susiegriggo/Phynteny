@@ -6,6 +6,7 @@ Add mmseqs annotations into phispy annotations
 import glob2
 from Bio import SeqIO, bgzf
 import re
+import os 
 import gzip
 import handle_genbank
 
@@ -28,10 +29,11 @@ for d in directories:
         mmseqs = '/home/edwa0468/phage/Prophage/phispy/phispy_phrogs/GCA/' + file_parts[8] + '/' + file_parts[9] + '/' + \
                  file_parts[10]
         mmseqs_fetch = glob2.glob(mmseqs + '/*')
-
+ 
+        #check that there is an mmseqs file present (length is greate than 0) 
         if len(mmseqs_fetch) > 0:
 
-            if os.path.getsize(mmseqs_fetch[0]):
+            if os.stat(mmseqs_fetch[0]).st_size != 0:
                 annotations = handle_genbank.get_mmseqs(mmseqs_fetch[0])
 
                 if len(annotations) > 0:
