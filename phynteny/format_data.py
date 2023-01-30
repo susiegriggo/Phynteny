@@ -10,7 +10,8 @@ import pickle
 from Bio import SeqIO
 import glob
 
-#from phynteny.generate_training_data import training_data
+
+# from phynteny.generate_training_data import training_data
 
 
 def get_genbank(filename):
@@ -41,7 +42,8 @@ def get_features(genbank):
             "position": [(int(i.location.start) - 1, int(i.location.end)) for i in features],
             "phrog": [i.qualifiers.get('phrog') for i in features]}
 
-#TODO add feature with the number of genes in the current oreintation to denote strand switches
+
+# TODO add feature with the number of genes in the current oreintation to denote strand switches
 def generate_data(data):
     """
     :param data: directory containing dictionaries of phispy genomes
@@ -97,6 +99,7 @@ def generate_data(data):
 
     return data_derep
 
+
 def test_train_data(data, test_portion):
     """
     Separate data in testing and training data 
@@ -125,6 +128,7 @@ def test_train_data(data, test_portion):
 
     return train_data, test_data
 
+
 def encode_strand(strand):
     """ 
     One hot encode sense
@@ -134,6 +138,7 @@ def encode_strand(strand):
     """
 
     return np.array([1 if i == 1 else 0 for i in strand]), np.array([1 if i == 2 else 0 for i in strand])
+
 
 def flip_genomes(training_data, phrog_encoding):
     """ 
@@ -193,6 +198,7 @@ def filter_genes(training_data, threshold):
 
     return dict(zip(filtered_keys, [training_data.get(k) for k in filtered_keys]))
 
+
 def count_direction(sense):
     """ 
     Count the number of genes which have occured with the same orientation
@@ -215,6 +221,7 @@ def count_direction(sense):
         direction_count.append(counter)
 
     return direction_count
+
 
 def format_data(training_data, phrog_encoding):
     """ 
@@ -266,14 +273,15 @@ def format_data(training_data, phrog_encoding):
     strand1s = [s[0] for s in sense_encodings]
     strand2s = [s[1] for s in sense_encodings]
 
-    #get the number of genes in the same direction
-    #direction_sum = [count_direction(s) for s in strand1s]
+    # get the number of genes in the same direction
+    # direction_sum = [count_direction(s) for s in strand1s]
 
     # return a set of features to train the LSTM
-    features = [strand1s, strand2s, length_encodings, start_encodings, intergenic_encodings]#, direction_sum]
+    features = [strand1s, strand2s, length_encodings, start_encodings, intergenic_encodings]  # , direction_sum]
     features = [[f[j] for f in features] for j in range(len(training_encodings))]
 
     return training_encodings, features
+
 
 def one_hot_encode(sequence, n_features):
     """ 
@@ -307,6 +315,7 @@ def encode_feature(encoding, feature, column):
 
     return encoding
 
+
 def one_hot_decode(encoded_seq):
     """ 
     Return one-hot encoding of PHROG category to its original numeral value 
@@ -338,7 +347,7 @@ def generate_example(sequence, features, num_functions, n_features, max_length, 
         for f in range(len(features)):
             X = encode_feature(X, features[f], num_functions + f)
 
-            # replace the function encoding for the masked sequence
+    # replace the function encoding for the masked sequence
     X[idx, 0:num_functions] = np.zeros(num_functions)
 
     # reshape the matrices
@@ -348,7 +357,7 @@ def generate_example(sequence, features, num_functions, n_features, max_length, 
     return X, y
 
 
-def generate_prediction(sequence, features, num_functions, n_features, max_length):
+def generate_prediction(sequence, features, num_functions, n_features, max_length, idx):
     """ 
     Prepare data to predict the function of all hypothetical genes in a sequence 
     
@@ -368,11 +377,12 @@ def generate_prediction(sequence, features, num_functions, n_features, max_lengt
         X = encode_feature(X, features[f], num_functions + f)
 
     # mask each unknown in the sequence
-    unknown_idx = [i for i, x in enumerate(sequence) if x == 0]
-    for unk in unknown_idx:
-        X[unk, 0:num_functions] = np.zeros(num_functions)
+    #unknown_idx = [i for i, x in enumerate(sequence) if x == 0]
+    #for unk in unknown_idx:
+    X[idx, 0:num_functions] = np.zeros(num_functions)
 
     return X.reshape((1, max_length, n_features))
+
 
 def generate_dataset(sequences, all_features, num_functions, n_features, max_length):
     """" 
