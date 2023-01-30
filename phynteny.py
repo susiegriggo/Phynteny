@@ -75,6 +75,7 @@ model = tf.keras.models.load_model(args.model)
 with open(args.thresholds, 'rb') as handle:
     thresholds = pickle.load(handle)
 handle.close()
+
 with open(args.outfile, 'wt') as handle:
     for key in keys:
 
@@ -120,18 +121,12 @@ with open(args.outfile, 'wt') as handle:
 
                     phynteny.append(category_encoding.get(encodings[0][i]))
 
-        
+        # update with these annotations
         cds = [i for i in gb_dict.get(key).features if i.type == 'CDS']
+        for i in range(len(cds)):
+            cds[i].qualifiers['phynteny'] = phynteny[i]
 
-        for i in range(len(cds)): 
-            cds[i].qualifiers['phynteny'] = phynteny[i] 
-        
-        # store the phynteny annotations
-        #gb_dict.get(key)['phynteny'] = phynteny
-
-        #write to genbank file
+            # write to genbank file
         SeqIO.write(gb_dict.get(key), handle, 'genbank')
 
-
 handle.close()
-
