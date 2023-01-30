@@ -50,20 +50,34 @@ one_letter = {'DNA, RNA and nucleotide metabolism': 4,
                   'transcription regulation': 9,
                   'unknown function': 0}
 
+#TODO decide what to with the hardcoded variables
+NUM_FUNCTIONS = 10 
+N_FEATURES = 15 
+MAX_LENGTH = 120 
 
 
 # loop through the phages in the genbank file
 keys = list(gb_dict.keys())
 
-#get relevant information from dictionaries
-phages = {} 
+
 for key in keys:
-    phages[key] =  extract_features(gb_dict.get(key)) 
+    
+    phages = {} 
+    phages[key] =  handle_genbank.extract_features(gb_dict.get(key)) 
+
+    encodings, features  = format_data.format_data(phages, one_letter)
+
+    #how many unknowns are there in this phage 
+    unk_idx = [i for i, x in enumerate(phages[key].get('phrogs')) if x == 0] 
 
 
-#convert to relevate gb_dict 
+    #mask this function 
+    X = format_data.generate_prediction(encodings, features, NUM_FUNCTIONS, N_FEATURES, MAX_LENGTH, unk_idx[0])
 
-format_data.format_data(gb_dict, one_letter)
+    
+    #make the prediction using the LSTM model
+    
+
 
 # open the genbank file to write to
 with open(args.outfile, 'wt') as handle:

@@ -236,7 +236,7 @@ def format_data(training_data, phrog_encoding):
     training_keys = list(training_data.keys())
 
     for key in training_keys:
-        print(training_data.get(key)) 
+     
         encoding = [phrog_encoding.get(i) for i in training_data.get(key).get('phrogs')]
         length = np.array([i[1] - i[0] for i in training_data.get(key).get('position')])
 
