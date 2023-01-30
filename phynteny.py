@@ -5,12 +5,14 @@ Phynteny: synteny-based annotation of phage genes
 """
 import argparse
 import sys
+import numpy as np 
 from phynteny import handle_genbank
 from phynteny import format_data
 from phynteny import predict
 from argparse import RawTextHelpFormatter
 from Bio import SeqIO
 import pickle 
+import tensorflow as tf 
 
 __author__ = "Susanna Grigson"
 __maintainer__ = "Susanna Grigson"
@@ -40,22 +42,21 @@ if not gb_dict:
 
 # Run Phynteny
 # ---------------------------------------------------
-one_letter = {'DNA, RNA and nucleotide metabolism': 4,
-                  'connector': 2,
-                  'head and packaging': 3,
-                  'integration and excision': 1,
-                  'lysis': 5,
-                  'moron, auxiliary metabolic gene and host takeover': 6,
-                  'other': 7,
-                  'tail': 8,
-                  'transcription regulation': 9,
-                  'unknown function': 0}
+category_encoding  = {4: 'DNA, RNA and nucleotide metabolism',
+              2: 'connector',
+            3: 'head and packaging',
+            1: 'integration and excision',
+            5: 'lysis',
+            6: 'moron, auxiliary metabolic gene and host takeover',
+            7: 'other',
+            8: 'tail',
+            9: 'transcription regulation',
+            0: 'unknown function'}
 
 #TODO decide what to with the hardcoded variables
 NUM_FUNCTIONS = 10 
 N_FEATURES = 15   
 MAX_LENGTH = 120 
-
 
 # loop through the phages in the genbank file
 keys = list(gb_dict.keys())
@@ -65,22 +66,20 @@ with open('phrog_annotation_info/phrog_integer.pkl', 'rb') as handle:
     categories = pickle.load(handle)  
 handle.close() 
 categories[0] = 0 
- 
-#print(categories.keys())
+
+#load the LSTM model 
+model = tf.keras.models.load_model(args.model)
+
+#load in the thresholds 
+with open(args.thresholds, 'rb') as handle: 
+    thresholds = pickle.load(handle)
+handle.close()  
+
 for key in keys:
     
     phages = {} 
     phages[key] =  handle_genbank.extract_features(gb_dict.get(key)) 
     
-    #convert the PHROG annotations to category level annotations 
-    #print(phages[key]['phrogs']) 
-    #replace no PHROG with a 0
-    
-    #phages[key]['phrogs'] = [0 if i == 'No_PHROG' else categories.get(int(i)) for i in phages[key]['phrogs']]
-    #print(phages[key]) 
-    #fetch encodings 
-
-
     phages[key]['phrogs'] = [0 if i == 'No_PHROG' else int(i) for i in phages[key]['phrogs']] 
     encodings, features  = format_data.format_data(phages, categories)
      
@@ -91,14 +90,31 @@ for key in keys:
         print('Your phage ' + str(key) + 'is already completley annotated') 
 
     else: 
-        
-        for i in unk_idx: 
-        #mask this function 
-            X = format_data.generate_prediction(encodings, features, NUM_FUNCTIONS, N_FEATURES, MAX_LENGTH, i) 
+       
+        protein_predictions = [] 
 
-    
+        #mask each unknown function 
+        for i in unk_idx: 
+            
+            X = format_data.generate_prediction(encodings, features, NUM_FUNCTIONS, N_FEATURES, MAX_LENGTH, i) 
+            
+            #predict the missing function 
+            yhat = model.predict(X, verbose = False) 
+            
+            #remove the unknown category and take the prediction 
+            softmax = np.zeros(NUM_FUNCTIONS)
+            softmax[1:] = yhat[0][i][1:]/np.sum(yhat[0][i][1:]) 
+            prediction = np.argmax(softmax)
+
+            #compare the prediction with the thresholds 
+            if np.max(softmax) > thresholds.get(category_encoding.get(prediction)):             
+                protein_predictions.append(category_encoding.get(prediction)) 
+
+            else: 
+                protein_predictions.append('no prediction') 
+
+
     #make the prediction using the LSTM model
-    
 
 
 # open the genbank file to write to
