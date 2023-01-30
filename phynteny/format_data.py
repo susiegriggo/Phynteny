@@ -292,10 +292,12 @@ def one_hot_encode(sequence, n_features):
     :param n_features: total number of features in the model
     :return: numpy array containing one hot encoding 
     """
-
+    #print('n_features: ' + str(n_features))
+    #print(sequence) 
     encoding = list()
     for value in sequence:
         vector = [0 for i in range(n_features)]
+        #print(value) 
         vector[value] = 1
         encoding.append(vector)
 
@@ -371,15 +373,14 @@ def generate_prediction(sequence, features, num_functions, n_features, max_lengt
 
     # construct features
     seq_len = len(sequence)
-    padded_sequence = pad_sequences([sequence], padding='post', maxlen=max_length)[0]
-
+    padded_sequence = pad_sequences(sequence, padding='post', maxlen=max_length)[0]
+    
     X = np.array(one_hot_encode(padded_sequence, n_features))
     for f in range(len(features)):
-        X = encode_feature(X, features[f], num_functions + f)
+     
+        X = encode_feature(X, features[0][f], num_functions + f)
 
-    # mask each unknown in the sequence
-    #unknown_idx = [i for i, x in enumerate(sequence) if x == 0]
-    #for unk in unknown_idx:
+    # mask the unknown
     X[idx, 0:num_functions] = np.zeros(num_functions)
 
     return X.reshape((1, max_length, n_features))

@@ -10,6 +10,7 @@ from phynteny import format_data
 from phynteny import predict
 from argparse import RawTextHelpFormatter
 from Bio import SeqIO
+import pickle 
 
 __author__ = "Susanna Grigson"
 __maintainer__ = "Susanna Grigson"
@@ -52,27 +53,48 @@ one_letter = {'DNA, RNA and nucleotide metabolism': 4,
 
 #TODO decide what to with the hardcoded variables
 NUM_FUNCTIONS = 10 
-N_FEATURES = 15 
+N_FEATURES = 15   
 MAX_LENGTH = 120 
 
 
 # loop through the phages in the genbank file
 keys = list(gb_dict.keys())
 
-
+# read in PHROG categories 
+with open('phrog_annotation_info/phrog_integer.pkl', 'rb') as handle: 
+    categories = pickle.load(handle)  
+handle.close() 
+categories[0] = 0 
+ 
+#print(categories.keys())
 for key in keys:
     
     phages = {} 
     phages[key] =  handle_genbank.extract_features(gb_dict.get(key)) 
+    
+    #convert the PHROG annotations to category level annotations 
+    #print(phages[key]['phrogs']) 
+    #replace no PHROG with a 0
+    
+    #phages[key]['phrogs'] = [0 if i == 'No_PHROG' else categories.get(int(i)) for i in phages[key]['phrogs']]
+    #print(phages[key]) 
+    #fetch encodings 
 
-    encodings, features  = format_data.format_data(phages, one_letter)
 
+    phages[key]['phrogs'] = [0 if i == 'No_PHROG' else int(i) for i in phages[key]['phrogs']] 
+    encodings, features  = format_data.format_data(phages, categories)
+     
     #how many unknowns are there in this phage 
-    unk_idx = [i for i, x in enumerate(phages[key].get('phrogs')) if x == 0] 
+    unk_idx = [i for i, x in enumerate(encodings[0]) if x == 0] 
+     
+    if len(unk_idx) == 0: 
+        print('Your phage ' + str(key) + 'is already completley annotated') 
 
-
-    #mask this function 
-    X = format_data.generate_prediction(encodings, features, NUM_FUNCTIONS, N_FEATURES, MAX_LENGTH, unk_idx[0])
+    else: 
+        
+        for i in unk_idx: 
+        #mask this function 
+            X = format_data.generate_prediction(encodings, features, NUM_FUNCTIONS, N_FEATURES, MAX_LENGTH, i) 
 
     
     #make the prediction using the LSTM model
