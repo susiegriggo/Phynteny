@@ -120,10 +120,18 @@ with open(args.outfile, 'wt') as handle:
 
                     phynteny.append(category_encoding.get(encodings[0][i]))
 
-        # store the phynteny annotations
-        phages[key]['phynteny'] = phynteny
+        
+        cds = [i for i in gb_dict.get(key).features if i.type == 'CDS']
 
-        SeqIO.write(phages[key], handle, 'genbank')
+        for i in range(len(cds)): 
+            cds[i].qualifiers['phynteny'] = phynteny[i] 
+        
+        # store the phynteny annotations
+        #gb_dict.get(key)['phynteny'] = phynteny
+
+        #write to genbank file
+        SeqIO.write(gb_dict.get(key), handle, 'genbank')
+
 
 handle.close()
 

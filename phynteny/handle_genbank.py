@@ -25,7 +25,7 @@ def get_mmseqs(phrog_file):
     except EmptyDataError:
 
         phrog_output = pd.DataFrame()
-        print('empty mmseqs file: ' + phrog_file)
+        #print('empty mmseqs file: ' + phrog_file)
 
     return phrog_output
 
