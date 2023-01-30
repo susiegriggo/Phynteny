@@ -3,6 +3,7 @@
 """
 Phynteny: synteny-based annotation of phage genes
 """
+
 import argparse
 import sys
 import numpy as np 
@@ -18,7 +19,7 @@ __author__ = "Susanna Grigson"
 __maintainer__ = "Susanna Grigson"
 __license__ = "MIT"
 __version__ = "0"
-__email__ = "susie.grigson@flinders.edu.au"
+__email__ = "susie.grigson@gmail.com"
 __status__ = "development"
 
 parser = argparse.ArgumentParser(description='Phynteny: synteny-based annotation of phage genes',
@@ -91,31 +92,39 @@ for key in keys:
 
     else: 
        
-        protein_predictions = [] 
+        phynteny = [] 
 
         #mask each unknown function 
-        for i in unk_idx: 
-            
-            X = format_data.generate_prediction(encodings, features, NUM_FUNCTIONS, N_FEATURES, MAX_LENGTH, i) 
-            
-            #predict the missing function 
-            yhat = model.predict(X, verbose = False) 
-            
-            #remove the unknown category and take the prediction 
-            softmax = np.zeros(NUM_FUNCTIONS)
-            softmax[1:] = yhat[0][i][1:]/np.sum(yhat[0][i][1:]) 
-            prediction = np.argmax(softmax)
+        for i in range(len(encodings[0])):
 
-            #compare the prediction with the thresholds 
-            if np.max(softmax) > thresholds.get(category_encoding.get(prediction)):             
-                protein_predictions.append(category_encoding.get(prediction)) 
+            if i in unk_idx: 
+            
+                X = format_data.generate_prediction(encodings, features, NUM_FUNCTIONS, N_FEATURES, MAX_LENGTH, i) 
+            
+                #predict the missing function 
+                yhat = model.predict(X, verbose = False) 
+            
+                #remove the unknown category and take the prediction 
+                softmax = np.zeros(NUM_FUNCTIONS)
+                softmax[1:] = yhat[0][i][1:]/np.sum(yhat[0][i][1:]) 
+                prediction = np.argmax(softmax)
+
+                #compare the prediction with the thresholds 
+                if np.max(softmax) > thresholds.get(category_encoding.get(prediction)):             
+                    phynteny.append(category_encoding.get(prediction)) 
+
+                else: 
+                    phynteny.append('no prediction') 
 
             else: 
-                protein_predictions.append('no prediction') 
+
+                phynteny.append(category_encoding.get(encodings[0][i]))
+
+    #store the phynteny annotations 
+    phages[key]['phynteny'] = phynteny 
 
 
-    #make the prediction using the LSTM model
-
+#TODO write the updated genbank to a file 
 
 # open the genbank file to write to
 with open(args.outfile, 'wt') as handle:
