@@ -3,8 +3,8 @@ Train PHROG gene order LSTM
 
 This should be given just a dictionary of training data 
 """
-import train_model 
-import format_data
+from phynteny train_model
+from phynteny format_data
 import argparse 
 import pickle5
 import pandas as pd

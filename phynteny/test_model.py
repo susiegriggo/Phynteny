@@ -3,10 +3,10 @@ test a single model
 """
 
 # imports
-import statistics
-import format_data
+from phynteny import statistics
+from phynteny import format_data
 import argparse
-import train_model
+from phynteny import train_model
 import pandas as pd
 import pickle
 from collections import Counter

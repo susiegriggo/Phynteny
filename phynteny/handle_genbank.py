@@ -10,7 +10,6 @@ from pandas.errors import EmptyDataError
 import re
 from Bio import SeqIO
 import gzip
-import pickle
 import random
 
 

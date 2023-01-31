@@ -2,8 +2,8 @@
 Compute statistics for models
 """
 
-import format_data 
-import statistics 
+from phynteny import format_data
+from phynteny import statistics
 import pandas as pd 
 import glob 
 import pickle 

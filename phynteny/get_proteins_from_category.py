@@ -7,10 +7,6 @@ Used to compare which alphafold protein structures are known
 import pandas as pd
 import glob
 import pickle5 as pickle
-import re
-import gzip
-from crc64iso.crc64iso import crc64
-import os 
 
 file_out = '/home/grig0076/phispy_phrog_pickles/protein_IDs/protein_IDs'
 

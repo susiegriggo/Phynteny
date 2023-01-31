@@ -10,13 +10,8 @@ from tensorflow.keras.layers import Bidirectional, TimeDistributed, Dense, LSTM
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import L1L2
-#from keras.layers.core import Lambda
-#from keras import backend as K
-import tensorflow as tf
 
-import pickle 
-import argparse 
-import random 
+import pickle
 from phynteny import format_data
 import numpy as np 
 from collections import ChainMap

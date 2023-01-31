@@ -1,9 +1,7 @@
 # imports
 import pickle
-import pickle
 import format_data
 import random
-import tensorflow as tf
 import numpy as np
 from sklearn.metrics import roc_auc_score, roc_curve
 

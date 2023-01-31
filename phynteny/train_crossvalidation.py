@@ -3,7 +3,7 @@ Train LSTM model with 10-fold cross validation
 """
 
 #imports
-import train_model
+from phynteny train_model
 import pandas as pd
 import textwrap
 import argparse
