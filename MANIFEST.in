@@ -1,3 +1,6 @@
+
+#TODO add all of the required files into this file
+
 include *.md LICENSE
 recursive-include phrog_annotation_info *
 recursive-include test_data *.gbk 

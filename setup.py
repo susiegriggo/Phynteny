@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # encoding: utf-8
-
+# copy this from metacoag 
 from setuptools import setup, find_packages 
 
 def readme(): 
@@ -31,4 +31,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    #print(find_packages()) 
+    print(find_packages()) 

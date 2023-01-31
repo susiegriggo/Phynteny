@@ -2,6 +2,8 @@
 
 """
 Phynteny: synteny-based annotation of phage genes
+
+#TODO change this to an executable file
 """
 
 import argparse
