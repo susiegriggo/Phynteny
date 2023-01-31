@@ -1,8 +1,9 @@
 include *.md
 include LICENSE
 
-recursive-include phynteny/ *
+recursive-include phynteny_utils/ *
 recursive-include test_data/ *
+recursive-include models/ * 
 
-global-exclude phynteny/ *.pyc
-global-exclude phynteny/__pycache__*.pyc
+global-exclude phynteny_utils/ *.pyc
+global-exclude phynteny_utils/__pycache__*.pyc

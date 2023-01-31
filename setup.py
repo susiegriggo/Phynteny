@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 packages = setuptools.find_packages()
-package_data = {"phynteny": ["phynteny/*"]}
+package_data = {"phynteny_utils": ["phynteny_utils/*"]}
 
 data_files = [(".", ["LICENSE", "README.md"])]
 
@@ -26,7 +26,7 @@ setuptools.setup(
     package_data=package_data,
     data_files=data_files,
     include_package_data=True,
-    scripts=["phynteny.py"],
+    scripts=["phynteny"],
     classifiers=[
         "Development Status :: 1 - Planning",
         "Programming Language :: Python :: 3",
@@ -37,7 +37,7 @@ setuptools.setup(
     ],
     install_requires=[ #TODO
         "biopython", 
-        "tensorflow==2.11.0",
+        "tensorflow-cpu==2.11.0",
         "pandas",
     ],
     python_requires=">=3.8",
