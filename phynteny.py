@@ -9,7 +9,7 @@ Phynteny: synteny-based annotation of phage genes
 import argparse
 import sys
 import numpy as np
-from phynteny import handle_genbank
+#from phynteny import handle_genbank
 from phynteny import format_data
 from argparse import RawTextHelpFormatter
 from Bio import SeqIO

@@ -36,11 +36,9 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[ #TODO
-        "biopython",
-        "tensorflow",
-        "pickle",
+        "biopython", 
+        "tensorflow==2.11.0",
         "pandas",
-        "numpy",
     ],
-    python_requires=">=3.7",
+    python_requires=">=3.8",
 )
