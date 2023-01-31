@@ -1,3 +1,6 @@
+
+#!/usr/bin/python
+
 """
 Module for manipulating genbank files
 """
