@@ -1,6 +1,8 @@
+include *.md
+include LICENSE
 
-#TODO add all of the required files into this file
+recursive-include phynteny/ *
+recursive-include test_data/ *
 
-include *.md LICENSE
-recursive-include phrog_annotation_info *
-recursive-include test_data *.gbk 
+global-exclude phynteny/ *.pyc
+global-exclude phynteny/__pycache__*.pyc
