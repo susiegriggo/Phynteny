@@ -9,7 +9,6 @@ import sys
 import numpy as np
 from phynteny import handle_genbank
 from phynteny import format_data
-from phynteny import predict
 from argparse import RawTextHelpFormatter
 from Bio import SeqIO
 import pickle
