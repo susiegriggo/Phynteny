@@ -39,6 +39,7 @@ setuptools.setup(
         "biopython", 
         "tensorflow-cpu==2.11.0",
         "pandas",
+        "click", 
     ],
     python_requires=">=3.8",
 )
