@@ -26,7 +26,7 @@ setuptools.setup(
     package_data=package_data,
     data_files=data_files,
     include_package_data=True,
-    scripts=["phynteny", ""],
+    scripts=["phynteny", "scripts/generate_training_data.py","scripts/train_crossvalidation.py" ],
     classifiers=[
         "Development Status :: 1 - Planning",
         "Programming Language :: Python :: 3",
@@ -35,11 +35,11 @@ setuptools.setup(
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         "Operating System :: OS Independent",
     ],
-    install_requires=[ #TODO
-        "biopython", 
+    install_requires=[  # TODO
+        "biopython",
         "tensorflow-cpu==2.11.0",
         "pandas",
-        "click", 
+        "click",
     ],
     python_requires=">=3.8",
 )

@@ -1,6 +1,6 @@
 # imports
 import pickle
-import format_data
+from phynteny_utils import  format_data
 import random
 import numpy as np
 from sklearn.metrics import roc_auc_score, roc_curve
