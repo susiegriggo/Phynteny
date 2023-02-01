@@ -3,7 +3,7 @@ Train LSTM model with 10-fold cross validation
 """
 
 #imports
-from phynteny train_model
+from phynteny_utils import train_model
 import pandas as pd
 import textwrap
 import argparse
@@ -46,7 +46,7 @@ def main():
     args = parse_args() 
     
     print('loading phrogs') 
-    #get phrog annotations 
+    #get phrog annotations #read in phrog encodings instead - maybe make this into a util function since used often 
     annot = pd.read_csv(args['phrog_annotations'], sep = '\t')
     cat_dict = dict(zip([str(i) for i in annot['phrog']], annot['category']))
     cat_dict[None] = 'unknown function'
@@ -61,7 +61,7 @@ def main():
          'other' : 7,
          'tail' : 8,
          'transcription regulation' : 9,
-         'unknown function' :  0} #changed unknown function to 10 so that a masked sequence is different from an unknown sequence
+         'unknown function' :  0}
 
     #use this dictionary to generate an encoding of each phrog
     phrog_encoding = dict(zip([str(i) for i in annot['phrog']], [one_letter.get(c) for c in annot['category']]))

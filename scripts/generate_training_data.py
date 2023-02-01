@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 Generate training data for the model
 """ 
@@ -6,7 +8,7 @@ Generate training data for the model
 import pickle
 import argparse
 import re
-import handle_genbank
+from phynteny_utils import handle_genbank
 
 
 def check_positive(arg):
@@ -27,11 +29,11 @@ parser.add_argument('-c', '--chunks', type=check_positive, help='Number of chunk
 args = vars(parser.parse_args())
 
 #read in annotations
-with open('/home/grig0076/GitHubs/Phynteny/phrog_annotation_info/phrog_integer.pkl', 'rb') as handle:
+with open('../phrog_annotation_info/phrog_integer.pkl', 'rb') as handle:
     phrog_integer = pickle.load(handle) 
     phrog_integer = dict(zip([str(i) for i in list(phrog_integer.keys())], phrog_integer.values()))
 handle.close()
-
+ 
 training_data = {} #dictionary to store all of the training data
 
 #takes a text file where each line is the file path to genbank files of phages to train a model
