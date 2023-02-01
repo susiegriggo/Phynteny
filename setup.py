@@ -38,7 +38,7 @@ setuptools.setup(
     install_requires=[ #TODO
         "biopython", 
         "tensorflow-cpu==2.11.0",
-        "pandas",
+        "pickle",
         "click", 
     ],
     python_requires=">=3.8",

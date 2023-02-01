@@ -6,12 +6,11 @@ Phynteny: synteny-based annotation of phage genes
 #TODO change this to an executable file
 """
 
-import argparse
+import click
 import sys
 import numpy as np
 from phynteny_utils import handle_genbank
 from phynteny_utils import format_data
-from argparse import RawTextHelpFormatter
 from Bio import SeqIO
 import pickle
 import tensorflow as tf
@@ -23,12 +22,32 @@ __version__ = "0"
 __email__ = "susie.grigson@gmail.com"
 __status__ = "development"
 
-parser = argparse.ArgumentParser(description='Phynteny: synteny-based annotation of phage genes',
+
+# argparse using click
+@click.command(description='Phynteny: synteny-based annotation of phage genes')
+@click.argument('infile', type=click.Path(exists=True), help='input file in genbank format')
+@click.option('-o', '--outfile', type=click.Path(), default='sys.stdout', help='where to write the output genbank file')
+@click.option('-m', '--model', type=click.Path(exists=True), default='model/all_chunk_trained_LSTMbest_val_loss.h5',
+              help='Path to custom LSTM model')
+@click.option('-t', '--thresholds', type=click.Path(exists=True),
+              default='model/all_chunk_trained_LSTMbest_val_loss_thresholds.pkl',
+              help='Path to dictionaries for a custom LSTM model')
+@click.version_option(version=__version__)
+
+def cli(infile, outfile, model, thresholds):
+    """Main command line interface for Phynteny"""
+    pass
+
+
+#parser = argparse.ArgumentParser(description='Phynteny: synteny-based annotation of phage genes',
                                  formatter_class=RawTextHelpFormatter)
 
+
+# convert to click
 def main():
-    #TODO don't use argeparse - use click instead
-    #TODO break this up into separate methods
+    # TODO don't use argeparse - use click instead
+    # TODO break this up into separate methods
+    """
     parser.add_argument('infile', help='input file in genbank format')
     parser.add_argument('-o', '--outfile', action='store', default=sys.stdout, type=str,
                         help='where to write the output genbank file')
@@ -39,6 +58,7 @@ def main():
     parser.add_argument('-V', '--version', action='version', version=__version__)
 
     args = parser.parse_args()
+    """
 
     gb_dict = handle_genbank.get_genbank(args.infile)
     if not gb_dict:
@@ -104,7 +124,8 @@ def main():
 
                     if i in unk_idx:
 
-                        X = format_data.generate_prediction(encodings, features, NUM_FUNCTIONS, N_FEATURES, MAX_LENGTH, i)
+                        X = format_data.generate_prediction(encodings, features, NUM_FUNCTIONS, N_FEATURES, MAX_LENGTH,
+                                                            i)
 
                         # predict the missing function
                         yhat = model.predict(X, verbose=False)
@@ -137,4 +158,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    cli()
+    #main()
