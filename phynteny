@@ -6,11 +6,12 @@ Phynteny: synteny-based annotation of phage genes
 #TODO change this to an executable file
 """
 
-import click
+import argparse
 import sys
 import numpy as np
 from phynteny_utils import handle_genbank
 from phynteny_utils import format_data
+from argparse import RawTextHelpFormatter
 from Bio import SeqIO
 import pickle
 import tensorflow as tf
@@ -23,29 +24,26 @@ __email__ = "susie.grigson@gmail.com"
 __status__ = "development"
 
 
-# argparse using click
-@click.command(description='Phynteny: synteny-based annotation of phage genes', ignore_unknown_options = True)
-@click.argument('infile', type=click.Path(exists=True), help='input file in genbank format')
-@click.option('-o', '--outfile', type=click.Path(), default='sys.stdout', help='where to write the output genbank file')
-@click.option('-m', '--model', type=click.Path(exists=True), default='model/all_chunk_trained_LSTMbest_val_loss.h5',
-              help='Path to custom LSTM model', show_default=True)
-@click.option('-t', '--thresholds', type=click.Path(exists=True),
-              default='model/all_chunk_trained_LSTMbest_val_loss_thresholds.pkl',
-              help='Path to dictionaries for a custom LSTM model', show_default=True)
-@click.version_option(version=__version__)
 
 
-def cli(infile, outfile, model, thresholds):
-    """Main command line interface for Phynteny"""
-    pass
+#parser = argparse.ArgumentParser(description='Phynteny: synteny-based annotation of phage genes',
+parser = argparse.ArgumentParser(description='Phynteny: synteny-based annotation of phage genes') 
 
-
-# convert to click
 def main():
+    #TODO don't use argeparse - use click instead
+    #TODO break this up into separate methods
+    parser.add_argument('infile', help='input file in genbank format')
+    parser.add_argument('-o', '--outfile', action='store', default=sys.stdout, type=str,
+                        help='where to write the output genbank file')
+    parser.add_argument('-m', '--model', action='store', help='Path to custom LSTM model',
+                        default='model/all_chunk_trained_LSTMbest_val_loss.h5')
+    parser.add_argument('-t', '--thresholds', action='store', help='Path to dictionaries for a custom LSTM model',
+                        default='model/all_chunk_trained_LSTMbest_val_loss_thresholds.pkl')
+    parser.add_argument('-V', '--version', action='version', version=__version__)
 
-    # TODO break this up into separate methods
-    
-    gb_dict = handle_genbank.get_genbank(% infile)
+    args = parser.parse_args()
+
+    gb_dict = handle_genbank.get_genbank(args.infile)
     if not gb_dict:
         sys.stdout.write("Error: no sequences found in genbank file\n")
         sys.exit()
@@ -78,19 +76,19 @@ def main():
     categories[0] = 0
 
     # load the LSTM model
-    model = tf.keras.models.load_model(% model)
+    model = tf.keras.models.load_model(args.model)
 
     # load in the thresholds
-    with open(% thresholds, 'rb') as handle:
+    with open(args.thresholds, 'rb') as handle:
         thresholds = pickle.load(handle)
     handle.close()
 
-    with open(% outfile, 'wt') as handle:
-
+    with open(args.outfile, 'wt') as handle:
         for key in keys:
 
             phages = {}
             phages[key] = handle_genbank.extract_features(gb_dict.get(key))
+
             phages[key]['phrogs'] = [0 if i == 'No_PHROG' else int(i) for i in phages[key]['phrogs']]
             encodings, features = format_data.format_data(phages, categories)
 
@@ -109,8 +107,7 @@ def main():
 
                     if i in unk_idx:
 
-                        X = format_data.generate_prediction(encodings, features, NUM_FUNCTIONS, N_FEATURES, MAX_LENGTH,
-                                                            i)
+                        X = format_data.generate_prediction(encodings, features, NUM_FUNCTIONS, N_FEATURES, MAX_LENGTH, i)
 
                         # predict the missing function
                         yhat = model.predict(X, verbose=False)
@@ -136,12 +133,11 @@ def main():
             for i in range(len(cds)):
                 cds[i].qualifiers['phynteny'] = phynteny[i]
 
-            # write to genbank file
+                # write to genbank file
             SeqIO.write(gb_dict.get(key), handle, 'genbank')
 
     handle.close()
 
 
 if __name__ == "__main__":
-    cli()
     main()
