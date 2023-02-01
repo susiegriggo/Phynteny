@@ -24,14 +24,14 @@ __status__ = "development"
 
 
 # argparse using click
-@click.command(description='Phynteny: synteny-based annotation of phage genes')
+@click.command(description='Phynteny: synteny-based annotation of phage genes', ignore_unknown_options = True)
 @click.argument('infile', type=click.Path(exists=True), help='input file in genbank format')
 @click.option('-o', '--outfile', type=click.Path(), default='sys.stdout', help='where to write the output genbank file')
 @click.option('-m', '--model', type=click.Path(exists=True), default='model/all_chunk_trained_LSTMbest_val_loss.h5',
-              help='Path to custom LSTM model')
+              help='Path to custom LSTM model', show_default=True)
 @click.option('-t', '--thresholds', type=click.Path(exists=True),
               default='model/all_chunk_trained_LSTMbest_val_loss_thresholds.pkl',
-              help='Path to dictionaries for a custom LSTM model')
+              help='Path to dictionaries for a custom LSTM model', show_default=True)
 @click.version_option(version=__version__)
 
 
