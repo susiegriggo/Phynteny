@@ -10,6 +10,7 @@ import pickle
 from Bio import SeqIO
 import glob
 
+
 def get_genbank(filename):
     """
     Parse genbank file
@@ -23,7 +24,7 @@ def get_genbank(filename):
     return gb_dict
 
 
-def get_features(genbank): #TODO add feature for number of genes with same orientation
+def get_features(genbank):  # TODO add feature for number of genes with same orientation
     """
     Get required features from genbank file
 

@@ -19,7 +19,8 @@ __status__ = "development"
 
 # dictionary paths
 phrog_categories = "phrog_annotation_info/phrog_integer.pkl"
-category_names = 'integer_category.pkl'
+category_names = "phrog_annotation_info/integer_category.pkl"
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -52,15 +53,15 @@ def parse_args():
 
     return parser.parse_args()
 
-def main():
 
+def main():
     # Setup
     # ---------------------------------------------------
 
-    #get arguments
+    # get arguments
     args = parse_args()
 
-    #get entries in the genbank file
+    # get entries in the genbank file
     gb_dict = handle_genbank.get_genbank(args.infile)
     if not gb_dict:
         sys.stdout.write("Error: no sequences found in genbank file\n")
@@ -68,28 +69,29 @@ def main():
     keys = list(gb_dict.keys())
 
     # create predictor object
-    gene_predictor = predictor.Predictor(args.model, phrog_categories, args.thresholds, category_names)
+    gene_predictor = predictor.Predictor(
+        args.model, phrog_categories, args.thresholds, category_names
+    )
 
     # Run Phynteny
     # ---------------------------------------------------
 
     with open(args.outfile, "wt") as handle:
-
         for key in keys:
-
-            #get current phage
+            # get current phage
             phages = {key: handle_genbank.extract_features(gb_dict.get(key))}
 
-            #get phrog annotations
+            # get phrog annotations
             phages[key]["phrogs"] = [
                 0 if i == "No_PHROG" else int(i) for i in phages[key]["phrogs"]
             ]
 
-            #make predictions
+            # make predictions
             phynteny = gene_predictor.predict_annotations(phages)
 
             # update with these annotations
             cds = [i for i in gb_dict.get(key).features if i.type == "CDS"]
+
             for i in range(len(cds)):
                 cds[i].qualifiers["phynteny"] = phynteny[i]
 
@@ -97,6 +99,7 @@ def main():
             SeqIO.write(gb_dict.get(key), handle, "genbank")
 
     handle.close()
+
 
 if __name__ == "__main__":
     main()

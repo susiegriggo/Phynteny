@@ -2,52 +2,69 @@
 Module to create a predictor object
 """
 
-#imports
+# imports
 import tensorflow as tf
 import pickle
-import format_data
+from phynteny_utils import format_data
 import numpy as np
+
 
 def get_dict(dict_path):
     """
     Helper function to import dictionaries
     """
 
-    with open(dict_path, 'rb') as handle:
+    with open(dict_path, "rb") as handle:
         dictionary = pickle.load(handle)
     handle.close()
 
     return dictionary
 
-class Predictor:
-    def __init__(self, model, phrog_categories_path, thresholds_path, category_names_path):
 
-        self.model = tf.keras.models.load_model(args.model)
-        self.n_features = model.get_config().get('layers')[0].get('config').get('batch_input_shape')[2]
-        self.max_length = model.get_config().get('layers')[0].get('config').get('batch_input_shape')[1]
+class Predictor:
+    def __init__(
+        self, model, phrog_categories_path, thresholds_path, category_names_path
+    ):
+        self.model = tf.keras.models.load_model(model)
+        self.n_features = (
+            self.model.get_config()
+            .get("layers")[0]
+            .get("config")
+            .get("batch_input_shape")[2]
+        )
+        self.max_length = (
+            self.model.get_config()
+            .get("layers")[0]
+            .get("config")
+            .get("batch_input_shape")[1]
+        )
         self.phrog_categories = get_dict(phrog_categories_path)
         self.thresholds = get_dict(thresholds_path)
         self.category_names = get_dict(category_names_path)
         self.num_functions = len(self.category_names)
 
-    def predict_annotations(self,phage_dict):
+    def predict_annotations(self, phage_dict):
         """
         predict phage annotations
         """
 
+        # TODO add 0 into phrog_categories
         encodings, features = format_data.format_data(phage_dict, self.phrog_categories)
 
         # get the index of the unknowns
-        unk_idx = [i for i, x in enumerate(encodings) if x == 0]
+        unk_idx = [i for i, x in enumerate(encodings[0]) if x == 0]
 
         if len(unk_idx) == 0:
-            print("Your phage " + str(phage_dict.keys()[0]) + "is already completely annotated")
+            print(
+                "Your phage "
+                + str(list(phage_dict.keys())[0])
+                + "is already completely annotated"
+            )
 
         phynteny = []
 
         # mask each unknown function
-        for i in range(len(encodings)):
-
+        for i in range(len(encodings[0])):
             if i in unk_idx:
                 # encode for the missing function
                 X = format_data.generate_prediction(
@@ -61,31 +78,27 @@ class Predictor:
 
                 # predict the missing function
                 yhat = self.model.predict(X, verbose=False)
-                label = self.get_best_prediction(yhat)
+                label = self.get_best_prediction(yhat[0][i])
                 phynteny.append(label)
+
+            else:
+                phynteny.append(self.category_names.get(encodings[0][i]))
 
         return phynteny
 
-
-    def get_best_prediction(self, yhat):
+    def get_best_prediction(self, v):
         """
         Get the best prediction
         """
 
         # remove the unknown category and take the prediction
         softmax = np.zeros(self.num_functions)
-        softmax[1:] = yhat[0][i][1:] / np.sum(yhat[0][i][1:])
+        softmax[1:] = v[1:] / np.sum(v[1:])
         prediction = np.argmax(softmax)
 
         # compare the prediction with the thresholds
-        if np.max(softmax) > self.thresholds.get(
-                self.category_names.get(prediction)
-        ):
+        if np.max(softmax) > self.thresholds.get(self.category_names.get(prediction)):
             return self.category_names.get(prediction)
 
         else:
             return "no prediction"
-
-
-
-
