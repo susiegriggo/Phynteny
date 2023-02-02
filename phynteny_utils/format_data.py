@@ -10,10 +10,6 @@ import pickle
 from Bio import SeqIO
 import glob
 
-
-# from phynteny.generate_training_data import training_data
-
-
 def get_genbank(filename):
     """
     Parse genbank file
@@ -27,7 +23,7 @@ def get_genbank(filename):
     return gb_dict
 
 
-def get_features(genbank):
+def get_features(genbank): #TODO add feature for number of genes with same orientation
     """
     Get required features from genbank file
 
@@ -45,98 +41,6 @@ def get_features(genbank):
         ],
         "phrog": [i.qualifiers.get("phrog") for i in features],
     }
-
-
-# TODO add feature with the number of genes in the current oreintation to denote strand switches
-def generate_data(data):
-    """
-    :param data: directory containing dictionaries of phispy genomes
-    :return dictionary
-    """
-
-    # get the directorys containing the genomes
-    levelone = glob.glob(data)
-
-    # counters to campare the sizes of the training datasets
-    included = 0
-    not_included = 0
-
-    # dictionary to store the filtered data
-    data = {}
-
-    # loop through each genome
-    for l1 in levelone:
-        leveltwo = glob.glob(l1 + "/*")
-
-        for l2 in leveltwo:
-            files = glob.glob(l2 + "/*")
-
-            for file in files:
-                with open(file, "rb") as handle:
-                    genomes = pickle.load(handle)
-
-                for g in list(genomes.keys()):
-                    this_genome = genomes.get(g)
-                    categories = [
-                        phrog_encoding.get(i) for i in this_genome.get("phrogs")
-                    ]
-
-                    categories_present = set(categories)
-                    if 0 in categories_present:
-                        categories_present.remove(0)
-
-                    # Take genomes which contain at least four different phrog categories
-                    if len(categories_present) >= 4:
-                        # only consider genomes which contain a gene belonging to 'integration and excision' at either the start or end of the genome
-                        if (
-                            categories[0] == 1 or categories[-1] == 1
-                        ):  # look into whether to include this
-                            included += 1
-                            data[g] = this_genome
-
-                        else:
-                            not_included += 1
-
-    print("Number of genomes after filtering: " + str(included) + " sequences")
-    print(
-        "Number of genomes removed during filtering: "
-        + str(not_included)
-        + " sequences"
-    )
-
-    # dereplicate the filtered data such that genome has unique gene organisation and orientation
-    data_derep = derep_trainingdata(data, phrog_encoding)
-
-    return data_derep
-
-
-def test_train_data(data, test_portion):
-    """
-    Separate data in testing and training data
-
-    :param data: directory containing dictionaries of phispy genomes
-    :param test_portion: portion as a decimal of the data reserved as test data
-    :return dictionary of training data
-    :return dictionary of testing data
-    """
-
-    # obtain data
-    genome_data = generate_data(data)
-    keys = list(genome_data.keys())
-
-    # shuffle
-    random.shuffle(keys)
-
-    # separate into training and testing data
-    test_num = int(len(keys) * test_num)
-    test_keys = keys[:test_num]
-    train_keys = keys[test_num:]
-
-    # get dictionaries
-    train_data = dict(zip(train_keys, [data.get(key) for key in train_keys]))
-    test_data = dict(zip(test_keys, [data.get(key) for key in test_keys]))
-
-    return train_data, test_data
 
 
 def encode_strand(strand):
