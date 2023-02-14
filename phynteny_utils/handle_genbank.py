@@ -61,14 +61,8 @@ def get_genbank(genbank):
 def phrog_to_integer(phrog_annot, phrog_integer):
     """
     Converts phrog annotation to its integer representation
-    """
+    """ 
     return [phrog_integer.get(i) for i in phrog_annot]
-
-
-def integer_to_category():
-    """
-    Converts integer encoding to its relevant phrog category
-    """
 
 
 def extract_features(this_phage):
@@ -178,9 +172,8 @@ def derep_trainingdata(training_data):
 
     # get the training keys and encodings
     training_keys = list(training_data.keys())
-    # training_encodings = [[phrog_encoding.get(i) for i in training_data.get(key).get('phrogs')] for key in
-    # training_keys]
 
+    #get the categories in each prophage 
     training_encodings = [training_data.get(k).get("categories") for k in training_keys]
 
     # write a function to remove duplicates in the training data

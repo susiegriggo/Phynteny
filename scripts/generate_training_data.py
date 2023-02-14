@@ -88,6 +88,8 @@ def generate_chunks(data, k, prefix):
 
 def main():
 
+    print('STARTING') 
+
     # get arguments
     args = parse_args()
 
@@ -98,7 +100,9 @@ def main():
             zip([str(i) for i in list(phrog_integer.keys())], phrog_integer.values())
         )
     handle.close()
+    phrog_integer['No_PHROG'] = 0 
 
+    print('getting input', flush = True)  
     # takes a text file where each line is the file path to genbank files of phages to train a model
     print("Extracting...", flush=True)
     print(args["input"], flush=True)
@@ -110,7 +114,7 @@ def main():
         genbank_files = file.readlines()
 
         for genbank in genbank_files:
-
+             
             # convert genbank to a dictionary
             gb_dict = handle_genbank.get_genbank(genbank)
             gb_keys = list(gb_dict.keys())
@@ -123,7 +127,7 @@ def main():
                 # integer encoding of phrog categories
                 integer = handle_genbank.phrog_to_integer(
                     phage_dict.get("phrogs"), phrog_integer
-                )
+                ) 
                 phage_dict["categories"] = integer
 
                 # evaluate the number of categories present in the phage
