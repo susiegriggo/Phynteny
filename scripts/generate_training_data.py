@@ -108,6 +108,10 @@ def main():
     print(args["input"], flush=True)
 
     training_data = {}  # dictionary to store all of the training data
+    
+    prophage_counter = 0 # count the number of prophages encountered 
+    prophage_pass = -0 # number of prophages which pass the filtering steps 
+
 
     with open(args["input"], "r") as file:
 
@@ -120,6 +124,9 @@ def main():
             gb_keys = list(gb_dict.keys())
 
             for key in gb_keys:
+
+                # update the counter 
+                prophage_counter += 1 
 
                 # extract the relevant features
                 phage_dict = handle_genbank.extract_features(gb_dict.get(key))
@@ -141,9 +148,13 @@ def main():
                     and len(categories_present) >= args["gene_categories"]
                 ):
 
+                    # update the passing candidature
+                    prophage_pass += 1 
+
                     # update dictionary with this entry
                     g = re.split(",|\.", re.split("/", genbank.strip())[-1])[0]
                     training_data[g + "_" + key] = phage_dict
+
 
     # save the training data dictionary
     print("Done Processing!\n")
@@ -165,10 +176,12 @@ def main():
 
     print("Complete!")
     print(
-        str(len(training_data))
+        str(prophage_counter)
         + " phages parsed. "
-        + str(len(data_derep_shuffle))
-        + " phages used"
+        + str(prophage_pass)
+        + " phages used. " 
+        + str(len(list(data_derep_shuffle.keys())))
+        + " phages left after dereplication." 
     )
 
 if __name__ == "__main__":
