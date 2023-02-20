@@ -163,7 +163,12 @@ def main():
     derep_data = handle_genbank.derep_trainingdata(training_data)
     data_derep_shuffle = handle_genbank.shuffle_dict(derep_data)
 
-    with open(args["output"] + "_all_data.pkl", "wb") as handle:
+    # save the non-dereplicated data - this might be what ends up being used 
+    with open(args["output"] + "_all_data.pkl", "wb") as handle: 
+        pickle.dump(training_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    handle.close() 
+
+    with open(args["output"] + "_dereplicated.pkl", "wb") as handle:
         pickle.dump(data_derep_shuffle, handle, protocol=pickle.HIGHEST_PROTOCOL)
     handle.close()
 
