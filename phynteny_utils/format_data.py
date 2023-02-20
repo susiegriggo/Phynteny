@@ -163,7 +163,8 @@ def format_data(training_data, phrog_encoding):
     training_keys = list(training_data.keys())
 
     for key in training_keys:
-        encoding = [phrog_encoding.get(i) for i in training_data.get(key).get("phrogs")]
+        #encoding = [phrog_encoding.get(i) for i in training_data.get(key).get("phrogs")]
+        encoding =  training_data.get(key).get("categories")
         length = np.array([i[1] - i[0] for i in training_data.get(key).get("position")])
 
         # encode the strand
@@ -174,7 +175,7 @@ def format_data(training_data, phrog_encoding):
         # start position of each gene
         start = np.array(
             [
-                i[0] - training_data.get(key).get("position")[0][0] + 1
+                round(i[0] - training_data.get(key).get("position")[0][0] + 1, 3)
                 for i in training_data.get(key).get("position")
             ]
         )
@@ -321,7 +322,7 @@ def generate_prediction(sequence, features, num_functions, n_features, max_lengt
 
 
 def generate_dataset(sequences, all_features, num_functions, n_features, max_length):
-    """ "
+    """ 
     Generate a dataset to train LSTM model
 
     :param sequences: set of sequences encoded as integers for each PHROG
@@ -339,7 +340,6 @@ def generate_dataset(sequences, all_features, num_functions, n_features, max_len
     # features is a list of list objects
     X = []
     y = []
-    masked_func = []
 
     for i in range(len(sequences)):
         # take a function to mask
@@ -356,9 +356,8 @@ def generate_dataset(sequences, all_features, num_functions, n_features, max_len
         # store the functon which was masked
         X.append(this_X)
         y.append(this_y)
-        masked_func.append(sequences[i][idx])
 
-    X = np.array(X).reshape(len(masked_func), max_length, n_features)
-    y = np.array(y).reshape(len(masked_func), max_length, num_functions)
+    X = np.array(X).reshape(len(sequences)), max_length, n_features)
+    y = np.array(y).reshape(len(sequences)), max_length, num_functions)
 
-    return X, y, masked_func
+    return X, y
