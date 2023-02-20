@@ -1,7 +1,9 @@
 """ 
 Script to train model 
 
-Use to parameter sweep to determine optimal batch size, epochs, dropout, memory cells 
+Use to parameter sweep to determine optimal batch size, epochs, dropout, memory cells
+
+Think about using classes in this script -how to handle the features like max length etc
 """
 
 # imports
@@ -12,8 +14,102 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import L1L2
 import pickle
 from phynteny_utils import format_data
+from sklearn.model_selection import StratifiedKFold
 import numpy as np
 from collections import ChainMap
+
+def get_dict(dict_path): #TODO where to place this
+    """
+    Helper function to import dictionaries
+    """
+
+    with open(dict_path, "rb") as handle:
+        dictionary = pickle.load(handle)
+    handle.close()
+
+    return dictionary
+
+class Model():
+
+    def __init__(self, data, phrog_categories_path, k, num_functions, n_features, out_file, memory_cells, batch_size, epochs, dropout, recurrent_dropout, learning_rate, patience, min_delta, features, validation_dropout):
+        """
+        :param data: dictionary of training data
+        :param phrog_categories_path: location of the dictionary describing the phrog_categories
+        """
+
+        self.data = get_dict(phrog_categories_path)
+        self.phrog_categories = get_dict(phrog_categories_path)
+        self.k = k
+        self.num_functions = num_functions
+        self.n_features = n_features
+        self.out_file = out_file
+        self.memory_cells = memory_cells
+        self.batch_size = batch_size
+        self.epochs = epochs
+        self.dropout = dropout
+        self.recurrent_dropout = recurrent_dropout
+        self.learning_rate = learning_rate
+        self.patience = patience
+        self.min_delta = min_delta
+        self.features = features
+        self.validation_dropout = validation_dropout
+
+    def train_LSTM(self):
+        """
+        Training procedure here
+        """
+
+
+    def generate_data(self):
+        """
+        Function to take training data and process
+        """
+
+        # get the phrog encodings and additional features
+        encodings, features = format_data.format_data(
+            self.data, self.phrog_encoding
+        )
+
+        # encoded the dataset as masked matrices
+        X, y, masked_idx = format_data.generate_dataset( #TODO is masked_idx necessary here
+            encodings, features, self.num_functions, self.n_features, self.max_length)
+
+        #TODO dereplicaiton of the training data - at what stage
+        #want to ignore the feautres when dereplicated
+
+        return X, y
+
+    def cross_validation(self):
+        """
+        Perform stratified cross-validation
+        """
+
+        skf = StratifiedKFold(n_splits=k + 1, shuffle=True, random_state=1)  # this generates the data here
+
+        for train_index, test_index in skf.split(X, y):
+            # use training indexes
+            train_LSTM(
+                    X[train_index],
+                    y[train_index],
+                    X[test_index],
+                    y[test_index],
+                    max_length,
+                    n_features,
+                    num_functions,
+                    model_file_out,
+                    history_file_out,
+                    memory_cells,
+                    batch_size,
+                    epochs,
+                    dropout,
+                    recurrent,
+                    lr,
+                    patience,
+                    min_delta,
+                )
+
+
+
 
 
 def select_features(data, features):

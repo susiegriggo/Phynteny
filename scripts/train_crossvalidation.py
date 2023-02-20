@@ -1,5 +1,7 @@
 """ 
-Train LSTM model with 10-fold cross validation 
+Train LSTM model with 10-fold cross validation
+
+TODO break this script up into different methods
 """
 
 #imports
@@ -8,6 +10,10 @@ import pandas as pd
 import textwrap
 import argparse
 
+
+# dictionary paths
+phrog_categories = "phrog_annotation_info/phrog_integer.pkl"
+category_names = "phrog_annotation_info/integer_category.pkl"
 
 def parse_args():
     """ 
@@ -45,32 +51,15 @@ def main():
     #get arguments 
     args = parse_args() 
     
-    print('loading phrogs') 
-    #get phrog annotations #read in phrog encodings instead - maybe make this into a util function since used often 
-    annot = pd.read_csv(args['phrog_annotations'], sep = '\t')
-    cat_dict = dict(zip([str(i) for i in annot['phrog']], annot['category']))
-    cat_dict[None] = 'unknown function'
+    print('loading phrog info')
 
-    #hard-codedn dictionary matching the PHROG cateogories to an integer value 
-    one_letter = {'DNA, RNA and nucleotide metabolism' : 4,
-         'connector' : 2,
-         'head and packaging' : 3,
-         'integration and excision': 1,
-         'lysis' : 5,
-         'moron, auxiliary metabolic gene and host takeover' : 6,
-         'other' : 7,
-         'tail' : 8,
-         'transcription regulation' : 9,
-         'unknown function' :  0}
+    #get the phrog encodings
+    phrog_encoding =  pickle5.load(open(phrog_categories, 'rb'))
+    phrog_encoding[None] = one_letter.get('unknown function')
 
-    #use this dictionary to generate an encoding of each phrog
-    phrog_encoding = dict(zip([str(i) for i in annot['phrog']], [one_letter.get(c) for c in annot['category']]))
-
-    #add a None object to this dictionary which is consist with the unknown 
-    phrog_encoding[None] = one_letter.get('unknown function') 
-        
-    num_functions = len(one_letter)
-    n_features = num_functions 
+    # set variables
+    num_functions = len(set(phrog_encoding.values()))
+    n_features = num_functions  #TODO this is flawed
     
     if args['features'] == 'all': 
         n_features = num_functions + 5 #TODO update this accordingly. Find a way to automate and make a function
