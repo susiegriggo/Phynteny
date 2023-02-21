@@ -230,11 +230,13 @@ def generate_dataset(data, features_included, num_functions, max_length):
     :param num_functions: number of different possible functions - PHROGs has 10
     :param max_length: maximum allowable size of a prophage
     :return: dataset framed for supervised learning
+    :return: list of indices masked for each instance in the dataset
     """
 
     # features is a list of list objects
     X = []
     y = []
+    masked_idx = [] # masked index
 
     keys = list(data.keys())
 
@@ -261,10 +263,15 @@ def generate_dataset(data, features_included, num_functions, max_length):
         #generate example 
         this_X, this_y = generate_example(encoding, features, num_functions, n_features, max_length, idx)
 
+        #store the data
         X.append(this_X)
         y.append(this_y)
 
+        #store the index
+        masked_idx.append(idx)
+
+    # reshape the data
     X = np.array(X).reshape(len(keys), max_length, n_features)
     y = np.array(y).reshape(len(keys), max_length, num_functions)
 
-    return X, y
+    return X, y, masked_idx

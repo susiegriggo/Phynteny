@@ -78,6 +78,8 @@ class Model:
 
         skf = StratifiedKFold(n_splits=self.n_features, shuffle=True, random_state=42)  # this generates the data here
 
+
+        #for the stratification should the masked value be what is parsed
         for train_index, val_index in skf.split(self.X, self.y): #TODO do something in case the data hasn't been set yet
 
             # generate stratified test and train sets
@@ -387,7 +389,6 @@ def train_kfold(
         del y_test
         del test_encodings
         del test_features
-
 
 def train_LSTM(
     X_train,
