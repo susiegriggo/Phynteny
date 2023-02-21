@@ -236,7 +236,7 @@ def generate_dataset(data, features_included, num_functions, max_length):
     # features is a list of list objects
     X = []
     y = []
-    masked_idx = [] # masked index
+    masked_cat = [] # masked index
 
     keys = list(data.keys())
 
@@ -268,10 +268,10 @@ def generate_dataset(data, features_included, num_functions, max_length):
         y.append(this_y)
 
         #store the index
-        masked_idx.append(idx)
+        masked_cat.append(encoding[idx])
 
     # reshape the data
     X = np.array(X).reshape(len(keys), max_length, n_features)
     y = np.array(y).reshape(len(keys), max_length, num_functions)
 
-    return X, y, masked_idx
+    return X, y, masked_cat
