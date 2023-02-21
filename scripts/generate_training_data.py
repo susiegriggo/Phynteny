@@ -10,7 +10,6 @@ import argparse
 import re
 from phynteny_utils import handle_genbank
 
-
 def check_positive(arg):
     """Type function for argparse - a float within some predefined bounds"""
 
@@ -52,39 +51,7 @@ def parse_args():
         required=False,
         default=4,
     )
-    parser.add_argument(
-        "-c",
-        "--chunks",
-        type=check_positive,
-        help="Number of chunks to divide data",
-        required=False,
-        default=0,
-    )
     return vars(parser.parse_args())
-
-def generate_chunks(data, k, prefix):
-    """
-    generate chunks to train model. The last chunk is termed the 'test' chunk
-
-    param data: complete set of training to chunk
-    param k: number of chunks to divide data
-    param prefix: string prefix of each output chunk
-    param prefix: prefix of the output k-folds
-    """
-
-    n = int(len(data) / k)
-
-    suffix = [i for i in range(k - 1)]
-    suffix.append("test")
-
-    # loop through each k-fold
-    for i in range(k):
-
-        fold = dict(list(data.items())[i * n: (i + 1) * n])
-
-        filename = prefix + "_" + str(suffix[i]) + "_chunk.pkl"
-        filehandler = open(filename, "wb")
-        pickle.dump(fold, filehandler)
 
 def main():
 
@@ -160,7 +127,7 @@ def main():
     print("Done Processing!\n")
     print("Removing duplicate phrog category orders")
 
-    derep_data = handle_genbank.derep_trainingdata(training_data)
+    derep_data = handle_genbank.derep_trainingdata(training_data) #TODO go back and check this dereplication procedure - how can I make sure it is random
     data_derep_shuffle = handle_genbank.shuffle_dict(derep_data)
 
     # save the non-dereplicated data - this might be what ends up being used 
@@ -173,11 +140,6 @@ def main():
     handle.close()
 
     print("\nTraining data save to " + str(args["output"] + "_all_data.pkl"))
-
-    if args["chunks"] > 0:
-
-        print("\nGenerating subsets for k-fold cross validation")
-        generate_chunks(data_derep_shuffle, args["chunks"], args["output"])
 
     print("Complete!")
     print(

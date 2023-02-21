@@ -31,18 +31,16 @@ def get_dict(dict_path): #TODO where to place this
 
 class Model():
 
-    def __init__(self, data, phrog_categories_path, k, num_functions, n_features, out_file, memory_cells, batch_size, epochs, dropout, recurrent_dropout, learning_rate, patience, min_delta, features, validation_dropout):
+    def __init__(self,  phrog_categories_path, k, num_functions, n_features,  memory_cells, batch_size, epochs, dropout, recurrent_dropout, learning_rate, patience, min_delta, activation, features, validation_dropout):
         """
-        :param data: dictionary of training data
+
         :param phrog_categories_path: location of the dictionary describing the phrog_categories
         """
 
-        self.data = get_dict(phrog_categories_path)
         self.phrog_categories = get_dict(phrog_categories_path)
         self.k = k
         self.num_functions = num_functions
         self.n_features = n_features
-        self.out_file = out_file
         self.memory_cells = memory_cells
         self.batch_size = batch_size
         self.epochs = epochs
@@ -52,64 +50,129 @@ class Model():
         self.patience = patience
         self.min_delta = min_delta
         self.features = features
+        self.activation = activation
         self.validation_dropout = validation_dropout
 
-    def train_LSTM(self):
+        #TODO write something to handle features
+
+    def train_LSTM(self): #TODO - include activation function
         """
         Training procedure here
         """
+        #TODO how to control the different features here
+        model = Sequential()
+        model.add(
+            Bidirectional(
+                LSTM(
+                    memory_cells,
+                    return_sequences=True,
+                    dropout=dropout,
+                    kernel_regularizer=L1L2(0, 0),
+                ),
+                input_shape=(max_length, n_features),
+            )
+        )
+        model.add(
+            Bidirectional(
+                LSTM(
+                    memory_cells,
+                    return_sequences=True,
+                    dropout=dropout,
+                    kernel_regularizer=L1L2(0, 0),
+                )
+            )
+        )
+        model.add(
+            Bidirectional(
+                LSTM(
+                    memory_cells,
+                    return_sequences=True,
+                    dropout=dropout,
+                    kernel_regularizer=L1L2(0, 0),
+                )
+            )
+        )
+        model.add(TimeDistributed(Dense(num_functions, activation="softmax")))
+
+        optimizer = Adam(learning_rate=lr)
+        model.compile(
+            loss="categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"]
+        )
+        print(model.summary(), flush=True)
+
+        es = EarlyStopping(
+            monitor="loss", mode="min", verbose=2, patience=patience, min_delta=min_delta
+        )  # use a set number of epoch when adjusting the memory cells and batch size
+        mc = ModelCheckpoint(
+            model_file_out[:-3] + "best_val_accuracy.h5",
+            monitor="val_loss",
+            mode="min",
+            save_best_only=True,
+            verbose=1,
+            save_freq="epoch",
+        )  # model with the best validation loss therefore minimise
+        mc2 = ModelCheckpoint(
+            model_file_out[:-3] + "best_val_loss.h5",
+            monitor="val_accuracy",
+            mode="max",
+            save_best_only=True,
+            verbose=1,
+            save_freq="epoch",
+        )  # model with the best validation set accuracy therefore maximise
+
+        history = model.fit(
+            X_train,
+            y_train,
+            epochs=epochs,
+            batch_size=batch_size,
+            callbacks=[es, mc, mc2],
+            validation_data=(X_test, y_test),
+        )
+
+        # save the model
+        model.save(model_file_out)
+
+        # save the history dictionary as a pickle
+        with open(history_file_out, "wb") as handle:
+            pickle.dump(history.history, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-    def generate_data(self):
+
+    def parse_data(self, data):
         """
-        Function to take training data and process
+        Function to take training data and process.
+        Note - previous data will be removed from the model object if new data is parsed
+
+        :param data: dictionary of training data to process
         """
 
         # get the phrog encodings and additional features
         encodings, features = format_data.format_data(
-            self.data, self.phrog_encoding
+            data, self.phrog_encoding
         )
 
-        # encoded the dataset as masked matrices
-        X, y, masked_idx = format_data.generate_dataset( #TODO is masked_idx necessary here
+        # encoded the dataset as masked matrices - these contain maskings
+        X, y = format_data.generate_dataset(
             encodings, features, self.num_functions, self.n_features, self.max_length)
 
-        #TODO dereplicaiton of the training data - at what stage
-        #want to ignore the feautres when dereplicated
+        self.X = X
+        self.y = y
 
-        return X, y
-
-    def cross_validation(self):
+    def data_split(self):
         """
         Perform stratified cross-validation
         """
 
-        skf = StratifiedKFold(n_splits=k + 1, shuffle=True, random_state=1)  # this generates the data here
+        skf = StratifiedKFold(n_splits=k + 1, shuffle=True, random_state=42)  # this generates the data here
 
-        for train_index, test_index in skf.split(X, y):
-            # use training indexes
-            train_LSTM(
-                    X[train_index],
-                    y[train_index],
-                    X[test_index],
-                    y[test_index],
-                    max_length,
-                    n_features,
-                    num_functions,
-                    model_file_out,
-                    history_file_out,
-                    memory_cells,
-                    batch_size,
-                    epochs,
-                    dropout,
-                    recurrent,
-                    lr,
-                    patience,
-                    min_delta,
-                )
+        for train_index, test_index in skf.split(self.X, self.y): #TODO do something in case the data hasn't been set yet
+
+            # generate stratified test and train sets
+            strat_train = X[train_index, :, :]
+            strat_test = y[test_index, :,:]
 
 
-
+            #go and train the LSTM model
 
 
 def select_features(data, features):
