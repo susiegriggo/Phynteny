@@ -317,48 +317,7 @@ def generate_prediction(sequence, features, num_functions, n_features, max_lengt
     return X.reshape((1, max_length, n_features))
 
 
-def generate_dataset(sequences, all_features, num_functions, n_features, max_length):
-    """ 
-    Generate a dataset to train LSTM model
-
-    :param sequences: set of sequences encoded as integers for each PHROG
-    :param dataset_size: number of sequences in the dataset
-    :param all_features:  set of features to include in the encodings
-    :param num_functions: number of possible PHROG categories
-    :param n_features: total number of features
-    :param max_length: maximum length of a sequence
-    :param features: state what selection of features to include
-    :return: Dataset of training or test data reprsented as X and y matrices
-    """
-
-    print("n_features: " + str(n_features), flush=True)
-
-    # features is a list of list objects
-    X = []
-    y = []
-
-    for i in range(len(sequences)):
-        # take a function to mask
-        idx = random.randint(1, len(sequences[i]) - 1)  # don't include ends
-
-        # make sure that the mask is not an uknown category
-        while sequences[i][idx] == 0:
-            idx = random.randint(1, len(sequences[i]) - 1)
-
-        this_X, this_y = generate_example(
-            sequences[i], all_features[i], num_functions, n_features, max_length, idx
-        )
-
-        # store the functon which was masked
-        X.append(this_X)
-        y.append(this_y)
-
-    X = np.array(X).reshape(len(sequences), max_length, n_features)
-    y = np.array(y).reshape(len(sequences), max_length, num_functions)
-
-    return X, y
-
-def generate_dataset2(data, features_included, num_functions, max_length):
+def generate_dataset(data, features_included, num_functions, max_length):
     """
 
     """
@@ -374,7 +333,7 @@ def generate_dataset2(data, features_included, num_functions, max_length):
     for i in range(len(keys)):
 
         #get the encoding
-        encoding = data.get(keys[i].get('categories'))
+        encoding = data.get(keys[i]).get('categories')
 
         #get the features
         features = get_features(data.get(keys[i]), features_included)
@@ -383,13 +342,14 @@ def generate_dataset2(data, features_included, num_functions, max_length):
         n_features = num_functions + len(features)
 
         #pick a function to mask
-        idx =  random.randint(1, len(encoding[i]) - 1)
+        idx =  random.randint(1, len(encoding) - 1)
 
         # make sure that the mask is not an uknown category
-        while encoding[i][idx] == 0:
-            idx = random.randint(1, len(encoding[i]) - 1)
+        while encoding[idx] == 0:
+            idx = random.randint(1, len(encoding) - 1)
 
-        this_X, this_y = generate_example(encoding, num_functions, n_features, max_length, idx)
+        #generate example 
+        this_X, this_y = generate_example(encoding, features, num_functions, n_features, max_length, idx)
 
         X.append(this_X)
         y.append(this_y)
