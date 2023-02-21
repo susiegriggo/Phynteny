@@ -21,26 +21,9 @@ def get_genbank(filename):
 
     return gb_dict
 
-"""
-
-def get_features(genbank):  # TODO add feature for number of genes with same orientation
-
-    # only consider CDS
-    features = [i for i in genbank.features if i.type == "CDS"et
-
-    return {
-        "length": len(genbank.seq),
-        "strand": [i.strand for i in features],
-        "position": [
-            (int(i.location.start) - 1, int(i.location.end)) for i in features
-        ],
-        "phrog": [i.qualifiers.get("phrog") for i in features],
-    }
-"""
-
 def encode_strand(strand):
     """
-    One hot encode sense
+    One hot encode the direction of each gene
 
     :param strand: sense encoded as a vector of 1s and 2s
     :return: one hot encoding as two separate numpy arrays
@@ -59,7 +42,7 @@ def encode_strand(strand):
 
 def encode_start(gene_positions):
     """
-    Encode the start
+    Encode the start of each gene
 
     :param gene_positions: vector of the start positions for each genes
     """
@@ -89,69 +72,6 @@ def encode_intergenic(gene_positions):
     intergenic.insert(0, 0)
 
     return np.array(intergenic)
-
-def flip_genomes(training_data, phrog_encoding):
-    """
-    If an integrase has an integrase at the end of a sequence flip so that it is at the start of the sequence
-
-    :param training_data: dictionary which contains details for each genome
-    :param phrog_encoding: dictionary nwhich converts phrogs to category integer encoding
-    :return: dictionary containing genomes which are flipped if needed
-    """
-
-    data = dict()
-
-    training_keys = list(training_data.keys())
-
-    for key in training_keys:
-        genome = training_data.get(key)
-        encoding = [phrog_encoding.get(i) for i in genome.get("phrogs")]
-
-        if encoding[-1] == 1:
-            # adjust the positions for the reverse order
-            length = genome.get("length")
-            positions = [
-                (np.abs(i[1] - length), np.abs(i[0] - length))
-                for i in genome.get("position")[::-1]
-            ]
-
-            sense = ["-" if i == "+" else "+" for i in genome.get("sense")[::-1]]
-
-            # add to the dictionary
-            data[key] = {
-                "length": genome.get("length"),
-                "phrogs": genome.get("phrogs")[::-1],
-                "protein_id": genome.get("protein_id")[::-1],
-                "sense": sense,
-                "position": positions,
-            }
-        else:
-            data[key] = genome
-
-    return data
-
-
-def filter_genes(training_data, threshold):
-    """
-    Filter training date to only contain prophages with a number of genes below some threshold
-
-    :param training_data: dictionary containing the training data
-    :param threshold: the maximum number of genes for a prophage
-    :return: dictionary containing training data without prophages with too many genes excluded
-    """
-
-    keys = list(training_data.keys())
-
-    num_genes = [
-        len(training_data.get(keys[i]).get("phrogs")) for i in range(len(keys))
-    ]
-
-    index = [i for i in range(len(keys)) if num_genes[i] <= threshold]
-
-    filtered_keys = [keys[i] for i in index]
-
-    return dict(zip(filtered_keys, [training_data.get(k) for k in filtered_keys]))
-
 
 def count_direction(strand):
     """
@@ -323,11 +243,11 @@ def encode_feature(encoding, feature, column):
     :param column: column to add feature
     :return: feature matrix including the new feature
     """
+
     encoding = encoding.astype("float64")
     encoding[: len(feature), column] = feature
 
     return encoding
-
 
 def one_hot_decode(encoded_seq):
     """
@@ -350,8 +270,11 @@ def generate_example(sequence, features, num_functions, n_features, max_length, 
     :return: training or test example separated as X and y matrices
     """
 
+    #TODO add a flag to this function to control whether the generatin is for testing or for a prediction
+
     seq_len = len(sequence)
     padded_sequence = pad_sequences([sequence], padding="post", maxlen=max_length)[0]
+
     y = np.array(one_hot_encode(padded_sequence, num_functions))
     X = np.array(one_hot_encode(padded_sequence, n_features))
 
@@ -432,5 +355,46 @@ def generate_dataset(sequences, all_features, num_functions, n_features, max_len
 
     X = np.array(X).reshape(len(sequences), max_length, n_features)
     y = np.array(y).reshape(len(sequences), max_length, num_functions)
+
+    return X, y
+
+def generate_dataset2(data, features_included, num_functions, max_length):
+    """
+
+    """
+
+    #TODO add a feature to cut off with the max_length parameter
+
+    # features is a list of list objects
+    X = []
+    y = []
+
+    keys = list(data.keys())
+
+    for i in range(len(keys)):
+
+        #get the encoding
+        encoding = data.get(keys[i].get('categories'))
+
+        #get the features
+        features = get_features(data.get(keys[i]), features_included)
+
+        #calculate the dimension
+        n_features = num_functions + len(features)
+
+        #pick a function to mask
+        idx =  random.randint(1, len(encoding[i]) - 1)
+
+        # make sure that the mask is not an uknown category
+        while encoding[i][idx] == 0:
+            idx = random.randint(1, len(encoding[i]) - 1)
+
+        this_X, this_y = generate_example(encoding, num_functions, n_features, max_length, idx)
+
+        X.append(this_X)
+        y.append(this_y)
+
+    X = np.array(X).reshape(len(keys), max_length, n_features)
+    y = np.array(y).reshape(len(keys), max_length, num_functions)
 
     return X, y

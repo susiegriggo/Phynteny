@@ -162,7 +162,13 @@ class Model:
             data, self.phrog_encoding #TODO is this procedure still the best
         )
 
-        encodings = [data.get(i).get('categories') for i in list(data.keys())] #TODO temp - might be a better strategy for this
+        # generate features
+        features = [format_data.get_features(data, self.features_include)]
+
+        # generate encodings
+        encodings = [data.get(i).get('categories') for i in list(data.keys())]
+
+        #extract the features and encodings and put into a matrix on a case by case basis
 
         # encoded the dataset as masked matrices - these contain maskings
         X, y = format_data.generate_dataset(
