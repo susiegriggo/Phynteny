@@ -21,16 +21,12 @@ def get_genbank(filename):
 
     return gb_dict
 
+"""
 
 def get_features(genbank):  # TODO add feature for number of genes with same orientation
-    """
-    Get required features from genbank file
 
-    param genbank: Genbank locus as SeqIO dictionary
-    return: Dictionary containing information required for training
-    """
     # only consider CDS
-    features = [i for i in genbank.features if i.type == "CDS"]
+    features = [i for i in genbank.features if i.type == "CDS"et
 
     return {
         "length": len(genbank.seq),
@@ -40,6 +36,7 @@ def get_features(genbank):  # TODO add feature for number of genes with same ori
         ],
         "phrog": [i.qualifiers.get("phrog") for i in features],
     }
+"""
 
 def encode_strand(strand):
     """
@@ -50,14 +47,15 @@ def encode_strand(strand):
     """
 
     encode = np.array(
-        [2 if i == "+" else 1 for i in phage.get("sense")]
+        [2 if i == "+" else 1 for i in strand]
     )
 
     strand_encode = np.array([1 if i == 1 else 0 for i in encode]), np.array(
         [1 if i == 2 else 0 for i in encode]
     )
-
-    return np.array([s[0] for s in strand_encode]), np.array([s[1] for s in strand_encode])
+    
+  
+    return strand_encode[0], strand_encode[1]
 
 def encode_start(gene_positions):
     """
@@ -90,7 +88,7 @@ def encode_intergenic(gene_positions):
 
     intergenic.insert(0, 0)
 
-    return intergenic
+    return np.array(intergenic)
 
 def flip_genomes(training_data, phrog_encoding):
     """
@@ -174,8 +172,10 @@ def count_direction(strand):
             counter = 0
 
         direction_count.append(counter)
+        
+    direction_count.insert(0, 0)
 
-    return direction_count
+    return np.array(direction_count)
 
 def get_features(phage, features_included = 'all'):
     """
@@ -188,32 +188,32 @@ def get_features(phage, features_included = 'all'):
     features = []
 
     # strand features
-    if features_included is in ["all", "strand"]:
-        strand1, strand2 = encode_strand(phage.get('strand'))
+    if features_included in ["all", "strand"]:
+        strand1, strand2 = encode_strand(phage.get('sense'))
         features.append(strand1)
         features.append(strand2)
 
-    # gene start position
-    if features_included is in ['all', 'gene_start']:
+    # gene start position #TODO manipulate this feature - might be able to make it an int value instead 
+    if features_included  in ['all', 'gene_start']:
         start = encode_start(phage.get('position'))
         features.append(start)
 
-    # intergenic distance
-    if features_included is in ['all', 'intergenic']:
+    # intergenic distance 
+    if features_included  in ['all', 'intergenic']:
         intergenic = encode_intergenic(phage.get('position'))
         features.append(intergenic)
 
     # gene length
-    if features_included is in ['all', 'gene_length']:
+    if features_included  in ['all', 'gene_length']:
         length = np.array([i[1] - i[0] for i in phage.get("position")])
         features.append(length)
 
     # orientation count
-    if features_included is in ['all', 'orientation_count']:
+    if features_included  in ['all', 'orientation_count']:
         orientation_count = count_direction(phage.get('sense'))
         features.append(orientation_count)
 
-    return features
+    return np.array(features)  
 
 def format_data(training_data, phrog_encoding):
     """
