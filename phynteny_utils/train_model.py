@@ -29,35 +29,46 @@ def get_dict(dict_path): #TODO where to place this
 
     return dictionary
 
-class Model():
+def feature_check(features_include):
+    """
+    Check the combination of features is possible
 
-    def __init__(self,  phrog_categories_path, k, num_functions, n_features,  memory_cells, batch_size, epochs, dropout, recurrent_dropout, learning_rate, patience, min_delta, activation, features, validation_dropout):
+    :param features: string describing the list of features
+    """
+
+    if features_include not in []:
+        raise Exception("Not an possible combination of features!\n"
+                        "Must be one of: 'all', 'none', 'intergenic', 'gene_length', 'position', 'orientation_count'")
+
+    return features_include
+
+class Model:
+
+    def __init__(self,  phrog_categories_path, features_include = 'all'):
         """
-
         :param phrog_categories_path: location of the dictionary describing the phrog_categories
+        :param features: string describing a subset of features to use - one of ['all', 'strand', 'none', 'gene_start', 'intergenic', 'gene_length', 'position', 'orientation_count']
         """
 
         self.phrog_categories = get_dict(phrog_categories_path)
-        self.k = k
-        self.num_functions = num_functions
-        self.n_features = n_features
-        self.memory_cells = memory_cells
-        self.batch_size = batch_size
-        self.epochs = epochs
-        self.dropout = dropout
-        self.recurrent_dropout = recurrent_dropout
-        self.learning_rate = learning_rate
-        self.patience = patience
-        self.min_delta = min_delta
-        self.features = features
-        self.activation = activation
-        self.validation_dropout = validation_dropout
+        self.features_include = feature_check(features_include)
+        self.num_functions = len(set(self.phrog_categories.values())) # dimension describing the number of functions
+        #self.n_features = self.num_functions + #TODO is there a way this can be determined from the input - calculate from the features
 
-        #TODO write something to handle features
-
-    def train_LSTM(self): #TODO - include activation function
+    def train_LSTM(self, memory_cells = 100, batch_size = 128,  dropout = 0.1, recurrent_dropout = 0, learning_rate = 0.0001,  activation = 'tanh',  validation_dropout = 0, patience = 5, min_delta = 0.0001 ): #TODO - include activation function
         """
         Training procedure here
+
+        :param memory_cells: number of memory cells in each hidden layer
+        :param batch_size: batch size during training
+        :param dropout: dropout of each hidden layer
+        :param recurrent_dropout: recurrent dropout for each layer
+        :param learning_rate: learning rate
+        :param  activation: string describing activation function
+        :param validation_dropout: validation dropout
+        :param epochs: number of epochs to train the model for
+        :param patience: number of epochs below min delta to cease training
+        :param min_delta: minimum loss before giving up on training
         """
         #TODO how to control the different features here
         model = Sequential()
@@ -148,19 +159,25 @@ class Model():
 
         # get the phrog encodings and additional features
         encodings, features = format_data.format_data(
-            data, self.phrog_encoding
+            data, self.phrog_encoding #TODO is this procedure still the best
         )
+
+        encodings = [data.get(i).get('categories') for i in list(data.keys())] #TODO temp - might be a better strategy for this
 
         # encoded the dataset as masked matrices - these contain maskings
         X, y = format_data.generate_dataset(
             encodings, features, self.num_functions, self.n_features, self.max_length)
 
+        self.n_features = X.shape[1] #set this based on the size of the outputs
         self.X = X
         self.y = y
 
-    def data_split(self):
+
+
+    def data_split(self, k):
         """
         Perform stratified cross-validation
+        :param k: number of k-folds to include. 1 is added to this to also generate a test set of equal size
         """
 
         skf = StratifiedKFold(n_splits=k + 1, shuffle=True, random_state=42)  # this generates the data here
@@ -173,7 +190,6 @@ class Model():
 
 
             #go and train the LSTM model
-
 
 def select_features(data, features):
     """

@@ -6,9 +6,7 @@ Functions to prepare data for training with the LSTM viral gene organisation mod
 import numpy as np
 import random
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-import pickle
 from Bio import SeqIO
-import glob
 
 
 def get_genbank(filename):
@@ -43,7 +41,6 @@ def get_features(genbank):  # TODO add feature for number of genes with same ori
         "phrog": [i.qualifiers.get("phrog") for i in features],
     }
 
-
 def encode_strand(strand):
     """
     One hot encode sense
@@ -52,10 +49,48 @@ def encode_strand(strand):
     :return: one hot encoding as two separate numpy arrays
     """
 
-    return np.array([1 if i == 1 else 0 for i in strand]), np.array(
-        [1 if i == 2 else 0 for i in strand]
+    encode = np.array(
+        [2 if i == "+" else 1 for i in phage.get("sense")]
     )
 
+    strand_encode = np.array([1 if i == 1 else 0 for i in encode]), np.array(
+        [1 if i == 2 else 0 for i in encode]
+    )
+
+    return np.array([s[0] for s in strand_encode]), np.array([s[1] for s in strand_encode])
+
+def encode_start(gene_positions):
+    """
+    Encode the start
+
+    :param gene_positions: vector of the start positions for each genes
+    """
+
+    start = np.array(
+        [
+            i[0] - gene_positions[0][0]
+            for i in gene_positions
+        ]
+    )
+
+    return np.round(start / np.max(start), 3)
+
+def encode_intergenic(gene_positions):
+    """
+    generate a vector which encodes the intergenic distance between genes
+
+    :param gene_positions: position of the gene along the genome
+    """
+
+    intergenic = [
+        gene_positions[i + 1][0]
+        - gene_positions[i][1]
+        for i in range(len(gene_positions) - 1)
+    ]
+
+    intergenic.insert(0, 0)
+
+    return intergenic
 
 def flip_genomes(training_data, phrog_encoding):
     """
@@ -120,7 +155,7 @@ def filter_genes(training_data, threshold):
     return dict(zip(filtered_keys, [training_data.get(k) for k in filtered_keys]))
 
 
-def count_direction(sense):
+def count_direction(strand):
     """
     Count the number of genes which have occured with the same orientation
 
@@ -131,8 +166,8 @@ def count_direction(sense):
     direction_count = []
     counter = 0
 
-    for i in range(len(sense) - 1):
-        if sense[i] == sense[i + 1]:
+    for i in range(len(strand) - 1):
+        if strand[i] == strand[i + 1]:
             counter += 1
 
         else:
@@ -142,6 +177,43 @@ def count_direction(sense):
 
     return direction_count
 
+def get_features(phage, features_included = 'all'):
+    """
+    Write a function which gets the features for a prophage
+
+    :param features_included: string describing the features to be included
+    :param phage: phage data object
+    """
+
+    features = []
+
+    # strand features
+    if features_included is in ["all", "strand"]:
+        strand1, strand2 = encode_strand(phage.get('strand'))
+        features.append(strand1)
+        features.append(strand2)
+
+    # gene start position
+    if features_included is in ['all', 'gene_start']:
+        start = encode_start(phage.get('position'))
+        features.append(start)
+
+    # intergenic distance
+    if features_included is in ['all', 'intergenic']:
+        intergenic = encode_intergenic(phage.get('position'))
+        features.append(intergenic)
+
+    # gene length
+    if features_included is in ['all', 'gene_length']:
+        length = np.array([i[1] - i[0] for i in phage.get("position")])
+        features.append(length)
+
+    # orientation count
+    if features_included is in ['all', 'orientation_count']:
+        orientation_count = count_direction(phage.get('sense'))
+        features.append(orientation_count)
+
+    return features
 
 def format_data(training_data, phrog_encoding):
     """
@@ -204,6 +276,7 @@ def format_data(training_data, phrog_encoding):
     sense_encodings = [encode_strand(s) for s in sense_encodings]
     strand1s = [s[0] for s in sense_encodings]
     strand2s = [s[1] for s in sense_encodings]
+
 
     # get the number of genes in the same direction
     # direction_sum = [count_direction(s) for s in strand1s]
