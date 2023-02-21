@@ -357,7 +357,7 @@ def generate_dataset(sequences, all_features, num_functions, n_features, max_len
         X.append(this_X)
         y.append(this_y)
 
-    X = np.array(X).reshape(len(sequences)), max_length, n_features)
+    X = np.array(X).reshape(len(sequences)), max_length, n_features))
     y = np.array(y).reshape(len(sequences)), max_length, num_functions)
 
     return X, y
