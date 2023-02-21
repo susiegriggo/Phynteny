@@ -44,7 +44,7 @@ def feature_check(features_include):
 
 class Model:
 
-    def __init__(self,  phrog_categories_path, features_include = 'all'):
+    def __init__(self,  phrog_categories_path, max_length = 120, features_include = 'all'):
         """
         :param phrog_categories_path: location of the dictionary describing the phrog_categories
         :param features: string describing a subset of features to use - one of ['all', 'strand', 'none', 'gene_start', 'intergenic', 'gene_length', 'position', 'orientation_count']
@@ -53,12 +53,51 @@ class Model:
         self.phrog_categories = get_dict(phrog_categories_path)
         self.features_include = feature_check(features_include)
         self.num_functions = len(set(self.phrog_categories.values())) # dimension describing the number of functions
-        #self.n_features = self.num_functions + #TODO is there a way this can be determined from the input - calculate from the features
+        self.max_length = max_length
 
-    def train_LSTM(self, memory_cells = 100, batch_size = 128,  dropout = 0.1, recurrent_dropout = 0, learning_rate = 0.0001,  activation = 'tanh',  validation_dropout = 0, patience = 5, min_delta = 0.0001 ): #TODO - include activation function
+    def parse_data(self, data):
+        """
+        Function to take training data and process.
+        Note - previous data will be removed from the model object if new data is parsed
+
+        :param data: dictionary of training data to process
+        """
+
+        #generate dataset
+        X, y = format_data.generate_dataset(data, self.features_include, self.num_functions, self.max_length)
+
+        self.n_features = X.shape[1] #set this based on the size of the outputs
+        #self.X = X
+        #self.y = y
+
+    def train_crossValidation(self, k):
+        """
+        Perform stratified cross-validation
+        :param k: number of k-folds to include. 1 is added to this to also generate a test set of equal size
+        """
+
+        skf = StratifiedKFold(n_splits=self.n_features, shuffle=True, random_state=42)  # this generates the data here
+
+        for train_index, val_index in skf.split(self.X, self.y): #TODO do something in case the data hasn't been set yet
+
+            # generate stratified test and train sets
+            X_train = X[train_index, :, :]
+            y_train = y[train_index, :,:]
+
+            X_val = X[val_index, :,:]
+            y_val = y[val_index, :,:]
+
+
+            #use this data to train the LSTM model
+
+            #go and train the LSTM model
+
+    def train_LSTM(self, X, y, memory_cells = 100, batch_size = 128,  dropout = 0.1, recurrent_dropout = 0, learning_rate = 0.0001,  activation = 'tanh',  validation_dropout = 0, patience = 5, min_delta = 0.0001 ): #TODO - include activation function
         """
         Training procedure here
 
+        :param X: X for training
+        :param y: y for training
         :param memory_cells: number of memory cells in each hidden layer
         :param batch_size: batch size during training
         :param dropout: dropout of each hidden layer
@@ -71,6 +110,7 @@ class Model:
         :param min_delta: minimum loss before giving up on training
         """
         #TODO how to control the different features here
+        #TODO determine at what stage to parse all the different features
         model = Sequential()
         model.add(
             Bidirectional(
@@ -147,55 +187,6 @@ class Model:
         with open(history_file_out, "wb") as handle:
             pickle.dump(history.history, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-
-
-    def parse_data(self, data):
-        """
-        Function to take training data and process.
-        Note - previous data will be removed from the model object if new data is parsed
-
-        :param data: dictionary of training data to process
-        """
-
-        # get the phrog encodings and additional features
-        encodings, features = format_data.format_data(
-            data, self.phrog_encoding #TODO is this procedure still the best
-        )
-
-        # generate features
-        features = [format_data.get_features(data, self.features_include)]
-
-        # generate encodings
-        encodings = [data.get(i).get('categories') for i in list(data.keys())]
-
-        #extract the features and encodings and put into a matrix on a case by case basis
-
-        # encoded the dataset as masked matrices - these contain maskings
-        X, y = format_data.generate_dataset(
-            encodings, features, self.num_functions, self.n_features, self.max_length)
-
-        self.n_features = X.shape[1] #set this based on the size of the outputs
-        self.X = X
-        self.y = y
-
-
-
-    def data_split(self, k):
-        """
-        Perform stratified cross-validation
-        :param k: number of k-folds to include. 1 is added to this to also generate a test set of equal size
-        """
-
-        skf = StratifiedKFold(n_splits=k + 1, shuffle=True, random_state=42)  # this generates the data here
-
-        for train_index, test_index in skf.split(self.X, self.y): #TODO do something in case the data hasn't been set yet
-
-            # generate stratified test and train sets
-            strat_train = X[train_index, :, :]
-            strat_test = y[test_index, :,:]
-
-
-            #go and train the LSTM model
 
 def select_features(data, features):
     """

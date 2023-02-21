@@ -6,20 +6,6 @@ Functions to prepare data for training with the LSTM viral gene organisation mod
 import numpy as np
 import random
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-from Bio import SeqIO
-
-
-def get_genbank(filename):
-    """
-    Parse genbank file
-
-    param filename: location of genbank file
-    return: dictionary of genbank file loci and their features
-    """
-    with open(filename, "rt") as handle:
-        gb_dict = SeqIO.to_dict(SeqIO.parse(handle, "gb"))
-
-    return gb_dict
 
 def encode_strand(strand):
     """
@@ -36,8 +22,7 @@ def encode_strand(strand):
     strand_encode = np.array([1 if i == 1 else 0 for i in encode]), np.array(
         [1 if i == 2 else 0 for i in encode]
     )
-    
-  
+
     return strand_encode[0], strand_encode[1]
 
 def encode_start(gene_positions):
@@ -45,6 +30,7 @@ def encode_start(gene_positions):
     Encode the start of each gene
 
     :param gene_positions: vector of the start positions for each genes
+    :return: vector of encoded gene positions
     """
 
     start = np.array(
@@ -61,6 +47,7 @@ def encode_intergenic(gene_positions):
     generate a vector which encodes the intergenic distance between genes
 
     :param gene_positions: position of the gene along the genome
+    :return: vector of intergenic gaps
     """
 
     intergenic = [
@@ -77,8 +64,8 @@ def count_direction(strand):
     """
     Count the number of genes which have occured with the same orientation
 
-    param sense: Determine the number of sequences which have occured in the same direction.
-    return: List of counts of genes occuring with the same orientation
+    :param sense: Determine the number of sequences which have occured in the same direction.
+    :return: List of counts of genes occuring with the same orientation
     """
 
     direction_count = []
@@ -103,6 +90,7 @@ def get_features(phage, features_included = 'all'):
 
     :param features_included: string describing the features to be included
     :param phage: phage data object
+    :return: array of features for the prophage
     """
 
     features = []
@@ -135,85 +123,6 @@ def get_features(phage, features_included = 'all'):
 
     return np.array(features)  
 
-def format_data(training_data, phrog_encoding):
-    """
-    Intial function to generate training data.
-    Currently only includes genomes which start or end with an integrase. This is hard coded and will likely need changing.
-
-    :param training_data: dictionary which contains details for each genome
-    :param phrog_encoding: dictionary which converts phrogs to cateogory integer encoding
-    :return: training encodings one-hot encoding each genome
-    :return: list of features
-    """
-
-    training_encodings = []
-    sense_encodings = []
-    start_encodings = []
-    length_encodings = []
-    intergenic_encodings = []
-
-    training_keys = list(training_data.keys())
-
-    for key in training_keys:
-        #encoding = [phrog_encoding.get(i) for i in training_data.get(key).get("phrogs")]
-        encoding =  training_data.get(key).get("categories")
-        length = np.array([i[1] - i[0] for i in training_data.get(key).get("position")])
-
-        # encode the strand
-        sense = np.array(
-            [2 if i == "+" else 1 for i in training_data.get(key).get("sense")]
-        )
-
-        # start position of each gene
-        start = np.array(
-            [
-                round(i[0] - training_data.get(key).get("position")[0][0] + 1, 3)
-                for i in training_data.get(key).get("position")
-            ]
-        )
-
-        # intergenic distances
-        intergenic = [
-            training_data.get(key).get("position")[i + 1][0]
-            - training_data.get(key).get("position")[i][1]
-            for i in range(len(training_data.get(key).get("position")) - 1)
-        ]
-        intergenic.insert(0, 0)
-
-        # update the features
-        training_encodings.append(encoding)
-        sense_encodings.append(sense)
-        start_encodings.append(start)
-        intergenic_encodings.append(intergenic)
-        length_encodings.append(length)
-
-    # scale the start positions according to the length of the genome
-    start_encodings = [
-        s / np.max(s) for s in start_encodings
-    ]  # simply divide starts by the length of the sequence
-
-    # split the sense into two separate features as it is categorical data
-    sense_encodings = [encode_strand(s) for s in sense_encodings]
-    strand1s = [s[0] for s in sense_encodings]
-    strand2s = [s[1] for s in sense_encodings]
-
-
-    # get the number of genes in the same direction
-    # direction_sum = [count_direction(s) for s in strand1s]
-
-    # return a set of features to train the LSTM
-    features = [
-        strand1s,
-        strand2s,
-        length_encodings,
-        start_encodings,
-        intergenic_encodings,
-    ]  # , direction_sum]
-    features = [[f[j] for f in features] for j in range(len(training_encodings))]
-
-    return training_encodings, features
-
-
 def one_hot_encode(sequence, n_features):
     """
     One hot encode PHROG categories as data is cateogrical.
@@ -222,17 +131,14 @@ def one_hot_encode(sequence, n_features):
     :param n_features: total number of features in the model
     :return: numpy array containing one hot encoding
     """
-    # print('n_features: ' + str(n_features))
-    # print(sequence)
+
     encoding = list()
     for value in sequence:
         vector = [0 for i in range(n_features)]
-        # print(value)
         vector[value] = 1
         encoding.append(vector)
 
     return np.array(encoding)
-
 
 def encode_feature(encoding, feature, column):
     """
@@ -267,10 +173,9 @@ def generate_example(sequence, features, num_functions, n_features, max_length, 
     :param features: list of features to include in problem
     :param num_functions: number of possible PHROG categories
     :param max_length: maximum length of a sequence
+    :param idx: index of the category to mask
     :return: training or test example separated as X and y matrices
     """
-
-    #TODO add a flag to this function to control whether the generatin is for testing or for a prediction
 
     seq_len = len(sequence)
     padded_sequence = pad_sequences([sequence], padding="post", maxlen=max_length)[0]
@@ -316,13 +221,16 @@ def generate_prediction(sequence, features, num_functions, n_features, max_lengt
 
     return X.reshape((1, max_length, n_features))
 
-
 def generate_dataset(data, features_included, num_functions, max_length):
     """
+    Generate a dataset ready to parse to LSTM from a dictionary of training data
 
+    :param data: dictionary of prophages
+    :param features_included: string describing which features should be included
+    :param num_functions: number of different possible functions - PHROGs has 10
+    :param max_length: maximum allowable size of a prophage
+    :return: dataset framed for supervised learning
     """
-
-    #TODO add a feature to cut off with the max_length parameter
 
     # features is a list of list objects
     X = []
@@ -334,6 +242,8 @@ def generate_dataset(data, features_included, num_functions, max_length):
 
         #get the encoding
         encoding = data.get(keys[i]).get('categories')
+        if len(encoding) > max_length:
+            raise Exception('Prophage in your data is larger than the maximum allowable length. Try using a larger maximum')
 
         #get the features
         features = get_features(data.get(keys[i]), features_included)
