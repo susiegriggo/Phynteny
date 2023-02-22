@@ -64,23 +64,28 @@ class Model:
         """
 
         #generate dataset
-        X, y = format_data.generate_dataset(data, self.features_include, self.num_functions, self.max_length)
+        X, y, masked_cat = format_data.generate_dataset(data, self.features_include, self.num_functions, self.max_length)
 
         self.n_features = X.shape[1] #set this based on the size of the outputs
-        #self.X = X
-        #self.y = y
+        self.X = X
+        self.y = y #TODO these are not in init - figure out what to do
+        self.masked_cat = masked_cat
 
     def train_crossValidation(self, k):
         """
         Perform stratified cross-validation
         :param k: number of k-folds to include. 1 is added to this to also generate a test set of equal size
+
+        refer to this to make https://github.com/Fuhaoyi/ACEP/blob/master/ACME_codes/ACEP_model_CV.py
         """
 
-        skf = StratifiedKFold(n_splits=self.n_features, shuffle=True, random_state=42)  # this generates the data here
+        skf = StratifiedKFold(n_splits=self.n_features, shuffle=True, random_state=42) #Potentially this should be repeated stratifiedKFold
 
+
+        #stratified KFold returns test and train set - how to distinguish the validation from the test set
 
         #for the stratification should the masked value be what is parsed
-        for train_index, val_index in skf.split(self.X, self.y): #TODO do something in case the data hasn't been set yet
+        for train_index, val_index in skf.split(np.zeros(len(self.masked_cat)), self.masked_cat): #
 
             # generate stratified test and train sets
             X_train = X[train_index, :, :]
@@ -90,9 +95,29 @@ class Model:
             y_val = y[val_index, :,:]
 
 
+
+
             #use this data to train the LSTM model
 
             #go and train the LSTM model
+
+
+    def create_model(self):
+        """
+        Function for generating a LSTM model
+
+        :return: model ready to be trained
+        """
+
+        #TODO adjust the number of hidden layers
+        #TODO which of these is the input layer - will the activation function of input layer need to be different
+
+        model = Sequential()
+        model.add(Bidirectional(LSTM())) #TODO set each of the variables in here as tuneable parameters
+        #we need to test the number of hidden layers?
+        #this is a lot of testing and a good reason for the randomised search
+
+
 
     def train_LSTM(self, X, y, memory_cells = 100, batch_size = 128,  dropout = 0.1, recurrent_dropout = 0, learning_rate = 0.0001,  activation = 'tanh',  validation_dropout = 0, patience = 5, min_delta = 0.0001 ): #TODO - include activation function
         """
@@ -113,6 +138,9 @@ class Model:
         """
         #TODO how to control the different features here
         #TODO determine at what stage to parse all the different features
+
+        #TODO when creating the model introduce a random seed for reproducibility
+
         model = Sequential()
         model.add(
             Bidirectional(
@@ -145,7 +173,7 @@ class Model:
                 )
             )
         )
-        model.add(TimeDistributed(Dense(num_functions, activation="softmax")))
+        model.add(TimeDistributed(Dense(num_functions, activation="softmax"))) #this is the output layer
 
         optimizer = Adam(learning_rate=lr)
         model.compile(
