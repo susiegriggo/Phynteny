@@ -42,6 +42,9 @@ def feature_check(features_include):
 
     return features_include
 
+
+
+
 class Model:
 
     def __init__(self,  phrog_categories_path, max_length = 120, features_include = 'all'):
@@ -96,28 +99,53 @@ class Model:
 
 
 
-
+        #add a random search function in here too
             #use this data to train the LSTM model
 
             #go and train the LSTM model
 
 
-    def create_model(self):
+    def create_model(self, layers = 2, neurons = 2,  kernel_regularizer=L1L2(0,0), dropout = 0.1, optimizer = Adam(), activation = 'tanh', learning_rate = 0.0001):
         """
         Function for generating a LSTM model
 
+        :param layers: number of layers to use in the model
+        :param neurons: number of memory cells in hidden layers
+        :param kernel_regularizer: kernel regulzarizer
+        :param dropout: dropout rate to implement
+        :param optimizer: which optimization function to use
+        :param activation: which activation function to use for the hidden layers
+        :param learning_rate: learning rate for training the model
         :return: model ready to be trained
         """
 
-        #TODO adjust the number of hidden layers
-        #TODO which of these is the input layer - will the activation function of input layer need to be different
-
+        # define the model
         model = Sequential()
-        model.add(Bidirectional(LSTM())) #TODO set each of the variables in here as tuneable parameters
-        #we need to test the number of hidden layers?
-        #this is a lot of testing and a good reason for the randomised search
 
+        # loop which controls the number of hidden layers
+        for layer in range(layers - 1):
 
+            model.add(
+                Bidirectional(
+                    LSTM(
+                        neurons, return_sequences = True, dropout = dropout, kernel_regularizer = kernel_regularizer, activation=activation)
+                    ),
+                    input_shape=(self.max_length, self.n_features),
+                )
+            )
+
+        # output layer
+        model.add(TimeDistributed(Dense(self.num_functions, activation="softmax")))
+
+        # optimizer
+        optimization_function = optimizer(learning_rate=learning_rate)
+
+        #compile the model
+        model.compile(
+            loss="categorical_crossentropy", optimizer=optimization_function, metrics=["accuracy"]
+        )
+
+        return model
 
     def train_LSTM(self, X, y, memory_cells = 100, batch_size = 128,  dropout = 0.1, recurrent_dropout = 0, learning_rate = 0.0001,  activation = 'tanh',  validation_dropout = 0, patience = 5, min_delta = 0.0001 ): #TODO - include activation function
         """
