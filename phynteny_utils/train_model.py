@@ -36,13 +36,11 @@ def feature_check(features_include):
     :param features: string describing the list of features
     """
 
-    if features_include not in []:
+    if features_include not in ['all', 'strand', 'none','intergenic', 'gene_length', 'position', 'orientation_count' ]:
         raise Exception("Not an possible combination of features!\n"
-                        "Must be one of: 'all', 'none', 'intergenic', 'gene_length', 'position', 'orientation_count'")
+                        "Must be one of: 'all', 'none', 'intergenic', 'gene_length', 'position', 'orientation_count', 'strand'")
 
     return features_include
-
-
 
 
 class Model:
@@ -105,11 +103,11 @@ class Model:
             #go and train the LSTM model
 
 
-    def create_model(self, layers = 2, neurons = 2,  kernel_regularizer=L1L2(0,0), dropout = 0.1, optimizer = Adam(), activation = 'tanh', learning_rate = 0.0001):
+    def create_model(self, layers = 2, neurons = 2,  kernel_regularizer=L1L2(0,0), dropout = 0.1, optimizer = Adam, activation = 'tanh', learning_rate = 0.0001):
         """
         Function for generating a LSTM model
 
-        :param layers: number of layers to use in the model
+        :param layers: number of hidden layers to use in the model
         :param neurons: number of memory cells in hidden layers
         :param kernel_regularizer: kernel regulzarizer
         :param dropout: dropout rate to implement
@@ -121,6 +119,17 @@ class Model:
 
         # define the model
         model = Sequential()
+        
+        
+        #TODO does the activation function of the input layer need to be different to the hidden layers and output layer 
+        # input layer 
+        model.add(
+                Bidirectional(
+                    LSTM(
+                        neurons, return_sequences = True, dropout = dropout, kernel_regularizer = kernel_regularizer, activation=activation), input_shape=(self.max_length, self.n_features)
+                    )
+                )
+        
 
         # loop which controls the number of hidden layers
         for layer in range(layers - 1):
@@ -130,9 +139,7 @@ class Model:
                     LSTM(
                         neurons, return_sequences = True, dropout = dropout, kernel_regularizer = kernel_regularizer, activation=activation)
                     ),
-                    input_shape=(self.max_length, self.n_features),
-                )
-            )
+                )  
 
         # output layer
         model.add(TimeDistributed(Dense(self.num_functions, activation="softmax")))
