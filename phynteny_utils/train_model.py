@@ -12,9 +12,13 @@ from tensorflow.keras.layers import Bidirectional, TimeDistributed, Dense, LSTM
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import L1L2
+from tensorflow import keras
+from keras import optimizers
+
 import pickle
 from phynteny_utils import format_data
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import StratifiedKFold, RandomizedSearchCV
+from scikeras.wrappers import KerasClassifier
 import numpy as np
 from collections import ChainMap
 
@@ -83,7 +87,7 @@ class Model:
         skf = StratifiedKFold(n_splits=self.n_features, shuffle=True, random_state=42) #Potentially this should be repeated stratifiedKFold
 
 
-        #stratified KFold returns test and train set - how to distinguish the validation from the test set
+        #stratified KFold returns test and train set - how to distinguish the validation from the test set - do a test train split to get the test set
 
         #for the stratification should the masked value be what is parsed
         for train_index, val_index in skf.split(np.zeros(len(self.masked_cat)), self.masked_cat): #
@@ -96,14 +100,32 @@ class Model:
             y_val = y[val_index, :,:]
 
 
+    def perform_search(self):
+        """
+        Perform search to identify the optimal set of parameters for the model
 
-        #add a random search function in here too
-            #use this data to train the LSTM model
+        parse parameters to use in a grid search
 
-            #go and train the LSTM model
+        # run this function several times to generate sufficient replication
+        """
 
+        # make model into an sklearn object
+        model = KerasClassifier(model=self.create_model(), verbose = 0)
 
-    def create_model(self, layers = 2, neurons = 2,  kernel_regularizer=L1L2(0,0), dropout = 0.1, optimizer = Adam, activation = 'tanh', learning_rate = 0.0001):
+        # define the parameter search space
+        batch_size = [10, 20, 30]
+        param_grid = dict(batch_size=batch_size)
+        search = RandomizedSearchCV(model,param_grid, n_jobs=-1)
+
+        # run the results
+        search_result = search.fit(self.X,self.y)
+
+        # evaluate the results of the grid search
+        print("Best: %f using %s" % (search_result.best_score_, search_result.best_params_))
+
+        # save the best estimator
+
+    def create_model(self, layers = 2, neurons = 2,  kernel_regularizer=L1L2(0,0), dropout = 0.1, activation = 'tanh', learning_rate = 0.0001):
         """
         Function for generating a LSTM model
 
@@ -132,7 +154,7 @@ class Model:
         
 
         # loop which controls the number of hidden layers
-        for layer in range(layers - 1):
+        for layer in range(layers):
 
             model.add(
                 Bidirectional(
@@ -145,11 +167,11 @@ class Model:
         model.add(TimeDistributed(Dense(self.num_functions, activation="softmax")))
 
         # optimizer
-        optimization_function = optimizer(learning_rate=learning_rate)
-
-        #compile the model
+        #optimization_function = keras.optimizers.RMSprop(learning_rate=0.01)
+        #print(optimization_function)
+        #compile the model #in this compilation add the optimization function
         model.compile(
-            loss="categorical_crossentropy", optimizer=optimization_function, metrics=["accuracy"]
+            loss="categorical_crossentropy", metrics=["accuracy"]
         )
 
         return model
