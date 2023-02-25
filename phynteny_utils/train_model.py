@@ -12,17 +12,96 @@ from tensorflow.keras.layers import Bidirectional, TimeDistributed, Dense, LSTM
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import L1L2
-from tensorflow import keras
-from keras import optimizers
+from itertools import product
 
 import pickle
 from phynteny_utils import format_data
-from sklearn.model_selection import StratifiedKFold, RandomizedSearchCV
+from sklearn.model_selection import StratifiedKFold, RandomizedSearchCV, GridSearchCV
 from scikeras.wrappers import KerasClassifier
 import numpy as np
 from collections import ChainMap
 
-def get_dict(dict_path): #TODO where to place this
+
+def generate_LSTM(layers=1, neurons=2, kernel_regularizer=L1L2(0, 0), dropout=0.1, activation='tanh',
+                  learning_rate=0.0001):
+    """
+    Function for generating a LSTM model
+
+    :param layers: number of hidden layers to use in the model
+    :param neurons: number of memory cells in hidden layers
+    :param kernel_regularizer: kernel regulzarizer
+    :param dropout: dropout rate to implement
+    :param optimizer: which optimization function to use
+    :param activation: which activation function to use for the hidden layers
+    :param learning_rate: learning rate for training the model
+    :return: model ready to be trained
+    """
+
+    # define the model
+    model = Sequential()
+
+    # TODO does the activation function of the input layer need to be different to the hidden layers and output layer
+    # input layer
+    model.add(
+        Bidirectional(
+            LSTM(
+                neurons, return_sequences=True, dropout=dropout, kernel_regularizer=kernel_regularizer),
+            input_shape=(1,1920)
+        )
+    )
+
+    # loop which controls the number of hidden layers
+    for layer in range(layers):
+        print('layer: ' + str(layer))
+        model.add(
+            Bidirectional(
+                LSTM(
+                    neurons, return_sequences=True, dropout=dropout, kernel_regularizer=kernel_regularizer)
+            ),
+        )
+
+        # output layer
+    model.add(TimeDistributed(Dense(10, activation="softmax")))
+
+    # optimizer
+    # optimization_function = keras.optimizers.RMSprop(learning_rate=0.01)
+    # print(optimization_function)
+    # compile the model #in this compilation add the optimization function
+    model.compile(
+        loss="categorical_crossentropy", metrics=["accuracy"]
+    )
+
+    return model
+
+
+def perform_search(X, y):
+    """
+        Perform search to identify the optimal set of parameters for the model
+
+        parse parameters to use in a grid search
+s
+        # run this function several times to generate sufficient replication
+        """
+
+    # make model into an sklearn object
+    model_obj = KerasClassifier(model=generate_LSTM, verbose=0)
+
+    # define the parameter search space
+    batch_size = [10, 20, 30]
+    activation = ['sigmoid', 'tanh', 'relu']
+    param_grid = dict(batch_size=batch_size, activation=activation)
+
+    # Generate all combinations of hyperparameters
+    param_list = list(product(*param_grid.values()))
+
+    # Loop over all hyperparameter combinations
+    for params in param_list:
+
+        print('Training with hyperparameters: ', params)
+
+
+
+def get_dict(dict_path):  # TODO where to place this
     """
     Helper function to import dictionaries
     """
@@ -33,6 +112,7 @@ def get_dict(dict_path): #TODO where to place this
 
     return dictionary
 
+
 def feature_check(features_include):
     """
     Check the combination of features is possible
@@ -40,7 +120,7 @@ def feature_check(features_include):
     :param features: string describing the list of features
     """
 
-    if features_include not in ['all', 'strand', 'none','intergenic', 'gene_length', 'position', 'orientation_count' ]:
+    if features_include not in ['all', 'strand', 'none', 'intergenic', 'gene_length', 'position', 'orientation_count']:
         raise Exception("Not an possible combination of features!\n"
                         "Must be one of: 'all', 'none', 'intergenic', 'gene_length', 'position', 'orientation_count', 'strand'")
 
@@ -49,7 +129,7 @@ def feature_check(features_include):
 
 class Model:
 
-    def __init__(self,  phrog_categories_path, max_length = 120, features_include = 'all'):
+    def __init__(self, phrog_categories_path, max_length=120, features_include='all'):
         """
         :param phrog_categories_path: location of the dictionary describing the phrog_categories
         :param features: string describing a subset of features to use - one of ['all', 'strand', 'none', 'gene_start', 'intergenic', 'gene_length', 'position', 'orientation_count']
@@ -57,7 +137,7 @@ class Model:
 
         self.phrog_categories = get_dict(phrog_categories_path)
         self.features_include = feature_check(features_include)
-        self.num_functions = len(set(self.phrog_categories.values())) # dimension describing the number of functions
+        self.num_functions = len(set(self.phrog_categories.values()))  # dimension describing the number of functions
         self.max_length = max_length
 
     def parse_data(self, data):
@@ -68,12 +148,13 @@ class Model:
         :param data: dictionary of training data to process
         """
 
-        #generate dataset
-        X, y, masked_cat = format_data.generate_dataset(data, self.features_include, self.num_functions, self.max_length)
+        # generate dataset
+        X, y, masked_cat = format_data.generate_dataset(data, self.features_include, self.num_functions,
+                                                        self.max_length)
 
-        self.n_features = X.shape[1] #set this based on the size of the outputs
+        self.n_features = X.shape[2]  # set this based on the size of the outputs
         self.X = X
-        self.y = y #TODO these are not in init - figure out what to do
+        self.y = y  # TODO these are not in init - figure out what to do
         self.masked_cat = masked_cat
 
     def train_crossValidation(self, k):
@@ -84,23 +165,22 @@ class Model:
         refer to this to make https://github.com/Fuhaoyi/ACEP/blob/master/ACME_codes/ACEP_model_CV.py
         """
 
-        skf = StratifiedKFold(n_splits=self.n_features, shuffle=True, random_state=42) #Potentially this should be repeated stratifiedKFold
+        skf = StratifiedKFold(n_splits=self.n_features, shuffle=True,
+                              random_state=42)  # Potentially this should be repeated stratifiedKFold
 
+        # stratified KFold returns test and train set - how to distinguish the validation from the test set - do a test train split to get the test set
 
-        #stratified KFold returns test and train set - how to distinguish the validation from the test set - do a test train split to get the test set
-
-        #for the stratification should the masked value be what is parsed
-        for train_index, val_index in skf.split(np.zeros(len(self.masked_cat)), self.masked_cat): #
+        # for the stratification should the masked value be what is parsed
+        for train_index, val_index in skf.split(np.zeros(len(self.masked_cat)), self.masked_cat):  #
 
             # generate stratified test and train sets
             X_train = X[train_index, :, :]
-            y_train = y[train_index, :,:]
+            y_train = y[train_index, :, :]
 
-            X_val = X[val_index, :,:]
-            y_val = y[val_index, :,:]
+            X_val = X[val_index, :, :]
+            y_val = y[val_index, :, :]
 
-
-    def perform_search(self):
+    def perform_searchee(self):
         """
         Perform search to identify the optimal set of parameters for the model
 
@@ -110,73 +190,31 @@ class Model:
         """
 
         # make model into an sklearn object
-        model = KerasClassifier(model=self.create_model(), verbose = 0)
+        model_obj = KerasClassifier(model=generate_LSTM, verbose=0)
 
         # define the parameter search space
         batch_size = [10, 20, 30]
         param_grid = dict(batch_size=batch_size)
-        search = RandomizedSearchCV(model,param_grid, n_jobs=-1)
+        # search = RandomizedSearchCV(model, param_grid, n_jobs=-1)
+        print(model_obj)
+        search = GridSearchCV(estimator=model_obj, param_grid=param_grid, n_jobs=-1)
 
         # run the results
-        search_result = search.fit(self.X,self.y)
+        self.X = self.X.reshape((self.X.shape[0], self.X.shape[1] * self.X.shape[2]))
+        self.y = self.y.reshape((self.y.shape[0], self.y.shape[1] * self.y.shape[2]))
+        print(self.X.shape)
+        print(self.y.shape)
+
+        search_result = search.fit(self.X, self.y)
 
         # evaluate the results of the grid search
         print("Best: %f using %s" % (search_result.best_score_, search_result.best_params_))
 
         # save the best estimator
 
-    def create_model(self, layers = 2, neurons = 2,  kernel_regularizer=L1L2(0,0), dropout = 0.1, activation = 'tanh', learning_rate = 0.0001):
-        """
-        Function for generating a LSTM model
-
-        :param layers: number of hidden layers to use in the model
-        :param neurons: number of memory cells in hidden layers
-        :param kernel_regularizer: kernel regulzarizer
-        :param dropout: dropout rate to implement
-        :param optimizer: which optimization function to use
-        :param activation: which activation function to use for the hidden layers
-        :param learning_rate: learning rate for training the model
-        :return: model ready to be trained
-        """
-
-        # define the model
-        model = Sequential()
-        
-        
-        #TODO does the activation function of the input layer need to be different to the hidden layers and output layer 
-        # input layer 
-        model.add(
-                Bidirectional(
-                    LSTM(
-                        neurons, return_sequences = True, dropout = dropout, kernel_regularizer = kernel_regularizer, activation=activation), input_shape=(self.max_length, self.n_features)
-                    )
-                )
-        
-
-        # loop which controls the number of hidden layers
-        for layer in range(layers):
-
-            model.add(
-                Bidirectional(
-                    LSTM(
-                        neurons, return_sequences = True, dropout = dropout, kernel_regularizer = kernel_regularizer, activation=activation)
-                    ),
-                )  
-
-        # output layer
-        model.add(TimeDistributed(Dense(self.num_functions, activation="softmax")))
-
-        # optimizer
-        #optimization_function = keras.optimizers.RMSprop(learning_rate=0.01)
-        #print(optimization_function)
-        #compile the model #in this compilation add the optimization function
-        model.compile(
-            loss="categorical_crossentropy", metrics=["accuracy"]
-        )
-
-        return model
-
-    def train_LSTM(self, X, y, memory_cells = 100, batch_size = 128,  dropout = 0.1, recurrent_dropout = 0, learning_rate = 0.0001,  activation = 'tanh',  validation_dropout = 0, patience = 5, min_delta = 0.0001 ): #TODO - include activation function
+    def train_LSTM(self, X, y, memory_cells=100, batch_size=128, dropout=0.1, recurrent_dropout=0, learning_rate=0.0001,
+                   activation='tanh', validation_dropout=0, patience=5,
+                   min_delta=0.0001):  # TODO - include activation function
         """
         Training procedure here
 
@@ -193,10 +231,10 @@ class Model:
         :param patience: number of epochs below min delta to cease training
         :param min_delta: minimum loss before giving up on training
         """
-        #TODO how to control the different features here
-        #TODO determine at what stage to parse all the different features
+        # TODO how to control the different features here
+        # TODO determine at what stage to parse all the different features
 
-        #TODO when creating the model introduce a random seed for reproducibility
+        # TODO when creating the model introduce a random seed for reproducibility
 
         model = Sequential()
         model.add(
@@ -230,7 +268,7 @@ class Model:
                 )
             )
         )
-        model.add(TimeDistributed(Dense(num_functions, activation="softmax"))) #this is the output layer
+        model.add(TimeDistributed(Dense(num_functions, activation="softmax")))  # this is the output layer
 
         optimizer = Adam(learning_rate=lr)
         model.compile(
@@ -304,24 +342,24 @@ def PermaDropout(rate):
 
 
 def train_kfold(
-    base,
-    phrog_encoding,
-    k,
-    num_functions,
-    n_features,
-    max_length,
-    file_out,
-    memory_cells,
-    batch_size,
-    epochs,
-    dropout,
-    recurrent,
-    lr,
-    patience,
-    min_delta,
-    features,
-    model="LSTM",
-    permadropout=False,
+        base,
+        phrog_encoding,
+        k,
+        num_functions,
+        n_features,
+        max_length,
+        file_out,
+        memory_cells,
+        batch_size,
+        epochs,
+        dropout,
+        recurrent,
+        lr,
+        patience,
+        min_delta,
+        features,
+        model="LSTM",
+        permadropout=False,
 ):
     """
     Separate training data into
@@ -475,24 +513,25 @@ def train_kfold(
         del test_encodings
         del test_features
 
+
 def train_LSTM(
-    X_train,
-    y_train,
-    X_test,
-    y_test,
-    max_length,
-    n_features,
-    num_functions,
-    model_file_out,
-    history_file_out,
-    memory_cells,
-    batch_size,
-    epochs,
-    dropout,
-    recurrent,
-    lr,
-    patience,
-    min_delta,
+        X_train,
+        y_train,
+        X_test,
+        y_test,
+        max_length,
+        n_features,
+        num_functions,
+        model_file_out,
+        history_file_out,
+        memory_cells,
+        batch_size,
+        epochs,
+        dropout,
+        recurrent,
+        lr,
+        patience,
+        min_delta,
 ):
     """
     Train and save LSTM and training history
@@ -586,23 +625,23 @@ def train_LSTM(
 
 
 def train_LSTM_permadropout(
-    X_train,
-    y_train,
-    X_test,
-    y_test,
-    max_length,
-    n_features,
-    num_functions,
-    model_file_out,
-    history_file_out,
-    memory_cells,
-    batch_size,
-    epochs,
-    dropout,
-    recurrent,
-    lr,
-    patience,
-    min_delta,
+        X_train,
+        y_train,
+        X_test,
+        y_test,
+        max_length,
+        n_features,
+        num_functions,
+        model_file_out,
+        history_file_out,
+        memory_cells,
+        batch_size,
+        epochs,
+        dropout,
+        recurrent,
+        lr,
+        patience,
+        min_delta,
 ):
     """
     Train LSTM with permadropout.
@@ -685,23 +724,23 @@ def train_LSTM_permadropout(
 
 
 def train_ANN(
-    X_train,
-    y_train,
-    X_test,
-    y_test,
-    max_length,
-    n_features,
-    num_functions,
-    model_file_out,
-    history_file_out,
-    memory_cells,
-    batch_size,
-    epochs,
-    dropout,
-    recurrent,
-    lr,
-    patience,
-    min_delta,
+        X_train,
+        y_train,
+        X_test,
+        y_test,
+        max_length,
+        n_features,
+        num_functions,
+        model_file_out,
+        history_file_out,
+        memory_cells,
+        batch_size,
+        epochs,
+        dropout,
+        recurrent,
+        lr,
+        patience,
+        min_delta,
 ):
     """
     Train Artificial Neural Network to compare with LSTM
@@ -761,23 +800,23 @@ def train_ANN(
 
 
 def train_ANN_permadropout(
-    X_train,
-    y_train,
-    X_test,
-    y_test,
-    max_length,
-    n_features,
-    num_functions,
-    model_file_out,
-    history_file_out,
-    memory_cells,
-    batch_size,
-    epochs,
-    dropout,
-    recurrent,
-    lr,
-    patience,
-    min_delta,
+        X_train,
+        y_train,
+        X_test,
+        y_test,
+        max_length,
+        n_features,
+        num_functions,
+        model_file_out,
+        history_file_out,
+        memory_cells,
+        batch_size,
+        epochs,
+        dropout,
+        recurrent,
+        lr,
+        patience,
+        min_delta,
 ):
     """
     Train LSTM with permadropout.

@@ -221,7 +221,7 @@ def generate_prediction(sequence, features, num_functions, n_features, max_lengt
 
     return X.reshape((1, max_length, n_features))
 
-    print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
+    print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))fd
 
 def generate_dataset(data, features_included, num_functions, max_length):
     """

@@ -173,6 +173,9 @@ def derep_trainingdata(training_data):
     # get the training keys and encodings
     training_keys = list(training_data.keys())
 
+    # randomly shuffle the keys
+    random.shuffle(training_keys)
+
     #get the categories in each prophage 
     training_encodings = [training_data.get(k).get("categories") for k in training_keys]
 
@@ -188,7 +191,6 @@ def derep_trainingdata(training_data):
 
     return dict(zip(dedup_keys, [training_data.get(d) for d in dedup_keys]))
 
-
 def add_predictions(gb_dict, predictions):
     """
     Add predictions to the genbank dictionary
@@ -203,7 +205,6 @@ def add_predictions(gb_dict, predictions):
     for i in range(len(predictions)):
         gb_dict[keys[i]]["phynteny"] = predictions[i]
     return gb_dict
-
 
 def write_genbank(gb_dict, filename):
     """
