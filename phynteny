@@ -4,8 +4,8 @@
 Phynteny: synteny-based annotation of phage genes
 """
 
-import argparse
 import sys
+import click
 from phynteny_utils import handle_genbank
 from phynteny_utils import predictor
 from Bio import SeqIO
@@ -22,62 +22,48 @@ phrog_categories = "phrog_annotation_info/phrog_integer.pkl"
 category_names = "phrog_annotation_info/integer_category.pkl"
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(
-        description="Phynteny: synteny-based annotation of phage genes"
-    )
-    parser.add_argument("infile", help="input file in genbank format")
-    parser.add_argument(
-        "-o",
-        "--outfile",
-        action="store",
-        default=sys.stdout,
-        type=str,
-        help="where to write the output genbank file",
-    )
-    parser.add_argument(
-        "-m",
-        "--model",
-        action="store",
-        help="Path to custom LSTM model",
-        default="model/all_chunk_trained_LSTMbest_val_loss.h5",
-    )
-    parser.add_argument(
-        "-t",
-        "--thresholds",
-        action="store",
-        help="Path to dictionaries for a custom LSTM model",
-        default="model/all_chunk_trained_LSTMbest_val_loss_thresholds.pkl",
-    )
-    parser.add_argument("-V", "--version", action="version", version=__version__)
-
-    return parser.parse_args()
-
-
-def main():
-    # Setup
-    # ---------------------------------------------------
-
-    # get arguments
-    args = parse_args()
-
+@click.command()
+@click.argument("infile", type=click.Path(exists=True))
+@click.option(
+    "-o",
+    "--outfile",
+    type=click.Path(),
+    help="where to write the output genbank file",
+)
+@click.option(
+    "-m",
+    "--model",
+    type=click.Path(exists=True),
+    help="Path to custom LSTM model",
+    default="model/all_chunk_trained_LSTMbest_val_loss.h5",
+)
+@click.option(
+    "-t",
+    "--thresholds",
+    type=click.Path(exists=True),
+    help="Path to dictionaries for a custom LSTM model",
+    default="model/all_chunk_trained_LSTMbest_val_loss_thresholds.pkl",
+)
+@click.version_option(version=__version__)
+def main(infile, outfile, model, thresholds):
+    """
+    Phynteny: synteny-based annotation of phage genes
+    """
     # get entries in the genbank file
-    gb_dict = handle_genbank.get_genbank(args.infile)
+    gb_dict = handle_genbank.get_genbank(infile)
     if not gb_dict:
-        sys.stdout.write("Error: no sequences found in genbank file\n")
+        click.echo("Error: no sequences found in genbank file")
         sys.exit()
     keys = list(gb_dict.keys())
 
     # create predictor object
-    gene_predictor = predictor.Predictor(
-        args.model, phrog_categories, args.thresholds, category_names
-    )
+    gene_predictor = predictor.Predictor(model, phrog_categories, thresholds, category_names)
 
     # Run Phynteny
-    # ---------------------------------------------------
+    with click.open_file(outfile, "wt") if outfile else sys.stdout as handle:
 
-    with open(args.outfile, "wt") as handle:
         for key in keys:
+
             # get current phage
             phages = {key: handle_genbank.extract_features(gb_dict.get(key))}
 
@@ -98,8 +84,7 @@ def main():
             # write to genbank file
             SeqIO.write(gb_dict.get(key), handle, "genbank")
 
-    handle.close()
-
 
 if __name__ == "__main__":
     main()
+
