@@ -10,96 +10,12 @@ Think about using classes in this script -how to handle the features like max le
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Bidirectional, TimeDistributed, Dense, LSTM
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
-from tensorflow.keras.optimizers import Adam
+import tensorflow.keras.optimizers as optimizers
 from tensorflow.keras.regularizers import L1L2
-from itertools import product
-
+from sklearn.model_selection import train_test_split, StratifiedKFold
 import pickle
 from phynteny_utils import format_data
-from sklearn.model_selection import StratifiedKFold, RandomizedSearchCV, GridSearchCV
-from scikeras.wrappers import KerasClassifier
 import numpy as np
-from collections import ChainMap
-
-
-def generate_LSTM(layers=1, neurons=2, kernel_regularizer=L1L2(0, 0), dropout=0.1, activation='tanh',
-                  learning_rate=0.0001):
-    """
-    Function for generating a LSTM model
-
-    :param layers: number of hidden layers to use in the model
-    :param neurons: number of memory cells in hidden layers
-    :param kernel_regularizer: kernel regulzarizer
-    :param dropout: dropout rate to implement
-    :param optimizer: which optimization function to use
-    :param activation: which activation function to use for the hidden layers
-    :param learning_rate: learning rate for training the model
-    :return: model ready to be trained
-    """
-
-    # define the model
-    model = Sequential()
-
-    # TODO does the activation function of the input layer need to be different to the hidden layers and output layer
-    # input layer
-    model.add(
-        Bidirectional(
-            LSTM(
-                neurons, return_sequences=True, dropout=dropout, kernel_regularizer=kernel_regularizer),
-            input_shape=(1,1920)
-        )
-    )
-
-    # loop which controls the number of hidden layers
-    for layer in range(layers):
-        print('layer: ' + str(layer))
-        model.add(
-            Bidirectional(
-                LSTM(
-                    neurons, return_sequences=True, dropout=dropout, kernel_regularizer=kernel_regularizer)
-            ),
-        )
-
-        # output layer
-    model.add(TimeDistributed(Dense(10, activation="softmax")))
-
-    # optimizer
-    # optimization_function = keras.optimizers.RMSprop(learning_rate=0.01)
-    # print(optimization_function)
-    # compile the model #in this compilation add the optimization function
-    model.compile(
-        loss="categorical_crossentropy", metrics=["accuracy"]
-    )
-
-    return model
-
-
-def perform_search(X, y):
-    """
-        Perform search to identify the optimal set of parameters for the model
-
-        parse parameters to use in a grid search
-s
-        # run this function several times to generate sufficient replication
-        """
-
-    # make model into an sklearn object
-    model_obj = KerasClassifier(model=generate_LSTM, verbose=0)
-
-    # define the parameter search space
-    batch_size = [10, 20, 30]
-    activation = ['sigmoid', 'tanh', 'relu']
-    param_grid = dict(batch_size=batch_size, activation=activation)
-
-    # Generate all combinations of hyperparameters
-    param_list = list(product(*param_grid.values()))
-
-    # Loop over all hyperparameter combinations
-    for params in param_list:
-
-        print('Training with hyperparameters: ', params)
-
-
 
 def get_dict(dict_path):  # TODO where to place this
     """
@@ -112,766 +28,245 @@ def get_dict(dict_path):  # TODO where to place this
 
     return dictionary
 
-
 def feature_check(features_include):
     """
     Check the combination of features is possible
 
-    :param features: string describing the list of features
+    :param features_include: string describing the list of features
     """
 
     if features_include not in ['all', 'strand', 'none', 'intergenic', 'gene_length', 'position', 'orientation_count']:
         raise Exception("Not an possible combination of features!\n"
-                        "Must be one of: 'all', 'none', 'intergenic', 'gene_length', 'position', 'orientation_count', 'strand'")
+                        "Must be one of: 'all', 'none', 'intergenic', 'gene_length', 'position', 'orientation_count', "
+                        "'strand'")
 
     return features_include
 
+def get_optimizer(optimizer_function, learning_rate):
+    """
+    Get the optimization function to train the LSTM based on the provided inputs
+
+    :param optimizer_function: optimization function. One of ['adam', 'rmsprop', 'adagrad', 'sgd']
+    :param learning_rate: initial learning rate for the opimization function
+    :return: opimization function
+    """
+
+    # optimization function
+    if optimizer_function == 'adam':
+        optimizer = optimizers.Adam(learning_rate=learning_rate)
+    elif optimizer_function == 'rmsprop':
+        optimizer = optimizers.RMSProp(learning_rate=learning_rate)
+    elif optimizer_function == 'adagrad':
+        optimizer = optimizers.Adagrad(learning_rate=learning_rate)
+    elif optimizer_function == 'sgd':
+        optimizer_function = optimizers.SGD(learning_rate=learning_rate)
+    else:
+        raise ValueError("Invalid optimizer function. Must be One of ['adam', 'rmsprop', 'adagrad', 'sgd']")
+
+    return optimizer_function
 
 class Model:
 
-    def __init__(self, phrog_categories_path, max_length=120, features_include='all'):
+    def __init__(self, phrog_categories_path, max_length=120, features_include='all', layers=1, neurons=2,
+                 batch_size=32, kernel_regularizer=L1L2(0, 0), dropout=0.1, activation='tanh',
+                 optimizer_function='adam', learning_rate=0.0001, patience=5, min_delta=0.0001):
         """
-        :param phrog_categories_path: location of the dictionary describing the phrog_categories
-        :param features: string describing a subset of features to use - one of ['all', 'strand', 'none', 'gene_start', 'intergenic', 'gene_length', 'position', 'orientation_count']
+        :param phrog_categories_path: location of the dictionary describing the phrog_categories :param
+        features_include: string describing a subset of features to use - one of ['all', 'strand', 'none',
+        'gene_start', 'intergenic', 'gene_length', 'position', 'orientation_count']
+        :param max_length: maximum length of prophage to consider
+        :param layers: number of hidden layers to use in the model
+        :param neurons: number of memory cells in hidden layers
+        :param batch_size: batch size for training
+        :param kernel_regularizer: kernel regulzarizer
+        :param dropout: dropout rate to implement
+        :param optimizer_function: which optimization function to use
+        :param activation: which activation function to use for the hidden layers
+        :param learning_rate: learning rate for training
+        :param patience: number of epochs with no improvement after which training will be stopped
+        :param min_delta: minimum change in validation loss considered an improvement
         """
 
+        # set general information for the model
         self.phrog_categories = get_dict(phrog_categories_path)
         self.features_include = feature_check(features_include)
-        self.num_functions = len(set(self.phrog_categories.values()))  # dimension describing the number of functions
+        self.num_functions = len(list(set(self.phrog_categories.values())))  # dimension describing the number of functions
         self.max_length = max_length
 
-    def parse_data(self, data):
+        # set the hyperparameters for the model
+        self.layers = layers
+        self.neurons = neurons
+        self.batch_size = batch_size
+        self.kernel_regularizer = kernel_regularizer
+        self.dropout = dropout
+        self.activation = activation
+        self.optimizer_function = optimizer_function
+        self.learning_rate = learning_rate
+
+        # set early stopping conditions
+        self.patience = patience
+        self.min_delta = min_delta
+
+        # placeholder variables
+        self.X = []
+        self.y = []
+        self.n_features = []
+
+    def fit_data(self, data_path):
         """
-        Function to take training data and process.
-        Note - previous data will be removed from the model object if new data is parsed
-
-        :param data: dictionary of training data to process
-        """
-
-        # generate dataset
-        X, y, masked_cat = format_data.generate_dataset(data, self.features_include, self.num_functions,
-                                                        self.max_length)
-
-        self.n_features = X.shape[2]  # set this based on the size of the outputs
-        self.X = X
-        self.y = y  # TODO these are not in init - figure out what to do
-        self.masked_cat = masked_cat
-
-    def train_crossValidation(self, k):
-        """
-        Perform stratified cross-validation
-        :param k: number of k-folds to include. 1 is added to this to also generate a test set of equal size
-
-        refer to this to make https://github.com/Fuhaoyi/ACEP/blob/master/ACME_codes/ACEP_model_CV.py
-        """
-
-        skf = StratifiedKFold(n_splits=self.n_features, shuffle=True,
-                              random_state=42)  # Potentially this should be repeated stratifiedKFold
-
-        # stratified KFold returns test and train set - how to distinguish the validation from the test set - do a test train split to get the test set
-
-        # for the stratification should the masked value be what is parsed
-        for train_index, val_index in skf.split(np.zeros(len(self.masked_cat)), self.masked_cat):  #
-
-            # generate stratified test and train sets
-            X_train = X[train_index, :, :]
-            y_train = y[train_index, :, :]
-
-            X_val = X[val_index, :, :]
-            y_val = y[val_index, :, :]
-
-    def perform_searchee(self):
-        """
-        Perform search to identify the optimal set of parameters for the model
-
-        parse parameters to use in a grid search
-
-        # run this function several times to generate sufficient replication
+        Fit data to model object
         """
 
-        # make model into an sklearn object
-        model_obj = KerasClassifier(model=generate_LSTM, verbose=0)
+        # get data from specified path
+        data = get_dict(data_path)
 
-        # define the parameter search space
-        batch_size = [10, 20, 30]
-        param_grid = dict(batch_size=batch_size)
-        # search = RandomizedSearchCV(model, param_grid, n_jobs=-1)
-        print(model_obj)
-        search = GridSearchCV(estimator=model_obj, param_grid=param_grid, n_jobs=-1)
+        # process the data
+        self.X, self.y = format_data.generate_dataset(data, self.features_include,
+                                                      self.num_functions,
+                                                      self.max_length)
+        self.n_features = self.X.shape[2]
 
-        # run the results
-        self.X = self.X.reshape((self.X.shape[0], self.X.shape[1] * self.X.shape[2]))
-        self.y = self.y.reshape((self.y.shape[0], self.y.shape[1] * self.y.shape[2]))
-        print(self.X.shape)
-        print(self.y.shape)
-
-        search_result = search.fit(self.X, self.y)
-
-        # evaluate the results of the grid search
-        print("Best: %f using %s" % (search_result.best_score_, search_result.best_params_))
-
-        # save the best estimator
-
-    def train_LSTM(self, X, y, memory_cells=100, batch_size=128, dropout=0.1, recurrent_dropout=0, learning_rate=0.0001,
-                   activation='tanh', validation_dropout=0, patience=5,
-                   min_delta=0.0001):  # TODO - include activation function
+    def get_callbacks(self, model_out):
         """
-        Training procedure here
+        Callbacks to use for training the LSTM
 
-        :param X: X for training
-        :param y: y for training
-        :param memory_cells: number of memory cells in each hidden layer
-        :param batch_size: batch size during training
-        :param dropout: dropout of each hidden layer
-        :param recurrent_dropout: recurrent dropout for each layer
-        :param learning_rate: learning rate
-        :param  activation: string describing activation function
-        :param validation_dropout: validation dropout
-        :param epochs: number of epochs to train the model for
-        :param patience: number of epochs below min delta to cease training
-        :param min_delta: minimum loss before giving up on training
+        :param model_out: the prefix of the model output
         """
-        # TODO how to control the different features here
-        # TODO determine at what stage to parse all the different features
-
-        # TODO when creating the model introduce a random seed for reproducibility
-
-        model = Sequential()
-        model.add(
-            Bidirectional(
-                LSTM(
-                    memory_cells,
-                    return_sequences=True,
-                    dropout=dropout,
-                    kernel_regularizer=L1L2(0, 0),
-                ),
-                input_shape=(max_length, n_features),
-            )
-        )
-        model.add(
-            Bidirectional(
-                LSTM(
-                    memory_cells,
-                    return_sequences=True,
-                    dropout=dropout,
-                    kernel_regularizer=L1L2(0, 0),
-                )
-            )
-        )
-        model.add(
-            Bidirectional(
-                LSTM(
-                    memory_cells,
-                    return_sequences=True,
-                    dropout=dropout,
-                    kernel_regularizer=L1L2(0, 0),
-                )
-            )
-        )
-        model.add(TimeDistributed(Dense(num_functions, activation="softmax")))  # this is the output layer
-
-        optimizer = Adam(learning_rate=lr)
-        model.compile(
-            loss="categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"]
-        )
-        print(model.summary(), flush=True)
 
         es = EarlyStopping(
-            monitor="loss", mode="min", verbose=2, patience=patience, min_delta=min_delta
-        )  # use a set number of epoch when adjusting the memory cells and batch size
+            monitor="loss", mode="min", verbose=2, patience=self.patience, min_delta=self.min_delta
+        )
+
         mc = ModelCheckpoint(
-            model_file_out[:-3] + "best_val_accuracy.h5",
+            model_out + "best_val_accuracy.h5",
             monitor="val_loss",
             mode="min",
             save_best_only=True,
             verbose=1,
             save_freq="epoch",
+
         )  # model with the best validation loss therefore minimise
         mc2 = ModelCheckpoint(
-            model_file_out[:-3] + "best_val_loss.h5",
+            model_out + "best_val_loss.h5",
             monitor="val_accuracy",
             mode="max",
             save_best_only=True,
             verbose=1,
             save_freq="epoch",
-        )  # model with the best validation set accuracy therefore maximise
 
+        )
+
+        callbacks = [es, mc, mc2]
+
+        return callbacks
+
+    def generate_LSTM(self):
+
+        """
+        Function for generating a LSTM model
+
+        :return: model ready to be trained
+        """
+
+        # define the model
+        model = Sequential()
+
+        # input layer
+        model.add(
+            Bidirectional(
+                LSTM(
+                    self.neurons, return_sequences=True, dropout=self.dropout, kernel_regularizer=self.kernel_regularizer,
+                    activation=self.activation),
+                input_shape=(self.max_length, self.n_features)
+            )
+        )
+
+        # loop which controls the number of hidden layers
+        for layer in range(self.layers):
+            print('layer: ' + str(layer))
+            model.add(
+                Bidirectional(
+                    LSTM(
+                        self.neurons, return_sequences=True, dropout=self.dropout,
+                        kernel_regularizer=self.kernel_regularizer,
+                        activation=self.activation)
+                ),
+            )
+
+        # output layer
+        model.add(TimeDistributed(Dense(self.num_functions, activation="softmax")))
+
+        # get the optimization function
+        optimizer = get_optimizer(self.optimizer_function, self.learning_rate)
+
+        model.compile(
+            loss="categorical_crossentropy", metrics=["accuracy"], optimizer=optimizer
+        )
+
+        print(model.summary(), flush=True)
+
+        return model
+
+    def train_model(self, X_1, y_1, X_val, y_val, model_out='model', history_out='history', epochs=140):
+        """
+        Function to train the LSTM model and save the trained model
+
+        :param X_1: X training data for the model
+        :param y_1: y training data for the model
+        :param X_val: X validation data for the model
+        :param y_val: y validation data for the model
+        :param model_out: string - prefix of model output
+        :param history_out: string - prefix of history dictionary output
+        :param epochs: number of epochs to train the model for
+        """
+
+        # model with the best validation set accuracy therefore maximise
+        model = self.generate_LSTM()
         history = model.fit(
-            X_train,
-            y_train,
+            X_1,
+            y_1,
             epochs=epochs,
-            batch_size=batch_size,
-            callbacks=[es, mc, mc2],
-            validation_data=(X_test, y_test),
+            batch_size=self.batch_size,
+            callbacks=self.get_callbacks(model_out),
+            validation_data=(X_val, y_val),
         )
 
         # save the model
-        model.save(model_file_out)
+        model.save(model_out + '.pkl')
 
         # save the history dictionary as a pickle
-        with open(history_file_out, "wb") as handle:
+        with open(history_out + '.pkl', "wb") as handle:
             pickle.dump(history.history, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
+    def train_crossValidation(self, model_out = 'model', history_out = 'history', n_splits=10):
+        """
+        Perform stratified cross-validation
+        Random states are used such that the splits can be reproduced between replicates
 
-def select_features(data, features):
-    """
-    Select a subset of features from a set of features
+        :param model_out: prefix of output models
+        :param history_out: prefix of history file
+        :param n_splits: number of k-folds to include. 1 is added to this to also generate a test set of equal size
+        """
 
-    :param data: total set of all features to consider
-    :param features: string defining whether to include 'all' feautres, 'strand features' or no features
-    :return: list of features
-    """
+        # separate into testing and training data - testing data reserved
+        X_1, X_test, y_1, y_test = train_test_split(self.X, self.y, test_size=float(1 / 11), random_state=42)
 
-    if features == "all":
-        return data
-    elif features == "strand":
-        return [data[i][:2] for i in range(len(data))]
-    else:
-        return [[] for i in range(len(data))]
+        # get the predicted category of the train data
+        masked_cat = [np.where(y_1[i, np.where(~X_1[i, :, 0:10].any(axis=1))[0][0]] == 1)[0][0] for i in range(len(X_1))]
 
+        skf = StratifiedKFold(n_splits=n_splits, shuffle=True,
+                              random_state=42)
 
-def PermaDropout(rate):
-    """
-    Function to apply dropout to the validation data as well as the training data. Useful for demonstrating why the validation loss is less than the training loss
+        # investigate each k-fold
+        for train_index, val_index in skf.split(np.zeros(len(masked_cat)), masked_cat):
 
-    :param rate: Dropout rate
-    :return: dropout layer applied to training data and validation data
-    """
+            # generate stratified test and train sets
+            X_train = X_1[train_index, :, :]
+            y_train = y_1[train_index, :, :]
 
-    return Lambda(lambda x: K.dropout(x, level=rate))
+            # generate validation data for the training
+            X_val = X_1[val_index, :, :]
+            y_val = y_1[val_index, :, :]
 
-
-def train_kfold(
-        base,
-        phrog_encoding,
-        k,
-        num_functions,
-        n_features,
-        max_length,
-        file_out,
-        memory_cells,
-        batch_size,
-        epochs,
-        dropout,
-        recurrent,
-        lr,
-        patience,
-        min_delta,
-        features,
-        model="LSTM",
-        permadropout=False,
-):
-    """
-    Separate training data into
-
-    :param train_type: Whether to include dropout on validation data
-    :param k: Number of folds to train over
-    :param base: base string of location of the data chunks
-    :param phrog_encoding: dictionary mapping proteins to phrog categories
-    :param num functions: number of possible functions inlcuded in data
-    :param n_features: number of possible features included in data
-    :param max_length: maximum number of genes included in a single prophage
-    :param file_out: destination to save model outputs
-    :param memory cells: Number of memory cells to use for each LSTM layer
-    :param batch_size: Batch size for training
-    :param epochs: Number of epochs to use for training
-    :param patience: Stopping condition - how many epochs without loss increasing to stop training
-    :param min_delta: Stopping condition loss value
-    :param model: Type of model to train - either LSTM or ANN
-    :param permadropout: If true applies dropout to validation data
-    """
-
-    # REMOVE
-    print("NUMBER OF FEATURES PARSED:" + str(n_features), flush=True)
-
-    # loop through the training chunks
-    kk = np.array(range(k))
-    for i in range(k - 2, k):
-        chunks = [base + str(f) + "_chunk.pkl" for f in kk[kk != i]]
-        print("reading chunks", flush=True)
-        training_chunks = [pickle.load(open(f, "rb")) for f in chunks]
-
-        print("merging chunks", flush=True)
-        train_data = ChainMap(*training_chunks)
-
-        # generate the training data
-        print("generating training features", flush=True)
-        print("features used: " + features, flush=True)
-        train_encodings, train_features = format_data.format_data(
-            train_data, phrog_encoding
-        )
-
-        print("before select there are : " + str(len(train_features[0])))
-        train_features = select_features(train_features, features)
-        print("after select there are : " + str(len(train_features[0])))
-
-        print("creating training dataset", flush=True)
-        X_train, y_train, masked_idx = format_data.generate_dataset(
-            train_encodings, train_features, num_functions, n_features, max_length
-        )
-        print("training X size: " + str(X_train.shape), flush=True)
-        print("training y size: " + str(y_train.shape), flush=True)
-
-        # generate the test data
-        test_data = pickle.load(open(base + str(i) + "_chunk.pkl", "rb"))
-        print("generating test features", flush=True)
-        test_encodings, test_features = format_data.format_data(
-            test_data, phrog_encoding
-        )
-        test_features = select_features(test_features, features)
-        print("creating test dataset", flush=True)
-
-        X_test, y_test, masked_idx = format_data.generate_dataset(
-            test_encodings, test_features, num_functions, n_features, max_length
-        )
-        print("test size: " + str(y_test.shape), flush=True)
-
-        # file names of the data
-        model_file_out = file_out + str(i) + "_" + features + "_chunk_trained_LSTM.h5"
-        history_file_out = file_out + str(i) + "_" + features + "_chunk_history.pkl"
-
-        print("Training for chunk: " + str(i), flush=True)
-
-        # train model
-        if permadropout == False:
-            print("Not including dropout on validation", flush=True)
-
-            if model == "LSTM":
-                train_LSTM(
-                    X_train,
-                    y_train,
-                    X_test,
-                    y_test,
-                    max_length,
-                    n_features,
-                    num_functions,
-                    model_file_out,
-                    history_file_out,
-                    memory_cells,
-                    batch_size,
-                    epochs,
-                    dropout,
-                    recurrent,
-                    lr,
-                    patience,
-                    min_delta,
-                )
-
-            if model == "ANN":
-                train_ANN(
-                    X_train,
-                    y_train,
-                    X_test,
-                    y_test,
-                    max_length,
-                    n_features,
-                    num_functions,
-                    model_file_out,
-                    history_file_out,
-                    memory_cells,
-                    batch_size,
-                    epochs,
-                    dropout,
-                    recurrent,
-                    lr,
-                    patience,
-                    min_delta,
-                )
-
-                print("Training with ANN", flush=True)
-
-        elif permadropout == True:
-            print("Including dropout on validation", flush=True)
-
-            train_LSTM_permadropout(
-                X_train,
-                y_train,
-                X_test,
-                y_test,
-                max_length,
-                n_features,
-                num_functions,
-                model_file_out,
-                history_file_out,
-                memory_cells,
-                batch_size,
-                epochs,
-                dropout,
-                recurrent,
-                lr,
-                patience,
-                min_delta,
-            )
-
-        del X_train
-        del y_train
-        del train_encodings
-        del train_features
-
-        del X_test
-        del y_test
-        del test_encodings
-        del test_features
-
-
-def train_LSTM(
-        X_train,
-        y_train,
-        X_test,
-        y_test,
-        max_length,
-        n_features,
-        num_functions,
-        model_file_out,
-        history_file_out,
-        memory_cells,
-        batch_size,
-        epochs,
-        dropout,
-        recurrent,
-        lr,
-        patience,
-        min_delta,
-):
-    """
-    Train and save LSTM and training history
-
-    :param X_train: Supervised learning problem features
-    :param y_train: Supervised learning problem labels
-    :param model_file_out: File name of saved model
-    :param history_file_out: File name of history dictionary
-    :param memory cells: Number of memory cells to use for each LSTM layer
-    :param batch_size: Batch size for training
-    :param epochs: Number of epochs to use for training
-    :param patience: Stopping condition - how many epochs without loss increasing to stop training
-    :param min_delta: Stopping condition loss value
-    """
-
-    model = Sequential()
-    model.add(
-        Bidirectional(
-            LSTM(
-                memory_cells,
-                return_sequences=True,
-                dropout=dropout,
-                kernel_regularizer=L1L2(0, 0),
-            ),
-            input_shape=(max_length, n_features),
-        )
-    )
-    model.add(
-        Bidirectional(
-            LSTM(
-                memory_cells,
-                return_sequences=True,
-                dropout=dropout,
-                kernel_regularizer=L1L2(0, 0),
-            )
-        )
-    )
-    model.add(
-        Bidirectional(
-            LSTM(
-                memory_cells,
-                return_sequences=True,
-                dropout=dropout,
-                kernel_regularizer=L1L2(0, 0),
-            )
-        )
-    )
-    model.add(TimeDistributed(Dense(num_functions, activation="softmax")))
-
-    optimizer = Adam(learning_rate=lr)
-    model.compile(
-        loss="categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"]
-    )
-    print(model.summary(), flush=True)
-
-    es = EarlyStopping(
-        monitor="loss", mode="min", verbose=2, patience=patience, min_delta=min_delta
-    )  # use a set number of epoch when adjusting the memory cells and batch size
-    mc = ModelCheckpoint(
-        model_file_out[:-3] + "best_val_accuracy.h5",
-        monitor="val_loss",
-        mode="min",
-        save_best_only=True,
-        verbose=1,
-        save_freq="epoch",
-    )  # model with the best validation loss therefore minimise
-    mc2 = ModelCheckpoint(
-        model_file_out[:-3] + "best_val_loss.h5",
-        monitor="val_accuracy",
-        mode="max",
-        save_best_only=True,
-        verbose=1,
-        save_freq="epoch",
-    )  # model with the best validation set accuracy therefore maximise
-
-    history = model.fit(
-        X_train,
-        y_train,
-        epochs=epochs,
-        batch_size=batch_size,
-        callbacks=[es, mc, mc2],
-        validation_data=(X_test, y_test),
-    )
-
-    # save the model
-    model.save(model_file_out)
-
-    # save the history dictionary as a pickle
-    with open(history_file_out, "wb") as handle:
-        pickle.dump(history.history, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-
-def train_LSTM_permadropout(
-        X_train,
-        y_train,
-        X_test,
-        y_test,
-        max_length,
-        n_features,
-        num_functions,
-        model_file_out,
-        history_file_out,
-        memory_cells,
-        batch_size,
-        epochs,
-        dropout,
-        recurrent,
-        lr,
-        patience,
-        min_delta,
-):
-    """
-    Train LSTM with permadropout.
-    Keras does not apply dropout to validation data. Use this function to explain gap between training loss and validation loss.
-
-    :param X_train: Supervised learning problem features
-    :param y_train: Supervised learning problem labels
-    :param model_file_out: File name of saved model
-    :param history_file_out: File name of history dictionary
-    :param memory cells: Number of memory cells to use for each LSTM layer
-    :param batch_size: Batch size for training
-    :param epochs: Number of epochs to use for training
-    :param patience: Stopping condition - how many epochs without loss increasing to stop training
-    :param min_delta: Stopping condition loss value
-    """
-
-    model = Sequential()
-    model.add(
-        Bidirectional(
-            LSTM(memory_cells, return_sequences=True, kernel_regularizer=L1L2(0, 0)),
-            input_shape=(max_length, n_features),
-        )
-    )
-    model.add(PermaDropout(dropout))
-    model.add(
-        Bidirectional(
-            LSTM(memory_cells, return_sequences=True, kernel_regularizer=L1L2(0, 0))
-        )
-    )
-    model.add(PermaDropout(dropout))
-    model.add(
-        Bidirectional(
-            LSTM(memory_cells, return_sequences=True, kernel_regularizer=L1L2(0, 0))
-        )
-    )
-    model.add(PermaDropout(dropout))
-    model.add(TimeDistributed(Dense(num_functions, activation="softmax")))
-
-    optimizer = Adam(learning_rate=lr)
-    model.compile(
-        loss="categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"]
-    )
-    print(model.summary(), flush=True)
-
-    es = EarlyStopping(
-        monitor="loss", mode="min", verbose=2, patience=patience, min_delta=min_delta
-    )  # use a set number of epoch when adjusting the memory cells and batch size
-    mc = ModelCheckpoint(
-        model_file_out[:-3] + "best_val_accuracy.h5",
-        monitor="val_loss",
-        mode="min",
-        save_best_only=True,
-        verbose=1,
-        save_freq="epoch",
-    )  # model with the best validation loss therefore minimise
-    mc2 = ModelCheckpoint(
-        model_file_out[:-3] + "best_val_loss.h5",
-        monitor="val_accuracy",
-        mode="max",
-        save_best_only=True,
-        verbose=1,
-        save_freq="epoch",
-    )  # model with the best validation set accuracy therefore maximise
-
-    history = model.fit(
-        X_train,
-        y_train,
-        epochs=epochs,
-        batch_size=batch_size,
-        callbacks=[es, mc, mc2],
-        validation_data=(X_test, y_test),
-    )
-
-    # save the model
-    model.save(model_file_out)
-
-    # save the history dictionary as a pickle
-    with open(history_file_out, "wb") as handle:
-        pickle.dump(history.history, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-
-def train_ANN(
-        X_train,
-        y_train,
-        X_test,
-        y_test,
-        max_length,
-        n_features,
-        num_functions,
-        model_file_out,
-        history_file_out,
-        memory_cells,
-        batch_size,
-        epochs,
-        dropout,
-        recurrent,
-        lr,
-        patience,
-        min_delta,
-):
-    """
-    Train Artificial Neural Network to compare with LSTM
-
-    :param X_train: Supervised learning problem features
-    :param y_train: Supervised learning problem labels
-    :param model_file_out: File name of saved model
-    :param history_file_out: File name of history dictionary
-    :param memory cells: Number of memory cells to use for each LSTM layer
-    :param batch_size: Batch size for training
-    :param epochs: Number of epochs to use for training
-    :param patience: Stopping condition - how many epochs without loss increasing to stop training
-    :param min_delta: Stopping condition loss value
-    """
-
-    model = Sequential()
-    model.add(Dense(memory_cells, input_shape=(max_length, n_features)))
-    model.add(Dropout(dropout))
-    model.add(Dense(memory_cells))
-    model.add(Dropout(dropout))
-    model.add(Dense(memory_cells))
-    model.add(Dropout(dropout))
-    model.add(Dense(num_functions, activation="softmax"))  # output layer
-    optimizer = Adam(learning_rate=lr)
-    model.compile(
-        loss="categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"]
-    )
-
-    es = EarlyStopping(
-        monitor="loss", mode="min", verbose=2, patience=patience, min_delta=min_delta
-    )  # use a set number of epoch when adjusting the memory cells and batch size
-    mc = ModelCheckpoint(
-        model_file_out[:-3] + "best_val_accuracy.h5",
-        monitor="val_loss",
-        mode="min",
-        save_best_only=True,
-        verbose=1,
-        save_freq="epoch",
-    )  # model with the best validation loss therefore minimise
-    mc2 = ModelCheckpoint(
-        model_file_out[:-3] + "best_val_loss.h5",
-        monitor="val_accuracy",
-        mode="max",
-        save_best_only=True,
-        verbose=1,
-        save_freq="epoch",
-    )  # model with the best validation set accuracy therefore maximise
-
-    history = model.fit(
-        X_train,
-        y_train,
-        epochs=epochs,
-        batch_size=batch_size,
-        callbacks=[es, mc, mc2],
-        validation_data=(X_test, y_test),
-    )
-
-
-def train_ANN_permadropout(
-        X_train,
-        y_train,
-        X_test,
-        y_test,
-        max_length,
-        n_features,
-        num_functions,
-        model_file_out,
-        history_file_out,
-        memory_cells,
-        batch_size,
-        epochs,
-        dropout,
-        recurrent,
-        lr,
-        patience,
-        min_delta,
-):
-    """
-    Train LSTM with permadropout.
-    Keras does not apply dropout to validation data. Use this function to explain gap between training loss and validation loss.
-
-    :param X_train: Supervised learning problem features
-    :param y_train: Supervised learning problem labels
-    :param model_file_out: File name of saved model
-    :param history_file_out: File name of history dictionary
-    :param memory cells: Number of memory cells to use for each LSTM layer
-    :param batch_size: Batch size for training
-    :param epochs: Number of epochs to use for training
-    :param patience: Stopping condition - how many epochs without loss increasing to stop training
-    :param min_delta: Stopping condition loss value
-    """
-
-    model = Sequential()
-
-    model.add(Dense(memory_cells, input_shape=(max_length, n_features)))
-    model.add(PermaDropout(dropout))
-    model.add(Dense(memory_cells))
-    model.add(PermaDropout(dropout))
-    model.add(Dense(memory_cells))
-    model.add(PermaDropout(dropout))
-    model.add(Dense(num_functions, activation="softmax"))  # output layer
-    optimizer = Adam(learning_rate=lr)
-    model.compile(
-        loss="categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"]
-    )
-
-    es = EarlyStopping(
-        monitor="loss", mode="min", verbose=2, patience=patience, min_delta=min_delta
-    )  # use a set number of epoch when adjusting the memory cells and batch size
-    mc = ModelCheckpoint(
-        model_file_out[:-3] + "best_val_accuracy.h5",
-        monitor="val_loss",
-        mode="min",
-        save_best_only=True,
-        verbose=1,
-        save_freq="epoch",
-    )  # model with the best validation loss therefore minimise
-    mc2 = ModelCheckpoint(
-        model_file_out[:-3] + "best_val_loss.h5",
-        monitor="val_accuracy",
-        mode="max",
-        save_best_only=True,
-        verbose=1,
-        save_freq="epoch",
-    )  # model with the best validation set accuracy therefore maximise
-
-    history = model.fit(
-        X_train,
-        y_train,
-        epochs=epochs,
-        batch_size=batch_size,
-        callbacks=[es, mc, mc2],
-        validation_data=(X_test, y_test),
-    )
+            # use the compile function here
+            self.train_model(X_train, y_train, X_val, y_val, model_out, history_out)

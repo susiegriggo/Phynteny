@@ -66,6 +66,7 @@ def main():
         phrog_integer = dict(
             zip([str(i) for i in list(phrog_integer.keys())], phrog_integer.values())
         )
+
     handle.close()
     phrog_integer['No_PHROG'] = 0 
 
@@ -127,7 +128,7 @@ def main():
     print("Done Processing!\n")
     print("Removing duplicate phrog category orders")
 
-    derep_data = handle_genbank.derep_trainingdata(training_data) #TODO go back and check this dereplication procedure - how can I make sure it is random
+    derep_data = handle_genbank.derep_trainingdata(training_data)
     data_derep_shuffle = handle_genbank.shuffle_dict(derep_data)
 
     # save the non-dereplicated data - this might be what ends up being used 
