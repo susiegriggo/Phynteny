@@ -7,6 +7,7 @@ import numpy as np
 import random
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
+
 def encode_strand(strand):
     """
     One hot encode the direction of each gene
@@ -25,6 +26,7 @@ def encode_strand(strand):
 
     return strand_encode[0], strand_encode[1]
 
+
 def encode_start(gene_positions):
     """
     Encode the start of each gene
@@ -41,6 +43,7 @@ def encode_start(gene_positions):
     )
 
     return np.round(start / np.max(start), 3)
+
 
 def encode_intergenic(gene_positions):
     """
@@ -59,6 +62,7 @@ def encode_intergenic(gene_positions):
     intergenic.insert(0, 0)
 
     return np.array(intergenic)
+
 
 def count_direction(strand):
     """
@@ -79,12 +83,13 @@ def count_direction(strand):
             counter = 0
 
         direction_count.append(counter)
-        
+
     direction_count.insert(0, 0)
 
     return np.array(direction_count)
 
-def get_features(phage, features_included = 'all'):
+
+def get_features(phage, features_included='all'):
     """
     Write a function which gets the features for a prophage
 
@@ -102,26 +107,27 @@ def get_features(phage, features_included = 'all'):
         features.append(strand2)
 
     # gene start position #TODO manipulate this feature - might be able to make it an int value instead 
-    if features_included  in ['all', 'gene_start']:
+    if features_included in ['all', 'gene_start']:
         start = encode_start(phage.get('position'))
         features.append(start)
 
     # intergenic distance 
-    if features_included  in ['all', 'intergenic']:
+    if features_included in ['all', 'intergenic']:
         intergenic = encode_intergenic(phage.get('position'))
         features.append(intergenic)
 
     # gene length
-    if features_included  in ['all', 'gene_length']:
+    if features_included in ['all', 'gene_length']:
         length = np.array([i[1] - i[0] for i in phage.get("position")])
         features.append(length)
 
     # orientation count
-    if features_included  in ['all', 'orientation_count']:
+    if features_included in ['all', 'orientation_count']:
         orientation_count = count_direction(phage.get('sense'))
         features.append(orientation_count)
 
-    return np.array(features)  
+    return np.array(features)
+
 
 def one_hot_encode(sequence, n_features):
     """
@@ -140,6 +146,7 @@ def one_hot_encode(sequence, n_features):
 
     return np.array(encoding)
 
+
 def encode_feature(encoding, feature, column):
     """
     Add a feature to sequence feature matrix
@@ -154,6 +161,7 @@ def encode_feature(encoding, feature, column):
     encoding[: len(feature), column] = feature
 
     return encoding
+
 
 def one_hot_decode(encoded_seq):
     """
@@ -221,7 +229,6 @@ def generate_prediction(sequence, features, num_functions, n_features, max_lengt
 
     return X.reshape((1, max_length, n_features))
 
-    print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))fd
 
 def generate_dataset(data, features_included, num_functions, max_length):
     """
@@ -243,31 +250,31 @@ def generate_dataset(data, features_included, num_functions, max_length):
 
     for i in range(len(keys)):
 
-        #get the encoding
+        # get the encoding
         encoding = data.get(keys[i]).get('categories')
         if len(encoding) > max_length:
-            raise Exception('Prophage in your data is larger than the maximum allowable length. Try using a larger maximum')
+            raise Exception(
+                'Prophage in your data is larger than the maximum allowable length. Try using a larger maximum')
 
-        #get the features
+        # get the features
         features = get_features(data.get(keys[i]), features_included)
 
-        #calculate the dimension
+        # calculate the dimension
         n_features = num_functions + len(features)
 
-        #pick a function to mask
-        idx =  random.randint(1, len(encoding) - 1)
+        # pick a function to mask
+        idx = random.randint(1, len(encoding) - 1)
 
         # make sure that the mask is not an uknown category
         while encoding[idx] == 0:
             idx = random.randint(1, len(encoding) - 1)
 
-        #generate example 
+        # generate example
         this_X, this_y = generate_example(encoding, features, num_functions, n_features, max_length, idx)
 
-        #store the data
+        # store the data
         X.append(this_X)
         y.append(this_y)
-
 
     # reshape the data
     X = np.array(X).reshape(len(keys), max_length, n_features)

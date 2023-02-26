@@ -17,7 +17,8 @@ import pickle
 from phynteny_utils import format_data
 import numpy as np
 
-def get_dict(dict_path):  # TODO where to place this
+
+def get_dict(dict_path):
     """
     Helper function to import dictionaries
     """
@@ -27,6 +28,7 @@ def get_dict(dict_path):  # TODO where to place this
     handle.close()
 
     return dictionary
+
 
 def feature_check(features_include):
     """
@@ -41,6 +43,7 @@ def feature_check(features_include):
                         "'strand'")
 
     return features_include
+
 
 def get_optimizer(optimizer_function, learning_rate):
     """
@@ -65,11 +68,13 @@ def get_optimizer(optimizer_function, learning_rate):
 
     return optimizer_function
 
+
 class Model:
 
     def __init__(self, phrog_categories_path, max_length=120, features_include='all', layers=1, neurons=2,
-                 batch_size=32, kernel_regularizer=L1L2(0, 0), dropout=0.1, activation='tanh',
-                 optimizer_function='adam', learning_rate=0.0001, patience=5, min_delta=0.0001):
+                 batch_size=32, dropout=0.1, activation='tanh',
+                 optimizer_function='adam', learning_rate=0.0001, patience=5, min_delta=0.0001, l1_regularizer=0,
+                 l2_regularizer=0):
         """
         :param phrog_categories_path: location of the dictionary describing the phrog_categories :param
         features_include: string describing a subset of features to use - one of ['all', 'strand', 'none',
@@ -90,14 +95,15 @@ class Model:
         # set general information for the model
         self.phrog_categories = get_dict(phrog_categories_path)
         self.features_include = feature_check(features_include)
-        self.num_functions = len(list(set(self.phrog_categories.values())))  # dimension describing the number of functions
+        self.num_functions = len(
+            list(set(self.phrog_categories.values())))  # dimension describing the number of functions
         self.max_length = max_length
 
         # set the hyperparameters for the model
         self.layers = layers
         self.neurons = neurons
         self.batch_size = batch_size
-        self.kernel_regularizer = kernel_regularizer
+        self.kernel_regularizer = L1L2(l1_regularizer, l2_regularizer)
         self.dropout = dropout
         self.activation = activation
         self.optimizer_function = optimizer_function
@@ -175,7 +181,8 @@ class Model:
         model.add(
             Bidirectional(
                 LSTM(
-                    self.neurons, return_sequences=True, dropout=self.dropout, kernel_regularizer=self.kernel_regularizer,
+                    self.neurons, return_sequences=True, dropout=self.dropout,
+                    kernel_regularizer=self.kernel_regularizer,
                     activation=self.activation),
                 input_shape=(self.max_length, self.n_features)
             )
@@ -238,7 +245,7 @@ class Model:
         with open(history_out + '.pkl', "wb") as handle:
             pickle.dump(history.history, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-    def train_crossValidation(self, model_out = 'model', history_out = 'history', n_splits=10):
+    def train_crossValidation(self, model_out='model', history_out='history', n_splits=10, epochs=140):
         """
         Perform stratified cross-validation
         Random states are used such that the splits can be reproduced between replicates
@@ -246,20 +253,24 @@ class Model:
         :param model_out: prefix of output models
         :param history_out: prefix of history file
         :param n_splits: number of k-folds to include. 1 is added to this to also generate a test set of equal size
+        :param epochs: number of epochs to train for
         """
 
         # separate into testing and training data - testing data reserved
         X_1, X_test, y_1, y_test = train_test_split(self.X, self.y, test_size=float(1 / 11), random_state=42)
 
         # get the predicted category of the train data
-        masked_cat = [np.where(y_1[i, np.where(~X_1[i, :, 0:10].any(axis=1))[0][0]] == 1)[0][0] for i in range(len(X_1))]
+        masked_cat = [np.where(y_1[i, np.where(~X_1[i, :, 0:10].any(axis=1))[0][0]] == 1)[0][0] for i in
+                      range(len(X_1))]
 
         skf = StratifiedKFold(n_splits=n_splits, shuffle=True,
                               random_state=42)
 
+        # count the number of folds
+        counter = 0
+
         # investigate each k-fold
         for train_index, val_index in skf.split(np.zeros(len(masked_cat)), masked_cat):
-
             # generate stratified test and train sets
             X_train = X_1[train_index, :, :]
             y_train = y_1[train_index, :, :]
@@ -269,4 +280,8 @@ class Model:
             y_val = y_1[val_index, :, :]
 
             # use the compile function here
-            self.train_model(X_train, y_train, X_val, y_val, model_out, history_out)
+            self.train_model(X_train, y_train, X_val, y_val, model_out + '_' + str(counter), history_out + '_' + str(counter),
+                             epochs=epochs)
+
+            # update counter
+            counter += 1
