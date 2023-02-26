@@ -16,9 +16,7 @@ def encode_strand(strand):
     :return: one hot encoding as two separate numpy arrays
     """
 
-    encode = np.array(
-        [2 if i == "+" else 1 for i in strand]
-    )
+    encode = np.array([2 if i == "+" else 1 for i in strand])
 
     strand_encode = np.array([1 if i == 1 else 0 for i in encode]), np.array(
         [1 if i == 2 else 0 for i in encode]
@@ -35,12 +33,7 @@ def encode_start(gene_positions):
     :return: vector of encoded gene positions
     """
 
-    start = np.array(
-        [
-            i[0] - gene_positions[0][0]
-            for i in gene_positions
-        ]
-    )
+    start = np.array([i[0] - gene_positions[0][0] for i in gene_positions])
 
     return np.round(start / np.max(start), 3)
 
@@ -54,8 +47,7 @@ def encode_intergenic(gene_positions):
     """
 
     intergenic = [
-        gene_positions[i + 1][0]
-        - gene_positions[i][1]
+        gene_positions[i + 1][0] - gene_positions[i][1]
         for i in range(len(gene_positions) - 1)
     ]
 
@@ -89,7 +81,7 @@ def count_direction(strand):
     return np.array(direction_count)
 
 
-def get_features(phage, features_included='all'):
+def get_features(phage, features_included="all"):
     """
     Write a function which gets the features for a prophage
 
@@ -102,28 +94,28 @@ def get_features(phage, features_included='all'):
 
     # strand features
     if features_included in ["all", "strand"]:
-        strand1, strand2 = encode_strand(phage.get('sense'))
+        strand1, strand2 = encode_strand(phage.get("sense"))
         features.append(strand1)
         features.append(strand2)
 
-    # gene start position #TODO manipulate this feature - might be able to make it an int value instead 
-    if features_included in ['all', 'gene_start']:
-        start = encode_start(phage.get('position'))
+    # gene start position #TODO manipulate this feature - might be able to make it an int value instead
+    if features_included in ["all", "gene_start"]:
+        start = encode_start(phage.get("position"))
         features.append(start)
 
-    # intergenic distance 
-    if features_included in ['all', 'intergenic']:
-        intergenic = encode_intergenic(phage.get('position'))
+    # intergenic distance
+    if features_included in ["all", "intergenic"]:
+        intergenic = encode_intergenic(phage.get("position"))
         features.append(intergenic)
 
     # gene length
-    if features_included in ['all', 'gene_length']:
+    if features_included in ["all", "gene_length"]:
         length = np.array([i[1] - i[0] for i in phage.get("position")])
         features.append(length)
 
     # orientation count
-    if features_included in ['all', 'orientation_count']:
-        orientation_count = count_direction(phage.get('sense'))
+    if features_included in ["all", "orientation_count"]:
+        orientation_count = count_direction(phage.get("sense"))
         features.append(orientation_count)
 
     return np.array(features)
@@ -249,12 +241,12 @@ def generate_dataset(data, features_included, num_functions, max_length):
     keys = list(data.keys())
 
     for i in range(len(keys)):
-
         # get the encoding
-        encoding = data.get(keys[i]).get('categories')
+        encoding = data.get(keys[i]).get("categories")
         if len(encoding) > max_length:
             raise Exception(
-                'Prophage in your data is larger than the maximum allowable length. Try using a larger maximum')
+                "Prophage in your data is larger than the maximum allowable length. Try using a larger maximum"
+            )
 
         # get the features
         features = get_features(data.get(keys[i]), features_included)
@@ -270,7 +262,9 @@ def generate_dataset(data, features_included, num_functions, max_length):
             idx = random.randint(1, len(encoding) - 1)
 
         # generate example
-        this_X, this_y = generate_example(encoding, features, num_functions, n_features, max_length, idx)
+        this_X, this_y = generate_example(
+            encoding, features, num_functions, n_features, max_length, idx
+        )
 
         # store the data
         X.append(this_X)

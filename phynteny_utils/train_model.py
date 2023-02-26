@@ -37,10 +37,20 @@ def feature_check(features_include):
     :param features_include: string describing the list of features
     """
 
-    if features_include not in ['all', 'strand', 'none', 'intergenic', 'gene_length', 'position', 'orientation_count']:
-        raise Exception("Not an possible combination of features!\n"
-                        "Must be one of: 'all', 'none', 'intergenic', 'gene_length', 'position', 'orientation_count', "
-                        "'strand'")
+    if features_include not in [
+        "all",
+        "strand",
+        "none",
+        "intergenic",
+        "gene_length",
+        "position",
+        "orientation_count",
+    ]:
+        raise Exception(
+            "Not an possible combination of features!\n"
+            "Must be one of: 'all', 'none', 'intergenic', 'gene_length', 'position', 'orientation_count', "
+            "'strand'"
+        )
 
     return features_include
 
@@ -55,26 +65,40 @@ def get_optimizer(optimizer_function, learning_rate):
     """
 
     # optimization function
-    if optimizer_function == 'adam':
+    if optimizer_function == "adam":
         optimizer = optimizers.Adam(learning_rate=learning_rate)
-    elif optimizer_function == 'rmsprop':
+    elif optimizer_function == "rmsprop":
         optimizer = optimizers.RMSProp(learning_rate=learning_rate)
-    elif optimizer_function == 'adagrad':
+    elif optimizer_function == "adagrad":
         optimizer = optimizers.Adagrad(learning_rate=learning_rate)
-    elif optimizer_function == 'sgd':
+    elif optimizer_function == "sgd":
         optimizer_function = optimizers.SGD(learning_rate=learning_rate)
     else:
-        raise ValueError("Invalid optimizer function. Must be One of ['adam', 'rmsprop', 'adagrad', 'sgd']")
+        raise ValueError(
+            "Invalid optimizer function. Must be One of ['adam', 'rmsprop', 'adagrad', 'sgd']"
+        )
 
     return optimizer_function
 
 
 class Model:
-
-    def __init__(self, phrog_categories_path, max_length=120, features_include='all', layers=1, neurons=2,
-                 batch_size=32, dropout=0.1, activation='tanh',
-                 optimizer_function='adam', learning_rate=0.0001, patience=5, min_delta=0.0001, l1_regularizer=0,
-                 l2_regularizer=0):
+    def __init__(
+        self,
+        phrog_categories_path,
+        max_length=120,
+        features_include="all",
+        layers=1,
+        neurons=2,
+        batch_size=32,
+        dropout=0.1,
+        activation="tanh",
+        optimizer_function="adam",
+        learning_rate=0.0001,
+        patience=5,
+        min_delta=0.0001,
+        l1_regularizer=0,
+        l2_regularizer=0,
+    ):
         """
         :param phrog_categories_path: location of the dictionary describing the phrog_categories :param
         features_include: string describing a subset of features to use - one of ['all', 'strand', 'none',
@@ -96,7 +120,8 @@ class Model:
         self.phrog_categories = get_dict(phrog_categories_path)
         self.features_include = feature_check(features_include)
         self.num_functions = len(
-            list(set(self.phrog_categories.values())))  # dimension describing the number of functions
+            list(set(self.phrog_categories.values()))
+        )  # dimension describing the number of functions
         self.max_length = max_length
 
         # set the hyperparameters for the model
@@ -127,9 +152,9 @@ class Model:
         data = get_dict(data_path)
 
         # process the data
-        self.X, self.y = format_data.generate_dataset(data, self.features_include,
-                                                      self.num_functions,
-                                                      self.max_length)
+        self.X, self.y = format_data.generate_dataset(
+            data, self.features_include, self.num_functions, self.max_length
+        )
         self.n_features = self.X.shape[2]
 
     def get_callbacks(self, model_out):
@@ -140,7 +165,11 @@ class Model:
         """
 
         es = EarlyStopping(
-            monitor="loss", mode="min", verbose=2, patience=self.patience, min_delta=self.min_delta
+            monitor="loss",
+            mode="min",
+            verbose=2,
+            patience=self.patience,
+            min_delta=self.min_delta,
         )
 
         mc = ModelCheckpoint(
@@ -150,7 +179,6 @@ class Model:
             save_best_only=True,
             verbose=1,
             save_freq="epoch",
-
         )  # model with the best validation loss therefore minimise
         mc2 = ModelCheckpoint(
             model_out + "best_val_loss.h5",
@@ -159,7 +187,6 @@ class Model:
             save_best_only=True,
             verbose=1,
             save_freq="epoch",
-
         )
 
         callbacks = [es, mc, mc2]
@@ -167,7 +194,6 @@ class Model:
         return callbacks
 
     def generate_LSTM(self):
-
         """
         Function for generating a LSTM model
 
@@ -181,22 +207,28 @@ class Model:
         model.add(
             Bidirectional(
                 LSTM(
-                    self.neurons, return_sequences=True, dropout=self.dropout,
+                    self.neurons,
+                    return_sequences=True,
+                    dropout=self.dropout,
                     kernel_regularizer=self.kernel_regularizer,
-                    activation=self.activation),
-                input_shape=(self.max_length, self.n_features)
+                    activation=self.activation,
+                ),
+                input_shape=(self.max_length, self.n_features),
             )
         )
 
         # loop which controls the number of hidden layers
         for layer in range(self.layers):
-            print('layer: ' + str(layer))
+            print("layer: " + str(layer))
             model.add(
                 Bidirectional(
                     LSTM(
-                        self.neurons, return_sequences=True, dropout=self.dropout,
+                        self.neurons,
+                        return_sequences=True,
+                        dropout=self.dropout,
                         kernel_regularizer=self.kernel_regularizer,
-                        activation=self.activation)
+                        activation=self.activation,
+                    )
                 ),
             )
 
@@ -214,7 +246,16 @@ class Model:
 
         return model
 
-    def train_model(self, X_1, y_1, X_val, y_val, model_out='model', history_out='history', epochs=140):
+    def train_model(
+        self,
+        X_1,
+        y_1,
+        X_val,
+        y_val,
+        model_out="model",
+        history_out="history",
+        epochs=140,
+    ):
         """
         Function to train the LSTM model and save the trained model
 
@@ -239,13 +280,15 @@ class Model:
         )
 
         # save the model
-        model.save(model_out + '.pkl')
+        model.save(model_out + ".pkl")
 
         # save the history dictionary as a pickle
-        with open(history_out + '.pkl', "wb") as handle:
+        with open(history_out + ".pkl", "wb") as handle:
             pickle.dump(history.history, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-    def train_crossValidation(self, model_out='model', history_out='history', n_splits=10, epochs=140):
+    def train_crossValidation(
+        self, model_out="model", history_out="history", n_splits=10, epochs=140
+    ):
         """
         Perform stratified cross-validation
         Random states are used such that the splits can be reproduced between replicates
@@ -257,14 +300,17 @@ class Model:
         """
 
         # separate into testing and training data - testing data reserved
-        X_1, X_test, y_1, y_test = train_test_split(self.X, self.y, test_size=float(1 / 11), random_state=42)
+        X_1, X_test, y_1, y_test = train_test_split(
+            self.X, self.y, test_size=float(1 / 11), random_state=42
+        )
 
         # get the predicted category of the train data
-        masked_cat = [np.where(y_1[i, np.where(~X_1[i, :, 0:10].any(axis=1))[0][0]] == 1)[0][0] for i in
-                      range(len(X_1))]
+        masked_cat = [
+            np.where(y_1[i, np.where(~X_1[i, :, 0:10].any(axis=1))[0][0]] == 1)[0][0]
+            for i in range(len(X_1))
+        ]
 
-        skf = StratifiedKFold(n_splits=n_splits, shuffle=True,
-                              random_state=42)
+        skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
 
         # count the number of folds
         counter = 0
@@ -280,8 +326,15 @@ class Model:
             y_val = y_1[val_index, :, :]
 
             # use the compile function here
-            self.train_model(X_train, y_train, X_val, y_val, model_out + '_' + str(counter), history_out + '_' + str(counter),
-                             epochs=epochs)
+            self.train_model(
+                X_train,
+                y_train,
+                X_val,
+                y_val,
+                model_out + "_" + str(counter),
+                history_out + "_" + str(counter),
+                epochs=epochs,
+            )
 
             # update counter
             counter += 1
