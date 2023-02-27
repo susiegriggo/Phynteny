@@ -41,6 +41,7 @@ def get_genbank(genbank):
         try:
             with gzip.open(genbank.strip(), "rt") as handle:
                 gb_dict = SeqIO.to_dict(SeqIO.parse(handle, "gb"))
+            handle.close() 
         except ValueError:
             print("ERROR: " + genbank.strip() + " is not a genbank file!")
             raise
@@ -49,6 +50,7 @@ def get_genbank(genbank):
         try:
             with open(genbank.strip(), "rt") as handle:
                 gb_dict = SeqIO.to_dict(SeqIO.parse(handle, "gb"))
+            handle.close() 
         except ValueError:
             print("ERROR: " + genbank.strip() + " is not a genbank file!")
             raise

@@ -44,6 +44,7 @@ def check_positive(ctx, param, value):
     help="Specify the minimum number of cateogries in each genome",
     default=4,
 )
+
 def main(input, output, maximum_genes, gene_categories):
     print("STARTING")
 
@@ -112,3 +113,5 @@ def main(input, output, maximum_genes, gene_categories):
     print("Done Processing!\n")
     print("Removing duplicate phrog category orders")
 
+if __name__ == "__main__":
+    main()
