@@ -9,7 +9,7 @@ import click
 from phynteny_utils import handle_genbank
 from phynteny_utils import predictor
 from Bio import SeqIO
-import os
+import pkg_resources 
 
 __author__ = "Susanna Grigson"
 __maintainer__ = "Susanna Grigson"
@@ -47,10 +47,21 @@ def main(infile, outfile, model, thresholds):
     """
 
     # get the absolute path to the directory containing this script
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    data_dir = os.path.join(current_dir, 'phrog_annotation_info')
-    phrog_categories = os.path.join(data_dir, 'phrog_annotation_info/phrog_integer.pkl')
-    category_names = os.path.join(data_dir, "phrog_annotation_info/integer_category.pkl")
+    #current_dir = os.path.dirname(os.path.abspath(__file__))
+    #data_dir = os.path.join(current_dir, 'phrog_annotation_info')
+    #phrog_categories = os.path.join(data_dir, 'phrog_annotation_info/phrog_integer.pkl')
+    #category_names = os.path.join(data_dir, "phrog_annotation_info/integer_category.pkl")
+
+    #category_filename = 'integer_category.pkl'
+    #phrog_filename = 'phrog_integer.pkl'
+    #phrog_categories = 'phynteny.phrog_annotation_info.' + phrog_filename 
+    #category_name = 'phynteny.phrog_annotation_info.' + category_filename 
+    
+    #phrog_categories = os.path.join(data_dir, phrog_filename)
+    #category_names = os.path.join(data_dir, category_filename)
+
+    phrog_categories = pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/phrog_integer.pkl')
+    category_names = pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/integer_category.pkl')
 
     # get entries in the genbank file
     gb_dict = handle_genbank.get_genbank(infile)

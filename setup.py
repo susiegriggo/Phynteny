@@ -7,9 +7,10 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 packages = setuptools.find_packages()
+print(packages) 
 package_data = {"phynteny_utils": ["phynteny_utils/*"]}
 
-data_files = [(".", ["LICENSE", "README.md"])]
+data_files = [(".", ["LICENSE", "README.md"]), ('data', ['phynteny_utils/phrog_annotation_info/integer_category.pkl', 'phynteny_utils/phrog_annotation_info/phrog_annot_v4.tsv', 'phynteny_utils/phrog_annotation_info/phrog_integer.pkl'])]
 
 setuptools.setup(
     name="Phynteny",
