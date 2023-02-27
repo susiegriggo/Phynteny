@@ -16,6 +16,9 @@ from sklearn.model_selection import train_test_split, StratifiedKFold
 import pickle
 from phynteny_utils import format_data
 import numpy as np
+import random
+import absl.logging
+absl.logging.set_verbosity(absl.logging.ERROR)
 
 
 def get_dict(dict_path):
@@ -83,21 +86,21 @@ def get_optimizer(optimizer_function, learning_rate):
 
 class Model:
     def __init__(
-        self,
-        phrog_path = "phrog_annotation_info/phrog_integer.pkl",
-        max_length=120,
-        features_include="all",
-        layers=1,
-        neurons=2,
-        batch_size=32,
-        dropout=0.1,
-        activation="tanh",
-        optimizer_function="adam",
-        learning_rate=0.0001,
-        patience=5,
-        min_delta=0.0001,
-        l1_regularizer=0,
-        l2_regularizer=0,
+            self,
+            phrog_path="phrog_annotation_info/phrog_integer.pkl",
+            max_length=120,
+            features_include="all",
+            layers=1,
+            neurons=2,
+            batch_size=32,
+            dropout=0.1,
+            activation="tanh",
+            optimizer_function="adam",
+            learning_rate=0.0001,
+            patience=5,
+            min_delta=0.0001,
+            l1_regularizer=0,
+            l2_regularizer=0,
     ):
         """
         :param phrog_categories_path: location of the dictionary describing the phrog_categories :param
@@ -156,6 +159,8 @@ class Model:
             data, self.features_include, self.num_functions, self.max_length
         )
         self.n_features = self.X.shape[2]
+
+        # TODO add a warning if the data exceeds the maximum length
 
     def get_callbacks(self, model_out):
         """
@@ -247,14 +252,14 @@ class Model:
         return model
 
     def train_model(
-        self,
-        X_1,
-        y_1,
-        X_val,
-        y_val,
-        model_out="model",
-        history_out="history",
-        epochs=140,
+            self,
+            X_1,
+            y_1,
+            X_val,
+            y_val,
+            model_out="model",
+            history_out="history",
+            epochs=140, save=True,
     ):
         """
         Function to train the LSTM model and save the trained model
@@ -266,6 +271,7 @@ class Model:
         :param model_out: string - prefix of model output
         :param history_out: string - prefix of history dictionary output
         :param epochs: number of epochs to train the model for
+        :param save: whether to save the model - default = True
         """
 
         # model with the best validation set accuracy therefore maximise
@@ -276,18 +282,19 @@ class Model:
             epochs=epochs,
             batch_size=self.batch_size,
             callbacks=self.get_callbacks(model_out),
-            validation_data=(X_val, y_val),
+            validation_data=(X_val, y_val), verbose=2
         )
 
         # save the model
-        model.save(model_out + ".pkl")
+        if save:
+            model.save(model_out + ".pkl")
 
         # save the history dictionary as a pickle
         with open(history_out + ".pkl", "wb") as handle:
             pickle.dump(history.history, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     def train_crossValidation(
-        self, model_out="model", history_out="history", n_splits=10, epochs=140
+            self, model_out="model", history_out="history", n_splits=10, epochs=140, save = True
     ):
         """
         Perform stratified cross-validation
@@ -331,34 +338,105 @@ class Model:
                 y_train,
                 X_val,
                 y_val,
-                model_out + "_" + str(counter),
-                history_out + "_" + str(counter),
-                epochs=epochs,
+                model_out=model_out + "_" + str(counter),
+                history_out=history_out + "_" + str(counter),
+                epochs=epochs,save=save
             )
 
             # update counter
             counter += 1
 
-def mean_metric(history_out):
+
+def mean_metric(history_out, n_splits):
     """
     Return the mean score for a model based on output history files
+
+    :param history_out: prefix used for the history output
+    :param n_splits: number of splits used for the cross validation
+
     """
 
-    # Read in each of the metrics
-    print('Work on this')
+    # intialise lists to store data
+    best_loss = []
+    best_val_loss = []
+    best_acc = []
+    best_val_acc = []
 
-    #take an average of the dictionaries with the corresponding history path
-    # use glob
+    # loop through each of the k-fold splits
+    for i in range(n_splits):
+        # read in the history from the split
+        hist = get_dict(history_out + '_' + str(i) + '.pkl')
 
-def random_search(hyperparameters, num_trials, model_out='model', history_out='history'):
+        # compare the history
+        best_loss.append(np.min(hist.get('loss')))
+        best_val_loss.append(np.min(hist.get('val_loss')))
+        best_acc.append(np.min(hist.get('accuracy')))
+        best_val_acc.append(np.min(hist.get('val_accuracy')))
+
+    return {'loss': np.mean(best_loss), "val_loss": np.mean(best_val_loss), "accuracy": np.mean(best_acc),
+            "val_accuracy": np.mean(best_val_acc)}
+
+
+def check_parameters(hyperparameters, num_trials):
+    """
+    Check the validity of the hyperparameter dictionary
+
+    :param hyperparameters: dictionary of the hyperparameters to test
+    :param num_trials: number of trials to use in the random search
+    """
+
+    poss_parameters = ['max_length',
+                       'features_include',
+                       'layers',
+                       'neurons',
+                       'batch_size',
+                       'dropout',
+                       'activation',
+                       'optimizer_function',
+                       'learning_rate',
+                       'patience',
+                       'min_delta',
+                       'l1_regularizer',
+                       'l2_regularizer']
+
+    # extract the hyperparameters used here
+    keys = list(hyperparameters.keys())
+
+    # get the total number of parameters in the dictionary
+    parameter_count = 1
+    for k in keys:
+
+        # Check that the parameter is allowed
+        if k not in poss_parameters:
+            raise ValueError(" illegal parameter value. Parameters must be one of 'max_length', 'features_include', "
+                             "'layers', 'neurons', 'batch_size', 'dropout', 'activation', 'optimizer_function', "
+                             "'learning_rate', 'patience', 'min_delta', 'l1_regularizer', 'l2_regularizer'")
+
+        # update the number of hyperparameters
+        parameter_count *= len(hyperparameters.get(k))
+
+    # calculate the number of allowed trials
+    if num_trials > parameter_count:
+        raise ValueError(
+            'num_trials must be equal or less than the possible number of hyperparamters! Try using a lower number of '
+            'trials')
+
+
+def random_search(data_path, hyperparameters, num_trials, model_out='model', history_out='history', k_folds=10,
+                  epochs=140, save=False):
     """
     Method for random parameter search
 
+    :param data_path: path to the pickled training data
     :param hyperparameters: dictionary of hyperparameters to test
     :param model_out: prefix of the model files
     :param history_out: prefix of history file
-    :param num_trials: number of random parameter combinations to try =
+    :param k_folds: number of folds to use for cross validation
+    :param num_trials: number of random parameter combinations to try
+    :param save: boolean whether or not to save the model
     """
+
+    check_parameters(hyperparameters, num_trials)
 
     # initialise helper variables
     tried_params = []
@@ -375,21 +453,26 @@ def random_search(hyperparameters, num_trials, model_out='model', history_out='h
 
         # create a model object using the hyperparameters
         model = Model(**params)
-        model.fit_data(data) # data is the path to the training data
-        model.train_crossValidation(
-            model_out=model_out, history_out=history_out, n_splits=k_folds, epochs=epochs
-        )
-        loss = 1 #TODO find a way to get the minimum validation loss
-        #need to evaluate the history to get the mean validation loss
+        model.fit_data(data_path)  # data is the path to the training data
 
-        #use this model to perform 10-fold cross validation
-        #will need to get the final loss from the history object
-        print(f'Validation loss: {loss:.4f}')
+        # perform stratified cross validation
+        model.train_crossValidation(
+            model_out=model_out, history_out=history_out + '_' + str(i), n_splits=k_folds, epochs=epochs, save=save
+        )
+        mean_metrics = mean_metric(history_out + '_' + str(i), k_folds)
+
+        # get the average metrics across the k-folds
+        val_loss = mean_metrics.get("val_loss")
+        val_acc = mean_metrics.get("val_accuracy")
+        # print(f'Validation loss: {val_loss:.4f}')
+        # print(f'Validation accuracy: {val_acc:.4f}')
 
         # need a way to return the loss
-        if loss < best_loss:
+        if val_loss < best_loss:
             best_params = params
-            best_loss = loss
+            best_loss = val_loss
+
+        # TODO compare the accuracy
 
     print(f'Best params: {best_params}')
     print(f'Best validation loss: {best_loss:.4f}')
