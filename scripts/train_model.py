@@ -1,5 +1,7 @@
 """
-Train LSTM with gene order 
+Train LSTM with gene order.
+
+This script trains a single instance of an LSTM using 10-fold stratified crossvalidation
 """
 
 # imports
@@ -149,7 +151,6 @@ def main(
 ):
     # create a model object
     model = train_model.Model(
-        "phrog_annotation_info/phrog_integer.pkl",
         max_length=max_length,
         features_include=features,
         layers=layers,

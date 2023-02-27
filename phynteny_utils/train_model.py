@@ -84,7 +84,7 @@ def get_optimizer(optimizer_function, learning_rate):
 class Model:
     def __init__(
         self,
-        phrog_categories_path,
+        phrog_path = "phrog_annotation_info/phrog_integer.pkl",
         max_length=120,
         features_include="all",
         layers=1,
@@ -117,7 +117,7 @@ class Model:
         """
 
         # set general information for the model
-        self.phrog_categories = get_dict(phrog_categories_path)
+        self.phrog_categories = get_dict(phrog_path)
         self.features_include = feature_check(features_include)
         self.num_functions = len(
             list(set(self.phrog_categories.values()))
@@ -338,3 +338,58 @@ class Model:
 
             # update counter
             counter += 1
+
+def mean_metric(history_out):
+    """
+    Return the mean score for a model based on output history files
+    """
+
+    # Read in each of the metrics
+    print('Work on this')
+
+    #take an average of the dictionaries with the corresponding history path
+    # use glob
+
+def random_search(hyperparameters, num_trials, model_out='model', history_out='history'):
+    """
+    Method for random parameter search
+
+    :param hyperparameters: dictionary of hyperparameters to test
+    :param model_out: prefix of the model files
+    :param history_out: prefix of history file
+    :param num_trials: number of random parameter combinations to try =
+    """
+
+    # initialise helper variables
+    tried_params = []
+    best_params = None
+    best_loss = float('inf')
+
+    for i in range(num_trials):
+
+        # Randomly select some hyperparameters to use for this trial, ensuring that each combination is unique
+        params = None
+        while params is None or params in tried_params:
+            params = {key: random.choice(values) for key, values in hyperparameters.items()}
+        tried_params.append(params)
+
+        # create a model object using the hyperparameters
+        model = Model(**params)
+        model.fit_data(data) # data is the path to the training data
+        model.train_crossValidation(
+            model_out=model_out, history_out=history_out, n_splits=k_folds, epochs=epochs
+        )
+        loss = 1 #TODO find a way to get the minimum validation loss
+        #need to evaluate the history to get the mean validation loss
+
+        #use this model to perform 10-fold cross validation
+        #will need to get the final loss from the history object
+        print(f'Validation loss: {loss:.4f}')
+
+        # need a way to return the loss
+        if loss < best_loss:
+            best_params = params
+            best_loss = loss
+
+    print(f'Best params: {best_params}')
+    print(f'Best validation loss: {best_loss:.4f}')
