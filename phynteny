@@ -31,25 +31,26 @@ __status__ = "development"
     "--model",
     type=click.Path(exists=True),
     help="Path to custom LSTM model",
-    default="model/all_chunk_trained_LSTMbest_val_loss.h5",
+    default=pkg_resources.resource_filename('phynteny_utils', 'model/all_chunk_trained_LSTMbest_val_loss.h5'),
 )
 @click.option(
     "-t",
     "--thresholds",
     type=click.Path(exists=True),
     help="Path to dictionaries for a custom LSTM model",
-    default="model/all_chunk_trained_LSTMbest_val_loss_thresholds.pkl",
+    default=pkg_resources.resource_filename('phynteny_utils', 'model/all_chunk_trained_LSTMbest_val_loss_thresholds.pkl'),
 )
 @click.version_option(version=__version__)
+
 def main(infile, outfile, model, thresholds):
     """
     Phynteny: synteny-based annotation of phage genes
     """
 
-    # get the absolute paths to phrog annotation files
+    # get the absolute paths to phrog annotation files, model and thresholds 
     phrog_categories = pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/phrog_integer.pkl')
     category_names = pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/integer_category.pkl')
-
+    
     # get entries in the genbank file
     gb_dict = handle_genbank.get_genbank(infile)
     if not gb_dict:
@@ -87,6 +88,7 @@ def main(infile, outfile, model, thresholds):
             # write to genbank file
             SeqIO.write(gb_dict.get(key), handle, "genbank")
 
+    print('DONE') 
 
 if __name__ == "__main__":
     main()

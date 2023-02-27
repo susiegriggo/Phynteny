@@ -3,7 +3,7 @@ include LICENSE
 
 recursive-include phynteny_utils/ *
 recursive-include test_data/ *
-recursive-include models/ * 
+ 
 
 global-exclude phynteny_utils/ *.pyc
 global-exclude phynteny_utils/__pycache__*.pyc
