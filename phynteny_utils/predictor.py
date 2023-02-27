@@ -49,7 +49,8 @@ class Predictor:
         """
 
         # TODO add 0 into phrog_categories
-        encodings, features = format_data.format_data(phage_dict, self.phrog_categories)
+        encodings = [[self.phrog_categories.get(p) for p in phage_dict.get(q).get('phrogs')] for q in list(phage_dict.keys())]
+        features = [format_data.get_features(phage_dict.get(q), features_included='all') for q in list(phage_dict.keys())]
 
         # get the index of the unknowns
         unk_idx = [i for i, x in enumerate(encodings[0]) if x == 0]

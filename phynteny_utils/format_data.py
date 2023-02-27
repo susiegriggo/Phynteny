@@ -7,7 +7,6 @@ import numpy as np
 import random
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-
 def encode_strand(strand):
     """
     One hot encode the direction of each gene
@@ -163,7 +162,6 @@ def one_hot_decode(encoded_seq):
     :return: integer encoding of the PHROG cateogries present in a sequence
     """
     return [np.argmax(vector) for vector in encoded_seq]
-
 
 def generate_example(sequence, features, num_functions, n_features, max_length, idx):
     """
