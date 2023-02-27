@@ -7,6 +7,7 @@ This script trains a single instance of an LSTM using 10-fold stratified crossva
 # imports
 from phynteny_utils import train_model
 import click
+import os
 
 
 @click.command()
@@ -34,7 +35,7 @@ import click
         ]
     ),
     help="What combination of features used to train model. Must be one of  ['all', 'strand', 'none', "
-    "'intergenic', 'gene_length', 'position', 'orientation_count']",
+         "'intergenic', 'gene_length', 'position', 'orientation_count']",
 )
 @click.option(
     "--layers",
@@ -129,42 +130,53 @@ import click
 @click.option(
     "--l2_regularize", "-l1", default=0, type=float, help="L2 regularization. Default=0"
 )
+def get_annotation_info(filename):
+    """
+    Get the location of the phrog annotation file
+    """
+
+
 def main(
-    data,
-    max_length,
-    features,
-    layers,
-    memory_cells,
-    batch_size,
-    dropout,
-    activation,
-    optimizer,
-    learning_rate,
-    patience,
-    min_delta,
-    model_out,
-    history_out,
-    k_folds,
-    epochs,
-    l1_regularize,
-    l2_regularize,
+        data,
+        max_length,
+        features,
+        layers,
+        memory_cells,
+        batch_size,
+        dropout,
+        activation,
+        optimizer,
+        learning_rate,
+        patience,
+        min_delta,
+        model_out,
+        history_out,
+        k_folds,
+        epochs,
+        l1_regularize,
+        l2_regularize,
 ):
+    # get the absolute path to the directory containing this script
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    data_dir = os.path.join(current_dir, '../phrog_annotation_info')
+    file_path = os.path.join(data_dir, 'phrog_integer.pkl')
+
     # create a model object
-    model = train_model.Model(
-        max_length=max_length,
-        features_include=features,
-        layers=layers,
-        neurons=memory_cells,
-        batch_size=batch_size,
-        dropout=dropout,
-        activation=activation,
-        optimizer_function=optimizer,
-        learning_rate=learning_rate,
-        patience=patience,
-        min_delta=min_delta,
-        l1_regularizer=l1_regularize,
-        l2_regularizer=l2_regularize,
-    )
+    model = train_model.Model(phrog_path=file_path,
+                              max_length=max_length,
+                              features_include=features,
+                              layers=layers,
+                              neurons=memory_cells,
+                              batch_size=batch_size,
+                              dropout=dropout,
+                              activation=activation,
+                              optimizer_function=optimizer,
+                              learning_rate=learning_rate,
+                              patience=patience,
+                              min_delta=min_delta,
+                              l1_regularizer=l1_regularize,
+                              l2_regularizer=l2_regularize,
+                              )
 
     # fit data to the model
     model.fit_data(data)

@@ -22,7 +22,6 @@ def parse_args():
 
     return vars(parser.parse_args())
 
-
 def main():
     print('starting', flush=True)
     args = parse_args()

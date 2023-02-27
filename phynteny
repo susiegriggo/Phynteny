@@ -18,6 +18,8 @@ __email__ = "susie.grigson@gmail.com"
 __status__ = "development"
 
 # dictionary paths
+
+
 phrog_categories = "phrog_annotation_info/phrog_integer.pkl"
 category_names = "phrog_annotation_info/integer_category.pkl"
 
@@ -49,6 +51,13 @@ def main(infile, outfile, model, thresholds):
     """
     Phynteny: synteny-based annotation of phage genes
     """
+
+    # get the absolute path to the directory containing this script
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    data_dir = os.path.join(current_dir, 'phrog_annotation_info')
+    phrog_categories = os.path.join(data_dir, 'phrog_annotation_info/phrog_integer.pkl')
+    category_names = os.path.join(data_dir, "phrog_annotation_info/integer_category.pkl")
+
     # get entries in the genbank file
     gb_dict = handle_genbank.get_genbank(infile)
     if not gb_dict:
