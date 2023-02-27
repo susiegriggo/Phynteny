@@ -59,7 +59,7 @@ class Predictor:
             print(
                 "Your phage "
                 + str(list(phage_dict.keys())[0])
-                + "is already completely annotated"
+                + "is already completely annotated!"
             )
 
         phynteny = []

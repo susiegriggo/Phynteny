@@ -46,20 +46,7 @@ def main(infile, outfile, model, thresholds):
     Phynteny: synteny-based annotation of phage genes
     """
 
-    # get the absolute path to the directory containing this script
-    #current_dir = os.path.dirname(os.path.abspath(__file__))
-    #data_dir = os.path.join(current_dir, 'phrog_annotation_info')
-    #phrog_categories = os.path.join(data_dir, 'phrog_annotation_info/phrog_integer.pkl')
-    #category_names = os.path.join(data_dir, "phrog_annotation_info/integer_category.pkl")
-
-    #category_filename = 'integer_category.pkl'
-    #phrog_filename = 'phrog_integer.pkl'
-    #phrog_categories = 'phynteny.phrog_annotation_info.' + phrog_filename 
-    #category_name = 'phynteny.phrog_annotation_info.' + category_filename 
-    
-    #phrog_categories = os.path.join(data_dir, phrog_filename)
-    #category_names = os.path.join(data_dir, category_filename)
-
+    # get the absolute paths to phrog annotation files
     phrog_categories = pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/phrog_integer.pkl')
     category_names = pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/integer_category.pkl')
 
@@ -77,6 +64,8 @@ def main(infile, outfile, model, thresholds):
     with click.open_file(outfile, "wt") if outfile else sys.stdout as handle:
 
         for key in keys:
+
+            print('Annotating the phage: ' + key, flush=True) 
 
             # get current phage
             phages = {key: handle_genbank.extract_features(gb_dict.get(key))}
