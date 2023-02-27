@@ -130,10 +130,6 @@ import os
 @click.option(
     "--l2_regularize", "-l1", default=0, type=float, help="L2 regularization. Default=0"
 )
-def get_annotation_info(filename):
-    """
-    Get the location of the phrog annotation file
-    """
 
 
 def main(
