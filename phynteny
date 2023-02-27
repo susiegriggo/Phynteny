@@ -9,6 +9,7 @@ import click
 from phynteny_utils import handle_genbank
 from phynteny_utils import predictor
 from Bio import SeqIO
+import os
 
 __author__ = "Susanna Grigson"
 __maintainer__ = "Susanna Grigson"
@@ -16,13 +17,6 @@ __license__ = "MIT"
 __version__ = "0"
 __email__ = "susie.grigson@gmail.com"
 __status__ = "development"
-
-# dictionary paths
-
-
-phrog_categories = "phrog_annotation_info/phrog_integer.pkl"
-category_names = "phrog_annotation_info/integer_category.pkl"
-
 
 @click.command()
 @click.argument("infile", type=click.Path(exists=True))
