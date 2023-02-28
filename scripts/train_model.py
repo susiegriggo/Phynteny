@@ -8,6 +8,7 @@ This script trains a single instance of an LSTM using 10-fold stratified crossva
 from phynteny_utils import train_model
 import click
 import os
+import pkg_resources
 
 
 @click.command()
@@ -152,13 +153,9 @@ def main(
         l1_regularize,
         l2_regularize,
 ):
-    # get the absolute path to the directory containing this script
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    data_dir = os.path.join(current_dir, '../phrog_annotation_info')
-    file_path = os.path.join(data_dir, 'phrog_integer.pkl')
 
     # create a model object
-    model = train_model.Model(phrog_path=file_path,
+    model = train_model.Model(phrog_path= pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/phrog_integer.pkl'),
                               max_length=max_length,
                               features_include=features,
                               layers=layers,
