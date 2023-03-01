@@ -112,6 +112,19 @@ def main(input, output, maximum_genes, gene_categories):
     # save the training data dictionary
     print("Done Processing!\n")
     print("Removing duplicate phrog category orders")
+    
+    # dereplicate the data and shuffle 
+    derep_data = handle_genbank.derep_trainingdata(training_data)
+    
+    # save the original data
+    with open(output + "_all_data.pkl", "wb") as handle: 
+        pickle.dump(training_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    handle.close() 
+
+    # save the dereplicated data
+    with open(output + "_dereplicated.pkl", "wb") as handle:
+        pickle.dump(data_derep, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    handle.close()
 
 if __name__ == "__main__":
     main()
