@@ -17,6 +17,7 @@ import pickle
 from phynteny_utils import format_data
 import numpy as np
 import random
+import pkg_resources 
 import absl.logging
 absl.logging.set_verbosity(absl.logging.ERROR)
 
@@ -87,11 +88,11 @@ def get_optimizer(optimizer_function, learning_rate):
 class Model:
     def __init__(
             self,
-            phrog_path="phrog_annotation_info/phrog_integer.pkl",
+            phrog_path=pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/phrog_integer.pkl'),
             max_length=120,
             features_include="all",
             layers=1,
-            neurons=2,
+            neurons=100,
             batch_size=32,
             dropout=0.1,
             activation="tanh",
@@ -172,7 +173,7 @@ class Model:
         es = EarlyStopping(
             monitor="loss",
             mode="min",
-            verbose=2,
+            verbose=1,
             patience=self.patience,
             min_delta=self.min_delta,
         )
@@ -282,7 +283,7 @@ class Model:
             epochs=epochs,
             batch_size=self.batch_size,
             callbacks=self.get_callbacks(model_out),
-            validation_data=(X_val, y_val), verbose=2
+            validation_data=(X_val, y_val), verbose=1
         )
 
         # save the model
