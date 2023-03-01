@@ -344,9 +344,14 @@ class Model:
                 epochs=epochs,save=save
             )
 
+            # delete the data to free up memory
+            del X_train
+            del X_train
+            del y_train
+            del y_test
+
             # update counter
             counter += 1
-
 
 def mean_metric(history_out, n_splits):
     """
@@ -376,7 +381,6 @@ def mean_metric(history_out, n_splits):
 
     return {'loss': np.mean(best_loss), "val_loss": np.mean(best_val_loss), "accuracy": np.mean(best_acc),
             "val_accuracy": np.mean(best_val_acc)}
-
 
 def check_parameters(hyperparameters, num_trials):
     """
