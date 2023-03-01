@@ -13,7 +13,7 @@ from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 import tensorflow.keras.optimizers as optimizers
 from tensorflow.keras.regularizers import L1L2
 from sklearn.model_selection import train_test_split, StratifiedKFold
-import pickle
+import pickle5
 from phynteny_utils import format_data
 import numpy as np
 import random
@@ -28,7 +28,7 @@ def get_dict(dict_path):
     """
 
     with open(dict_path, "rb") as handle:
-        dictionary = pickle.load(handle)
+        dictionary = pickle5.load(handle)
     handle.close()
 
     return dictionary

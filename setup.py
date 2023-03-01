@@ -38,9 +38,13 @@ setuptools.setup(
     ],
     install_requires=[  # TODO
         "biopython",
-        "tensorflow-cpu==2.11.0",
+        "sklearn",
+        'numpy==1.21',
         "pandas",
-        "click",
+        "click", 
+        "joblib",
     ],
-    python_requires=">=3.8",
+    python_requires=">=3.7",
 )
+
+#may need to add nvidia-tensorrt==7.2.3.4 
