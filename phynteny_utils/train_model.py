@@ -242,10 +242,10 @@ class Model:
         model.add(TimeDistributed(Dense(self.num_functions, activation="softmax")))
 
         # get the optimization function
-        optimizer = get_optimizer(self.optimizer_function, self.learning_rate)
+        optimizer = get_optimizer(self.optimizer_function, self.learning_rate) #TODO add the optimzer back - temp fix?
 
         model.compile(
-            loss="categorical_crossentropy", metrics=["accuracy"], optimizer=optimizer
+            loss="categorical_crossentropy", metrics=["accuracy"]
         )
 
         print(model.summary(), flush=True)
