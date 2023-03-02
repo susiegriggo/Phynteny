@@ -38,11 +38,13 @@ setuptools.setup(
     ],
     install_requires=[  # TODO
         "biopython",
-        "sklearn",
+        "pickle5",
+        "scikit-learn",
         'numpy==1.21',
         "pandas",
         "click", 
-        "joblib",
+        "joblib", 
+        "tensorflow==2.11.0",
     ],
     python_requires=">=3.7",
 )
