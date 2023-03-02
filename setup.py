@@ -43,8 +43,7 @@ setuptools.setup(
         'numpy==1.21',
         "pandas",
         "click", 
-        "joblib", 
-        "tensorflow==2.11.0",
+        "joblib",
     ],
     python_requires=">=3.7",
 )

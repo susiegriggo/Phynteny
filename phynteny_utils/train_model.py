@@ -245,7 +245,7 @@ class Model:
         optimizer = get_optimizer(self.optimizer_function, self.learning_rate) #TODO add the optimzer back - temp fix?
 
         model.compile(
-            loss="categorical_crossentropy", metrics=["accuracy"]
+            loss="categorical_crossentropy", metrics=["accuracy"], optimizer=optimizer
         )
 
         print(model.summary(), flush=True)
@@ -292,7 +292,7 @@ class Model:
 
         # save the history dictionary as a pickle
         with open(history_out + ".pkl", "wb") as handle:
-            pickle.dump(history.history, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle5.dump(history.history, handle, protocol=pickle5.HIGHEST_PROTOCOL)
 
     def train_crossValidation(
             self, model_out="model", history_out="history", n_splits=10, epochs=140, save = True
