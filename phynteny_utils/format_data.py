@@ -6,7 +6,7 @@ Functions to prepare data for training with the LSTM viral gene organisation mod
 import numpy as np
 import random
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-import warnings
+from sklearn.model_selection import train_test_split
 
 def encode_strand(strand):
     """
@@ -279,3 +279,57 @@ def generate_dataset(data, features_included, num_functions, max_length):
     y = np.array(y).reshape(len(keys), max_length, num_functions)
 
     return X, y
+
+def test_train():
+    def test_train(data, path, num_functions, max_genes=120, test_size=11):
+        """
+        Split the data into testing and training datasets. Saves these datasets as dictionaries
+
+        :param data: dictionary of curate phage data
+        :param path: path prefix to save the testing and training dictionaries
+        :param num_functions: number of possible cateogories in the encoding
+        :param max_genes: maximum number of genes to consider in a prophage
+        :param test_size: proportion of the data to be included as test data (default is 11 which indicates one eleventh of the data
+        """
+
+        # get the keys of the data
+        keys = list(data.keys())
+
+        # encode the data
+        X, y = generate_dataset(data, 'all', num_functions, max_genes)
+        X_dict = dict(zip(keys, X))
+        y_dict = dict(zip(keys, y))
+
+        # generate a list describing which categories get masked
+        categories = [
+            np.where(y[i, np.where(~X[i, :, 0:num_functions].any(axis=1))[0][0]] == 1)[0][0]
+            for i in range(len(X))
+        ]
+        train_keys, test_keys, train_cat, test_cat = train_test_split(data, categories, test_size=float(1 / test_size),
+                                                                      random_state=42, stratify=categories)
+        # generate a dictionary of training data which can be used
+        train_X_data = dict(zip(train_keys, [X_dict.get(i) for i in train_keys]))
+        train_y_data = dict(zip(train_keys, [y_dict.get(i) for i in train_keys]))
+        test_X_data = dict(zip(test_keys, [X_dict.get(i) for i in test_keys]))
+        test_y_data = dict(zip(test_keys, [y_dict.get(i) for i in test_keys]))
+
+        # for the test data get the entire prophages because these can be used to test annotation of the entire genome
+        test_phage = dict(zip(test_keys, [data.get(i) for i in test_keys]))
+
+        # save each of these dictionaries
+        with open(path + "_train_X.pkl", "wb") as handle:
+            pickle.dump(train_X_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        handle.close()
+        with open(path + "_train_y.pkl", "wb") as handle:
+            pickle.dump(train_y_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        handle.close()
+        with open(path + "_test_X.pkl", "wb") as handle:
+            pickle.dump(test_X_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        handle.close()
+        with open(path + "_test_y.pkl", "wb") as handle:
+            pickle.dump(test_y_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        handle.close()
+        with open(path + "_test_prophages.pkl", "wb") as handle:
+            pickle.dump(test_phage, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        handle.close()
+
