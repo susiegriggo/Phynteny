@@ -4,16 +4,17 @@ from phynteny_utils import handle_genbank
 from phynteny_utils import format_data
 import pkg_resources
 
+
 @click.command()
 @click.option(
     "-i",
     "--input_data",
     help="Text file containing genbank files to build model",
     required=True,
-    type=click.Path(exists=True), 
+    type=click.Path(exists=True),
 )
 @click.option(
-    "-g",
+    "-m",
     "--maximum_genes",
     type=int,
     help="Specify the maximum number of genes in each genome",
@@ -33,24 +34,26 @@ import pkg_resources
     type=str,
     help="Prefix for the output files",
 )
-
-
-
 def main(input_data, gene_categories, maximum_genes, prefix):
-    
     print("STARTING")
 
     # read in annotations
-    phrog_integer = pkg_resources.resource_filename(
-        "phynteny_utils", "phrog_annotation_info/phrog_integer.pkl"
+    phrog_integer = format_data.get_dict(
+        pkg_resources.resource_filename(
+            "phynteny_utils", "phrog_annotation_info/phrog_integer.pkl"
+        )
     )
+
     phrog_integer["No_PHROG"] = 0
     num_functions = len(list(set(phrog_integer.values())))
 
     # takes a text file where each line is the file path to genbank files of phages to train a model
     print("getting input", flush=True)
     print(input, flush=True)
-    data = handle_genbank.get_data(input_data, gene_categories, phrog_integer, maximum_genes)  # dictionary to store all of the training data
+    data = handle_genbank.get_data(
+        input_data, gene_categories, phrog_integer, maximum_genes
+    )  # dictionary to store all of the training data
+
     # save the training data dictionary
     print("Done Processing!\n")
     print("Removing duplicate phrog category orders")
@@ -70,6 +73,7 @@ def main(input_data, gene_categories, maximum_genes, prefix):
 
     # save the testing and training datasets
     format_data.test_train(data, prefix, num_functions, maximum_genes)
+
 
 if __name__ == "__main__":
     main()

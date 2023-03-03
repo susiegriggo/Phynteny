@@ -5,8 +5,22 @@ Functions to prepare data for training with the LSTM viral gene organisation mod
 # imports
 import numpy as np
 import random
+import pickle5
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
+
+
+def get_dict(dict_path):
+    """
+    Helper function to import dictionaries
+    """
+
+    with open(dict_path, "rb") as handle:
+        dictionary = pickle5.load(handle)
+    handle.close()
+
+    return dictionary
+
 
 def encode_strand(strand):
     """
@@ -164,6 +178,7 @@ def one_hot_decode(encoded_seq):
     """
     return [np.argmax(vector) for vector in encoded_seq]
 
+
 def generate_example(sequence, features, num_functions, n_features, max_length, idx):
     """
     Convert a sequence of PHROG functions and associated features to a supervised learning problem
@@ -179,7 +194,7 @@ def generate_example(sequence, features, num_functions, n_features, max_length, 
     # check the length of the sequence
     seq_len = len(sequence)
     if seq_len > max_length:
-        ValueError('Phage contains more genes than the maximum specified!')
+        ValueError("Phage contains more genes than the maximum specified!")
 
     # pad the sequence
     padded_sequence = pad_sequences([sequence], padding="post", maxlen=max_length)[0]
@@ -199,6 +214,7 @@ def generate_example(sequence, features, num_functions, n_features, max_length, 
     y = y.reshape((1, max_length, num_functions))
 
     return X, y
+
 
 def generate_prediction(sequence, features, num_functions, n_features, max_length, idx):
     """
@@ -244,7 +260,6 @@ def generate_dataset(data, features_included, num_functions, max_length):
     keys = list(data.keys())
 
     for i in range(len(keys)):
-
         # get the encoding
         encoding = data.get(keys[i]).get("categories")
         if len(encoding) > max_length:
@@ -280,6 +295,7 @@ def generate_dataset(data, features_included, num_functions, max_length):
 
     return X, y
 
+
 def test_train():
     def test_train(data, path, num_functions, max_genes=120, test_size=11):
         """
@@ -296,17 +312,24 @@ def test_train():
         keys = list(data.keys())
 
         # encode the data
-        X, y = generate_dataset(data, 'all', num_functions, max_genes)
+        X, y = generate_dataset(data, "all", num_functions, max_genes)
         X_dict = dict(zip(keys, X))
         y_dict = dict(zip(keys, y))
 
         # generate a list describing which categories get masked
         categories = [
-            np.where(y[i, np.where(~X[i, :, 0:num_functions].any(axis=1))[0][0]] == 1)[0][0]
+            np.where(y[i, np.where(~X[i, :, 0:num_functions].any(axis=1))[0][0]] == 1)[
+                0
+            ][0]
             for i in range(len(X))
         ]
-        train_keys, test_keys, train_cat, test_cat = train_test_split(data, categories, test_size=float(1 / test_size),
-                                                                      random_state=42, stratify=categories)
+        train_keys, test_keys, train_cat, test_cat = train_test_split(
+            data,
+            categories,
+            test_size=float(1 / test_size),
+            random_state=42,
+            stratify=categories,
+        )
         # generate a dictionary of training data which can be used
         train_X_data = dict(zip(train_keys, [X_dict.get(i) for i in train_keys]))
         train_y_data = dict(zip(train_keys, [y_dict.get(i) for i in train_keys]))
@@ -332,4 +355,3 @@ def test_train():
         with open(path + "_test_prophages.pkl", "wb") as handle:
             pickle.dump(test_phage, handle, protocol=pickle.HIGHEST_PROTOCOL)
         handle.close()
-

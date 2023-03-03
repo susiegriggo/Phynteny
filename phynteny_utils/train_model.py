@@ -17,8 +17,9 @@ import pickle5
 from phynteny_utils import format_data
 import numpy as np
 import random
-import pkg_resources 
+import pkg_resources
 import absl.logging
+
 absl.logging.set_verbosity(absl.logging.ERROR)
 
 
@@ -87,21 +88,23 @@ def get_optimizer(optimizer_function, learning_rate):
 
 class Model:
     def __init__(
-            self,
-            phrog_path=pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/phrog_integer.pkl'),
-            max_length=120,
-            features_include="all",
-            layers=1,
-            neurons=100,
-            batch_size=32,
-            dropout=0.1,
-            activation="tanh",
-            optimizer_function="adam",
-            learning_rate=0.0001,
-            patience=5,
-            min_delta=0.0001,
-            l1_regularizer=0,
-            l2_regularizer=0,
+        self,
+        phrog_path=pkg_resources.resource_filename(
+            "phynteny_utils", "phrog_annotation_info/phrog_integer.pkl"
+        ),
+        max_length=120,
+        features_include="all",
+        layers=1,
+        neurons=100,
+        batch_size=32,
+        dropout=0.1,
+        activation="tanh",
+        optimizer_function="adam",
+        learning_rate=0.0001,
+        patience=5,
+        min_delta=0.0001,
+        l1_regularizer=0,
+        l2_regularizer=0,
     ):
         """
         :param phrog_categories_path: location of the dictionary describing the phrog_categories :param
@@ -243,7 +246,9 @@ class Model:
         model.add(TimeDistributed(Dense(self.num_functions, activation="softmax")))
 
         # get the optimization function
-        optimizer = get_optimizer(self.optimizer_function, self.learning_rate) #TODO add the optimzer back - temp fix?
+        optimizer = get_optimizer(
+            self.optimizer_function, self.learning_rate
+        )  # TODO add the optimzer back - temp fix?
 
         model.compile(
             loss="categorical_crossentropy", metrics=["accuracy"], optimizer=optimizer
@@ -254,14 +259,15 @@ class Model:
         return model
 
     def train_model(
-            self,
-            X_1,
-            y_1,
-            X_val,
-            y_val,
-            model_out="model",
-            history_out="history",
-            epochs=140, save=True,
+        self,
+        X_1,
+        y_1,
+        X_val,
+        y_val,
+        model_out="model",
+        history_out="history",
+        epochs=140,
+        save=True,
     ):
         """
         Function to train the LSTM model and save the trained model
@@ -284,7 +290,8 @@ class Model:
             epochs=epochs,
             batch_size=self.batch_size,
             callbacks=self.get_callbacks(model_out),
-            validation_data=(X_val, y_val), verbose=1
+            validation_data=(X_val, y_val),
+            verbose=1,
         )
 
         # save the model
@@ -296,7 +303,12 @@ class Model:
             pickle5.dump(history.history, handle, protocol=pickle5.HIGHEST_PROTOCOL)
 
     def train_crossValidation(
-            self, model_out="model", history_out="history", n_splits=10, epochs=140, save = True
+        self,
+        model_out="model",
+        history_out="history",
+        n_splits=10,
+        epochs=140,
+        save=True,
     ):
         """
         Perform stratified cross-validation
@@ -311,11 +323,14 @@ class Model:
         # separate into testing and training data - testing data reserved
         X_1, X_test, y_1, y_test = train_test_split(
             self.X, self.y, test_size=float(1 / 11), random_state=42
-        ) #TODO move the test and train split out of this module - perhaps do this in the generate training data script
+        )  # TODO move the test and train split out of this module - perhaps do this in the generate training data script
 
         # get the predicted category of the train data
         masked_cat = [
-            np.where(y_1[i, np.where(~X_1[i, :, 0:self.num_functions].any(axis=1))[0][0]] == 1)[0][0]
+            np.where(
+                y_1[i, np.where(~X_1[i, :, 0 : self.num_functions].any(axis=1))[0][0]]
+                == 1
+            )[0][0]
             for i in range(len(X_1))
         ]
 
@@ -326,7 +341,6 @@ class Model:
 
         # investigate each k-fold
         for train_index, val_index in skf.split(np.zeros(len(masked_cat)), masked_cat):
-
             # generate stratified test and train sets
             X_train = X_1[train_index, :, :]
             y_train = y_1[train_index, :, :]
@@ -343,7 +357,8 @@ class Model:
                 y_val,
                 model_out=model_out + "_" + str(counter),
                 history_out=history_out + "_" + str(counter),
-                epochs=epochs,save=save
+                epochs=epochs,
+                save=save,
             )
 
             # delete the data to free up memory
@@ -354,6 +369,7 @@ class Model:
 
             # update counter
             counter += 1
+
 
 def mean_metric(history_out, n_splits):
     """
@@ -373,16 +389,21 @@ def mean_metric(history_out, n_splits):
     # loop through each of the k-fold splits
     for i in range(n_splits):
         # read in the history from the split
-        hist = get_dict(history_out + '_' + str(i) + '.pkl')
+        hist = get_dict(history_out + "_" + str(i) + ".pkl")
 
         # compare the history
-        best_loss.append(np.min(hist.get('loss')))
-        best_val_loss.append(np.min(hist.get('val_loss')))
-        best_acc.append(np.min(hist.get('accuracy')))
-        best_val_acc.append(np.min(hist.get('val_accuracy')))
+        best_loss.append(np.min(hist.get("loss")))
+        best_val_loss.append(np.min(hist.get("val_loss")))
+        best_acc.append(np.min(hist.get("accuracy")))
+        best_val_acc.append(np.min(hist.get("val_accuracy")))
 
-    return {'loss': np.mean(best_loss), "val_loss": np.mean(best_val_loss), "accuracy": np.mean(best_acc),
-            "val_accuracy": np.mean(best_val_acc)}
+    return {
+        "loss": np.mean(best_loss),
+        "val_loss": np.mean(best_val_loss),
+        "accuracy": np.mean(best_acc),
+        "val_accuracy": np.mean(best_val_acc),
+    }
+
 
 def check_parameters(hyperparameters, num_trials):
     """
@@ -392,19 +413,21 @@ def check_parameters(hyperparameters, num_trials):
     :param num_trials: number of trials to use in the random search
     """
 
-    poss_parameters = ['max_length',
-                       'features_include',
-                       'layers',
-                       'neurons',
-                       'batch_size',
-                       'dropout',
-                       'activation',
-                       'optimizer_function',
-                       'learning_rate',
-                       'patience',
-                       'min_delta',
-                       'l1_regularizer',
-                       'l2_regularizer']
+    poss_parameters = [
+        "max_length",
+        "features_include",
+        "layers",
+        "neurons",
+        "batch_size",
+        "dropout",
+        "activation",
+        "optimizer_function",
+        "learning_rate",
+        "patience",
+        "min_delta",
+        "l1_regularizer",
+        "l2_regularizer",
+    ]
 
     # extract the hyperparameters used here
     keys = list(hyperparameters.keys())
@@ -412,12 +435,13 @@ def check_parameters(hyperparameters, num_trials):
     # get the total number of parameters in the dictionary
     parameter_count = 1
     for k in keys:
-
         # Check that the parameter is allowed
         if k not in poss_parameters:
-            raise ValueError(" illegal parameter value. Parameters must be one of 'max_length', 'features_include', "
-                             "'layers', 'neurons', 'batch_size', 'dropout', 'activation', 'optimizer_function', "
-                             "'learning_rate', 'patience', 'min_delta', 'l1_regularizer', 'l2_regularizer'")
+            raise ValueError(
+                " illegal parameter value. Parameters must be one of 'max_length', 'features_include', "
+                "'layers', 'neurons', 'batch_size', 'dropout', 'activation', 'optimizer_function', "
+                "'learning_rate', 'patience', 'min_delta', 'l1_regularizer', 'l2_regularizer'"
+            )
 
         # update the number of hyperparameters
         parameter_count *= len(hyperparameters.get(k))
@@ -425,12 +449,21 @@ def check_parameters(hyperparameters, num_trials):
     # calculate the number of allowed trials
     if num_trials > parameter_count:
         raise ValueError(
-            'num_trials must be equal or less than the possible number of hyperparamters! Try using a lower number of '
-            'trials')
+            "num_trials must be equal or less than the possible number of hyperparamters! Try using a lower number of "
+            "trials"
+        )
 
 
-def random_search(data_path, hyperparameters, num_trials, model_out='model', history_out='history', k_folds=10,
-                  epochs=140, save=False):
+def random_search(
+    data_path,
+    hyperparameters,
+    num_trials,
+    model_out="model",
+    history_out="history",
+    k_folds=10,
+    epochs=140,
+    save=False,
+):
     """
     Method for random parameter search
 
@@ -448,14 +481,15 @@ def random_search(data_path, hyperparameters, num_trials, model_out='model', his
     # initialise helper variables
     tried_params = []
     best_params = None
-    best_loss = float('inf')
+    best_loss = float("inf")
 
     for i in range(num_trials):
-
         # Randomly select some hyperparameters to use for this trial, ensuring that each combination is unique
         params = None
         while params is None or params in tried_params:
-            params = {key: random.choice(values) for key, values in hyperparameters.items()}
+            params = {
+                key: random.choice(values) for key, values in hyperparameters.items()
+            }
         tried_params.append(params)
 
         # create a model object using the hyperparameters
@@ -464,9 +498,13 @@ def random_search(data_path, hyperparameters, num_trials, model_out='model', his
 
         # perform stratified cross validation
         model.train_crossValidation(
-            model_out=model_out, history_out=history_out + '_' + str(i), n_splits=k_folds, epochs=epochs, save=save
+            model_out=model_out,
+            history_out=history_out + "_" + str(i),
+            n_splits=k_folds,
+            epochs=epochs,
+            save=save,
         )
-        mean_metrics = mean_metric(history_out + '_' + str(i), k_folds)
+        mean_metrics = mean_metric(history_out + "_" + str(i), k_folds)
 
         # get the average metrics across the k-folds
         val_loss = mean_metrics.get("val_loss")
@@ -481,5 +519,5 @@ def random_search(data_path, hyperparameters, num_trials, model_out='model', his
 
         # TODO compare the accuracy
 
-    print(f'Best params: {best_params}')
-    print(f'Best validation loss: {best_loss:.4f}')
+    print(f"Best params: {best_params}")
+    print(f"Best validation loss: {best_loss:.4f}")
