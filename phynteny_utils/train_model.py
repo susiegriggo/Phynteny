@@ -162,6 +162,7 @@ class Model:
         self.n_features = self.X.shape[2]
 
         # TODO add a warning if the data exceeds the maximum length
+        # TODO make it possible to fit in data which has already been masked
 
     def get_callbacks(self, model_out):
         """
@@ -310,11 +311,11 @@ class Model:
         # separate into testing and training data - testing data reserved
         X_1, X_test, y_1, y_test = train_test_split(
             self.X, self.y, test_size=float(1 / 11), random_state=42
-        )
+        ) #TODO move the test and train split out of this module - perhaps do this in the generate training data script
 
         # get the predicted category of the train data
         masked_cat = [
-            np.where(y_1[i, np.where(~X_1[i, :, 0:10].any(axis=1))[0][0]] == 1)[0][0]
+            np.where(y_1[i, np.where(~X_1[i, :, 0:self.num_functions].any(axis=1))[0][0]] == 1)[0][0]
             for i in range(len(X_1))
         ]
 
@@ -325,6 +326,7 @@ class Model:
 
         # investigate each k-fold
         for train_index, val_index in skf.split(np.zeros(len(masked_cat)), masked_cat):
+
             # generate stratified test and train sets
             X_train = X_1[train_index, :, :]
             y_train = y_1[train_index, :, :]

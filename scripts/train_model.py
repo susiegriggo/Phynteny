@@ -7,7 +7,6 @@ This script trains a single instance of an LSTM using 10-fold stratified crossva
 # imports
 from phynteny_utils import train_model
 import click
-import os
 import pkg_resources
 
 

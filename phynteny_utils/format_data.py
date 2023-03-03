@@ -6,6 +6,7 @@ Functions to prepare data for training with the LSTM viral gene organisation mod
 import numpy as np
 import random
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+import warnings
 
 def encode_strand(strand):
     """
@@ -175,12 +176,17 @@ def generate_example(sequence, features, num_functions, n_features, max_length, 
     :return: training or test example separated as X and y matrices
     """
 
+    # check the length of the sequence
     seq_len = len(sequence)
+    if seq_len > max_length:
+        ValueError('Phage contains more genes than the maximum specified!')
+
+    # pad the sequence
     padded_sequence = pad_sequences([sequence], padding="post", maxlen=max_length)[0]
 
+    # generate encoding
     y = np.array(one_hot_encode(padded_sequence, num_functions))
     X = np.array(one_hot_encode(padded_sequence, n_features))
-
     if len(features) > 0:
         for f in range(len(features)):
             X = encode_feature(X, features[f], num_functions + f)
@@ -193,7 +199,6 @@ def generate_example(sequence, features, num_functions, n_features, max_length, 
     y = y.reshape((1, max_length, num_functions))
 
     return X, y
-
 
 def generate_prediction(sequence, features, num_functions, n_features, max_length, idx):
     """
@@ -239,6 +244,7 @@ def generate_dataset(data, features_included, num_functions, max_length):
     keys = list(data.keys())
 
     for i in range(len(keys)):
+
         # get the encoding
         encoding = data.get(keys[i]).get("categories")
         if len(encoding) > max_length:
