@@ -16,14 +16,14 @@ import numpy as np
     type=click.Path(exists=True),
 )
 @click.option(
-    "-max_genes",
+    "-g",
     "--maximum_genes",
     type=int,
     help="Specify the maximum number of genes in each genome",
     default=120,
 )
 @click.option(
-    "-gene_cat",
+    "-c",
     "--gene_categories",
     type=int,
     help="Specify the minimum number of cateogries in each genome",
@@ -36,6 +36,7 @@ import numpy as np
     type=str,
     help="Prefix for the output files",
 )
+
 
 def get_data(input_data, gene_categories, phrog_integer, maximum_genes):
     """
