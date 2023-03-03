@@ -183,4 +183,4 @@ def main(input_data, maximum_genes, gene_categories, prefix):
     test_train(data, prefix, num_functions, maximum_genes)
 
 if __name__ == "__main__":
-    main(input_data, output, maximum_genes, gene_categories, prefix)
+    main()
