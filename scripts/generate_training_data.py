@@ -16,13 +16,6 @@ import numpy as np
     type=click.Path(exists=True),
 )
 @click.option(
-    "-o",
-    "--output",
-    help="Name of output dictionary containing training data",
-    required=True,
-    type=click.Path(),
-)
-@click.option(
     "-max_genes",
     "--maximum_genes",
     type=int,
@@ -153,7 +146,7 @@ def test_train(data, path, num_functions, max_genes = 120, test_size = 11):
         pickle.dump(test_phage, handle, protocol=pickle.HIGHEST_PROTOCOL)
     handle.close()
 
-def main(input_data, output, maximum_genes, gene_categories, prefix):
+def main(input_data, maximum_genes, gene_categories, prefix):
 
     print("STARTING")
 
@@ -167,7 +160,7 @@ def main(input_data, output, maximum_genes, gene_categories, prefix):
     # takes a text file where each line is the file path to genbank files of phages to train a model
     print("getting input", flush=True)
     print(input, flush=True)
-    data = get_data(input, gene_categories, phrog_integer, maximum_genes)  # dictionary to store all of the training data
+    data = get_data(input_data, gene_categories, phrog_integer, maximum_genes)  # dictionary to store all of the training data
 
     # save the training data dictionary
     print("Done Processing!\n")
@@ -177,12 +170,12 @@ def main(input_data, output, maximum_genes, gene_categories, prefix):
     derep_dict= handle_genbank.derep_trainingdata(data)
     
     # save the original data
-    with open(output + "_all_data.pkl", "wb") as handle: 
+    with open(prefix + "_all_data.pkl", "wb") as handle:
         pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
     handle.close() 
 
     # save the de-replicated data
-    with open(output + "_dereplicated.pkl", "wb") as handle:
+    with open(prefix + "_dereplicated.pkl", "wb") as handle:
         pickle.dump(derep_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
     handle.close()
 
