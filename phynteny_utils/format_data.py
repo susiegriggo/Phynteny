@@ -299,7 +299,7 @@ def generate_dataset(data, features_included, num_functions, max_length):
     return X, y
 
 
-def test_train(data, path, num_functions, max_genes=120, test_size=11):
+def test_train(data, path, num_functions, max_genes=120, test_size=10):
     """
     Split the data into testing and training datasets. Saves these datasets as dictionaries
 
