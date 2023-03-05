@@ -43,24 +43,24 @@ def main(input_data, gene_categories, maximum_genes, prefix):
             "phynteny_utils", "phrog_annotation_info/phrog_integer.pkl"
         )
     )
-
+    phrog_integer = dict(
+        zip([str(i) for i in phrog_integer.keys()], phrog_integer.values())
+    )
     phrog_integer["No_PHROG"] = 0
     num_functions = len(list(set(phrog_integer.values())))
 
     # takes a text file where each line is the file path to genbank files of phages to train a model
     print("getting input", flush=True)
-    print(input, flush=True)
     data = handle_genbank.get_data(
         input_data, gene_categories, phrog_integer, maximum_genes
     )  # dictionary to store all of the training data
 
     # save the training data dictionary
-    print("Done Processing!\n")
-    print("Removing duplicate phrog category orders")
+    print("Done Processing!")
+    print("Generating datasets")
 
     # dereplicate the data and shuffle
     derep_dict = handle_genbank.derep_trainingdata(data)
-
     # save the original data
     with open(prefix + "_all_data.pkl", "wb") as handle:
         pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
@@ -73,6 +73,8 @@ def main(input_data, gene_categories, maximum_genes, prefix):
 
     # save the testing and training datasets
     format_data.test_train(data, prefix, num_functions, maximum_genes)
+
+    print("DONE")
 
 
 if __name__ == "__main__":

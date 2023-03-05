@@ -37,7 +37,6 @@ def get_genbank(genbank):
     """
 
     if genbank.strip()[-3:] == ".gz":
-         
         try:
             with gzip.open(genbank.strip(), "rt") as handle:
                 gb_dict = SeqIO.to_dict(SeqIO.parse(handle, "gb"))
@@ -62,6 +61,7 @@ def phrog_to_integer(phrog_annot, phrog_integer):
     """
     Converts phrog annotation to its integer representation
     """
+
     return [phrog_integer.get(i) for i in phrog_annot]
 
 
@@ -247,13 +247,11 @@ def get_data(input_data, gene_categories, phrog_integer, maximum_genes):
         genbank_files = file.readlines()
 
         for genbank in genbank_files:
-
             # convert genbank to a dictionary
             gb_dict = get_genbank(genbank)
             gb_keys = list(gb_dict.keys())
 
             for key in gb_keys:
-
                 # update the counter
                 prophage_counter += 1
 
