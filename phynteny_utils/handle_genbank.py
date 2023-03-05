@@ -24,7 +24,6 @@ def get_mmseqs(phrog_file):
 
     except EmptyDataError:
         phrog_output = pd.DataFrame()
-        # print('empty mmseqs file: ' + phrog_file)
 
     return phrog_output
 
@@ -38,10 +37,11 @@ def get_genbank(genbank):
     """
 
     if genbank.strip()[-3:] == ".gz":
+         
         try:
             with gzip.open(genbank.strip(), "rt") as handle:
                 gb_dict = SeqIO.to_dict(SeqIO.parse(handle, "gb"))
-            handle.close() 
+            handle.close()
         except ValueError:
             print("ERROR: " + genbank.strip() + " is not a genbank file!")
             raise
@@ -50,7 +50,7 @@ def get_genbank(genbank):
         try:
             with open(genbank.strip(), "rt") as handle:
                 gb_dict = SeqIO.to_dict(SeqIO.parse(handle, "gb"))
-            handle.close() 
+            handle.close()
         except ValueError:
             print("ERROR: " + genbank.strip() + " is not a genbank file!")
             raise
@@ -61,7 +61,7 @@ def get_genbank(genbank):
 def phrog_to_integer(phrog_annot, phrog_integer):
     """
     Converts phrog annotation to its integer representation
-    """ 
+    """
     return [phrog_integer.get(i) for i in phrog_annot]
 
 
@@ -176,7 +176,7 @@ def derep_trainingdata(training_data):
     # randomly shuffle the keys
     random.shuffle(training_keys)
 
-    #get the categories in each prophage 
+    # get the categories in each prophage
     training_encodings = [training_data.get(k).get("categories") for k in training_keys]
 
     # write a function to remove duplicates in the training data
@@ -190,6 +190,7 @@ def derep_trainingdata(training_data):
     dedup_keys = list(dict(zip(training_hash, training_keys)).values())
 
     return dict(zip(dedup_keys, [training_data.get(d) for d in dedup_keys]))
+
 
 def add_predictions(gb_dict, predictions):
     """
@@ -205,6 +206,7 @@ def add_predictions(gb_dict, predictions):
     for i in range(len(predictions)):
         gb_dict[keys[i]]["phynteny"] = predictions[i]
     return gb_dict
+
 
 def write_genbank(gb_dict, filename):
     """
@@ -225,3 +227,58 @@ def write_genbank(gb_dict, filename):
             for key in keys:
                 SeqIO.write(gb_dict.get(key), handle, "genbank")
         handle.close()
+
+
+def get_data(input_data, gene_categories, phrog_integer, maximum_genes):
+    """
+    Loop to fetch training and test data
+
+    :param input_data: path to where the input files are located
+    :param gene_categories: number of gene categories which must be included
+    :return: curated data dictionary
+    """
+
+    training_data = {}  # dictionary to store all of the training data
+
+    prophage_counter = 0  # count the number of prophages encountered
+    prophage_pass = 0  # number of prophages which pass the filtering steps
+
+    with open(input_data, "r", errors="replace") as file:
+        genbank_files = file.readlines()
+
+        for genbank in genbank_files:
+
+            # convert genbank to a dictionary
+            gb_dict = get_genbank(genbank)
+            gb_keys = list(gb_dict.keys())
+
+            for key in gb_keys:
+
+                # update the counter
+                prophage_counter += 1
+
+                # extract the relevant features
+                phage_dict = extract_features(gb_dict.get(key))
+
+                # integer encoding of phrog categories
+                integer = phrog_to_integer(phage_dict.get("phrogs"), phrog_integer)
+                phage_dict["categories"] = integer
+
+                # evaluate the number of categories present in the phage
+                categories_present = set(integer)
+                if 0 in categories_present:
+                    categories_present.remove(0)
+
+                # if above the minimum number of categories are included
+                if (
+                    len(phage_dict.get("phrogs")) <= maximum_genes
+                    and len(categories_present) >= gene_categories
+                ):
+                    # update the passing candidature
+                    prophage_pass += 1
+
+                    # update dictionary with this entry
+                    g = re.split(",|\.", re.split("/", genbank.strip())[-1])[0]
+                    training_data[g + "_" + key] = phage_dict
+
+    return training_data

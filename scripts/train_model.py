@@ -7,7 +7,6 @@ This script trains a single instance of an LSTM using 10-fold stratified crossva
 # imports
 from phynteny_utils import train_model
 import click
-import os
 import pkg_resources
 
 
@@ -179,7 +178,6 @@ def main(
     model.train_crossValidation(
         model_out=model_out, history_out=history_out, n_splits=k_folds, epochs=epochs
     )
-
 
 if __name__ == "__main__":
     main()

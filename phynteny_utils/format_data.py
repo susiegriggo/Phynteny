@@ -5,7 +5,22 @@ Functions to prepare data for training with the LSTM viral gene organisation mod
 # imports
 import numpy as np
 import random
+import pickle5
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+from sklearn.model_selection import train_test_split
+
+
+def get_dict(dict_path):
+    """
+    Helper function to import dictionaries
+    """
+
+    with open(dict_path, "rb") as handle:
+        dictionary = pickle5.load(handle)
+    handle.close()
+
+    return dictionary
+
 
 def encode_strand(strand):
     """
@@ -59,7 +74,7 @@ def count_direction(strand):
     """
     Count the number of genes which have occured with the same orientation
 
-    :param sense: Determine the number of sequences which have occured in the same direction.
+    :param strand: Determine the number of sequences which have occured in the same direction.
     :return: List of counts of genes occuring with the same orientation
     """
 
@@ -163,6 +178,7 @@ def one_hot_decode(encoded_seq):
     """
     return [np.argmax(vector) for vector in encoded_seq]
 
+
 def generate_example(sequence, features, num_functions, n_features, max_length, idx):
     """
     Convert a sequence of PHROG functions and associated features to a supervised learning problem
@@ -175,12 +191,17 @@ def generate_example(sequence, features, num_functions, n_features, max_length, 
     :return: training or test example separated as X and y matrices
     """
 
+    # check the length of the sequence
     seq_len = len(sequence)
+    if seq_len > max_length:
+        ValueError("Phage contains more genes than the maximum specified!")
+
+    # pad the sequence
     padded_sequence = pad_sequences([sequence], padding="post", maxlen=max_length)[0]
 
+    # generate encoding
     y = np.array(one_hot_encode(padded_sequence, num_functions))
     X = np.array(one_hot_encode(padded_sequence, n_features))
-
     if len(features) > 0:
         for f in range(len(features)):
             X = encode_feature(X, features[f], num_functions + f)
@@ -273,3 +294,62 @@ def generate_dataset(data, features_included, num_functions, max_length):
     y = np.array(y).reshape(len(keys), max_length, num_functions)
 
     return X, y
+
+def test_train(data, path, num_functions, max_genes=120, test_size=11):
+    """
+    Split the data into testing and training datasets. Saves these datasets as dictionaries
+
+    :param data: dictionary of curate phage data
+    :param path: path prefix to save the testing and training dictionaries
+    :param num_functions: number of possible cateogories in the encoding
+    :param max_genes: maximum number of genes to consider in a prophage
+    :param test_size: proportion of the data to be included as test data (default is 11 which indicates one eleventh of the data
+    """
+
+    # get the keys of the data
+    keys = list(data.keys())
+
+    # encode the data
+    X, y = generate_dataset(data, "all", num_functions, max_genes)
+    X_dict = dict(zip(keys, X))
+    y_dict = dict(zip(keys, y))
+
+    # generate a list describing which categories get masked
+    categories = [
+        np.where(y[i, np.where(~X[i, :, 0:num_functions].any(axis=1))[0][0]] == 1)[
+            0
+        ][0]
+        for i in range(len(X))
+    ]
+    train_keys, test_keys, train_cat, test_cat = train_test_split(
+        data,
+        categories,
+        test_size=float(1 / test_size),
+        random_state=42,
+        stratify=categories,
+    )
+    # generate a dictionary of training data which can be used
+    train_X_data = dict(zip(train_keys, [X_dict.get(i) for i in train_keys]))
+    train_y_data = dict(zip(train_keys, [y_dict.get(i) for i in train_keys]))
+    test_X_data = dict(zip(test_keys, [X_dict.get(i) for i in test_keys]))
+    test_y_data = dict(zip(test_keys, [y_dict.get(i) for i in test_keys]))
+
+    # for the test data get the entire prophages because these can be used to test annotation of the entire genome
+    test_phage = dict(zip(test_keys, [data.get(i) for i in test_keys]))
+
+    # save each of these dictionaries
+    with open(path + "_train_X.pkl", "wb") as handle:
+        pickle5.dump(train_X_data)
+    handle.close()
+    with open(path + "_train_y.pkl", "wb") as handle:
+        pickle5.dump(train_y_data, handle)
+    handle.close()
+    with open(path + "_test_X.pkl", "wb") as handle:
+        pickle5.dump(test_X_data, handle)
+    handle.close()
+    with open(path + "_test_y.pkl", "wb") as handle:
+        pickle5.dump(test_y_data, handle)
+    handle.close()
+    with open(path + "_test_prophages.pkl", "wb") as handle:
+        pickle5.dump(test_phage, handle)
+    handle.close()
