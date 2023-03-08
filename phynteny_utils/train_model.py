@@ -361,11 +361,6 @@ class Model:
                 save=save,
             )
 
-            # delete the data to free up memory
-            del X_train
-            del X_train
-            del y_train
-            del y_test
 
             # update counter
             counter += 1
