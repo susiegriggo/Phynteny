@@ -181,7 +181,7 @@ class Model:
         self.y = np.array(y.values())
 
 
-     def get_callbacks(self, model_out):
+    def get_callbacks(self, model_out):
         """
         Callbacks to use for training the LSTM
 
