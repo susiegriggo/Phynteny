@@ -167,7 +167,20 @@ class Model:
         # TODO add a warning if the data exceeds the maximum length
         # TODO make it possible to fit in data which has already been masked
 
-    def get_callbacks(self, model_out):
+    def parse_masked_data(self, X_path, y_path):
+        """
+        Parse a pre-masked dataset
+        """
+
+        # get the X data
+        X = get_dict(X_path)
+        self.X = np.array(X.values())
+
+        # get the y data
+        y = get_dict(y_path)
+        self.y = np.array(y.values())
+
+def get_callbacks(self, model_out):
         """
         Callbacks to use for training the LSTM
 

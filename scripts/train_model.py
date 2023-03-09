@@ -11,7 +11,9 @@ import pkg_resources
 
 
 @click.command()
-@click.option("--data", "-d", help="File path to training data")
+#@click.option("--data", "-d", help="File path to training data")
+@click.option("--X_path", "-X", help="File path to X training data")
+@click.option("--y_path", "-y", help="File path to y training data")
 @click.option(
     "--max_length",
     "-ml",
@@ -133,7 +135,8 @@ import pkg_resources
 
 
 def main(
-        data,
+        X_path,
+        y_path,
         max_length,
         features,
         layers,
@@ -171,7 +174,10 @@ def main(
                               )
 
     # fit data to the model
-    model.fit_data(data)
+    #model.fit_data(data)
+
+    # parse the pre-masked data
+    model.parse_masked_data(X_path, y_path)
 
     # perform stratified k-fold validation
     print("Performing cross validation... ")
