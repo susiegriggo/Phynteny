@@ -178,8 +178,10 @@ class Model:
 
         # get the y data
         y = get_dict(y_path)
-        self.y = np.array(list(y.values())) 
+        self.y = np.array(list(y.values()))
 
+        #update the number of known features
+        self.n_features = self.X.shape[2]
 
     def get_callbacks(self, model_out):
         """
