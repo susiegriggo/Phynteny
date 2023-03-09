@@ -22,9 +22,8 @@ __status__ = "development"
 @click.argument("infile", type=click.Path(exists=True))
 @click.option(
     "-o",
-    "--outfile",
-    default = 'phynteny_out.gbk',  
-    type=click.Path(),
+    "--outfile", 
+    type=click.Path(), 
     help="where to write the output genbank file",
 )
 @click.option(
@@ -82,14 +81,14 @@ def main(infile, outfile, model, thresholds):
 
             # update with these annotations
             cds = [i for i in gb_dict.get(key).features if i.type == "CDS"]
-
             for i in range(len(cds)):
                 cds[i].qualifiers["phynteny"] = phynteny[i]
 
             # write to genbank file
-            SeqIO.write(gb_dict.get(key), handle, "genbank")
-
-    print('DONE') 
+            SeqIO.write(gb_dict.get(key), handle, "genbank") 
+    
+    if outfile: 
+        print('DONE') 
 
 if __name__ == "__main__":
     main()
