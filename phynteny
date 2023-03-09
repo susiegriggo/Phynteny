@@ -23,6 +23,7 @@ __status__ = "development"
 @click.option(
     "-o",
     "--outfile",
+    default = 'phynteny_out.gbk',  
     type=click.Path(),
     help="where to write the output genbank file",
 )

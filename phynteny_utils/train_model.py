@@ -174,11 +174,11 @@ class Model:
 
         # get the X data
         X = get_dict(X_path)
-        self.X = np.array(X.values())
+        self.X = np.array(list(X.values()))
 
         # get the y data
         y = get_dict(y_path)
-        self.y = np.array(y.values())
+        self.y = np.array(list(y.values())) 
 
 
     def get_callbacks(self, model_out):
@@ -228,6 +228,10 @@ class Model:
         model = Sequential()
 
         # input layer
+        print('Adding to the LSTM') 
+        print('Value of self.max_length: ' + str(self.max_length))
+        print('Size of n features: ' + str(self.n_features))
+
         model.add(
             Bidirectional(
                 LSTM(
