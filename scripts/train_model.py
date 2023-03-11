@@ -156,6 +156,7 @@ def main(
         l2_regularize,
 ):
 
+    print('STARTING')
     # create a model object
     model = train_model.Model(phrog_path= pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/phrog_integer.pkl'),
                               max_length=max_length,
@@ -176,6 +177,7 @@ def main(
     # fit data to the model
     #model.fit_data(data)
 
+    print('PARSING DATA') 
     # parse the pre-masked data
     model.parse_masked_data(x_path, y_path)
 

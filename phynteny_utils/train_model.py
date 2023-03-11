@@ -164,8 +164,8 @@ class Model:
         )
         self.n_features = self.X.shape[2]
 
-        # TODO add a warning if the data exceeds the maximum length
-        # TODO make it possible to fit in data which has already been masked
+        #TODO add a warning if the data exceeds the maximum length
+        #TODO make it possible to fit in data which has already been masked
 
     def parse_masked_data(self, X_path, y_path):
         """
@@ -230,10 +230,6 @@ class Model:
         model = Sequential()
 
         # input layer
-        print('Adding to the LSTM') 
-        print('Value of self.max_length: ' + str(self.max_length))
-        print('Size of n features: ' + str(self.n_features))
-
         model.add(
             Bidirectional(
                 LSTM(
@@ -249,7 +245,7 @@ class Model:
 
         # loop which controls the number of hidden layers
         for layer in range(self.layers):
-            print("layer: " + str(layer))
+            
             model.add(
                 Bidirectional(
                     LSTM(
@@ -265,17 +261,17 @@ class Model:
         # output layer
         model.add(TimeDistributed(Dense(self.num_functions, activation="softmax")))
 
+     
         # get the optimization function
         optimizer = get_optimizer(
             self.optimizer_function, self.learning_rate
-        )  # TODO add the optimzer back - temp fix?
+        )  
 
         model.compile(
             loss="categorical_crossentropy", metrics=["accuracy"], optimizer=optimizer
-        )
-
+        ) 
         print(model.summary(), flush=True)
-
+         
         return model
 
     def train_model(
@@ -304,6 +300,7 @@ class Model:
 
         # model with the best validation set accuracy therefore maximise
         model = self.generate_LSTM()
+         
         history = model.fit(
             X_1,
             y_1,
@@ -339,21 +336,22 @@ class Model:
         :param n_splits: number of k-folds to include. 1 is added to this to also generate a test set of equal size
         :param epochs: number of epochs to train for
         """
-
+        
         # separate into testing and training data - testing data reserved
-        X_1, X_test, y_1, y_test = train_test_split(
-            self.X, self.y, test_size=float(1 / 11), random_state=42
-        )  # TODO move the test and train split out of this module - perhaps do this in the generate training data script
+        #X_1, X_test, y_1, y_test = train_test_split(
+        #    self.X, self.y, test_size=float(1 / 11), random_state=42
+        #)  # TODO move the test and train split out of this module - perhaps do this in the generate training data script
 
+        
         # get the predicted category of the train data
         masked_cat = [
             np.where(
-                y_1[i, np.where(~X_1[i, :, 0 : self.num_functions].any(axis=1))[0][0]]
+                self.y[i, np.where(~self.X[i, :, 0 : self.num_functions].any(axis=1))[0][0]]
                 == 1
             )[0][0]
-            for i in range(len(X_1))
+            for i in range(len(self.X))
         ]
-
+    
         skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
 
         # count the number of folds
@@ -361,13 +359,14 @@ class Model:
 
         # investigate each k-fold
         for train_index, val_index in skf.split(np.zeros(len(masked_cat)), masked_cat):
+            
             # generate stratified test and train sets
-            X_train = X_1[train_index, :, :]
-            y_train = y_1[train_index, :, :]
+            X_train = self.X[train_index, :, :]
+            y_train = self.y[train_index, :, :]
 
             # generate validation data for the training
-            X_val = X_1[val_index, :, :]
-            y_val = y_1[val_index, :, :]
+            X_val = self.X[val_index, :, :]
+            y_val = self.y[val_index, :, :]
 
             # use the compile function here
             self.train_model(
