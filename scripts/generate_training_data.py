@@ -72,7 +72,7 @@ def main(input_data, gene_categories, maximum_genes, prefix):
     handle.close()
 
     # save the testing and training datasets
-    format_data.test_train(data, prefix, num_functions, maximum_genes)
+    format_data.test_train(derep_data, prefix, num_functions, maximum_genes)
 
     print("DONE")
 
