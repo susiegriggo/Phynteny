@@ -19,7 +19,7 @@ import numpy as np
 import random
 import pkg_resources
 import absl.logging
-
+import tensorflow as tf  
 absl.logging.set_verbosity(absl.logging.ERROR)
 
 
