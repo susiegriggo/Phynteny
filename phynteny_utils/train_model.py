@@ -374,8 +374,8 @@ class Model:
                 y_train,
                 X_val,
                 y_val,
-                model_out=model_out + "_" + str(counter),
-                history_out=history_out + "_" + str(counter),
+                model_out=model_out + ".rep_" + str(counter) + '.',
+                history_out=history_out + ".rep_" + str(counter) + '.',
                 epochs=epochs,
                 save=save,
             )
