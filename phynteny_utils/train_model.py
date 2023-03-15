@@ -313,7 +313,7 @@ class Model:
 
         # save the model
         if save:
-            model.save(model_out + ".pkl")
+            model.save(model_out + "final_model")
 
         # save the history dictionary as a pickle
         with open(history_out + ".pkl", "wb") as handle:
