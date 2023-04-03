@@ -11,6 +11,7 @@ from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Bidirectional, TimeDistributed, Dense, LSTM
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 import tensorflow.keras.optimizers as optimizers
+import tensorflow.keras import initializers
 from tensorflow.keras.regularizers import L1L2
 from sklearn.model_selection import train_test_split, StratifiedKFold
 import pickle5
@@ -85,6 +86,29 @@ def get_optimizer(optimizer_function, learning_rate):
 
     return optimizer_function
 
+def get_initializer(initializer_function):
+    """
+    Get the kernel initializer to train the LSTM
+
+    :param initializer_function: string describing which intializer to use
+    :return: kernel_initializer
+    """
+
+    if initializer_function == 'zeros':
+        kernel_initializer = initializers.Zeros()
+    elif initializer_function == 'random_normal':
+        kernel_initializer = initializers.RandomNormal(stddev=0.01, seed=42)
+    elif initializer_function == 'random_uniform':
+        kernel_initializer = initializers.RandomUniform(minval=-0.05, maxval=0.05, seed=42)
+    elif initializer_function == 'truncated_normal':
+        kernel_initializer = initializers.TruncatedNormal(mean=0.0, stddev=0.05, seed=42)
+
+    else:
+        raise ValueError(
+            "Invalid optimizer function. Must be One of ['zeros', 'random_normal', 'random_uniform', 'truncated_normal']"
+        )
+
+    return kernel_initializer
 
 class Model:
     def __init__(
@@ -105,6 +129,7 @@ class Model:
         min_delta=0.0001,
         l1_regularizer=0,
         l2_regularizer=0,
+        kernel_initializer='zeros'
     ):
         """
         :param phrog_categories_path: location of the dictionary describing the phrog_categories :param
@@ -136,6 +161,7 @@ class Model:
         self.neurons = neurons
         self.batch_size = batch_size
         self.kernel_regularizer = L1L2(l1_regularizer, l2_regularizer)
+        self.kernel_intializer = kernel_initializer
         self.dropout = dropout
         self.activation = activation
         self.optimizer_function = optimizer_function
@@ -229,6 +255,9 @@ class Model:
         # define the model
         model = Sequential()
 
+        # get the kernel initializer
+        kernel_initializer = get_initializer(self.kernel_intializer)
+
         # input layer
         model.add(
             Bidirectional(
@@ -236,7 +265,8 @@ class Model:
                     self.neurons,
                     return_sequences=True,
                     dropout=self.dropout,
-                    #kernel_regularizer=self.kernel_regularizer,
+                    kernel_regularizer=self.kernel_regularizer,
+                    kernel_initializer=,
                     activation=self.activation,
                 ),
                 input_shape=(self.max_length, self.n_features),
@@ -252,7 +282,8 @@ class Model:
                         self.neurons,
                         return_sequences=True,
                         dropout=self.dropout,
-                        #kernel_regularizer=self.kernel_regularizer,
+                        kernel_regularizer=self.kernel_regularizer,
+                        kernel_initializer=,
                         activation=self.activation,
                     )
                 ),
