@@ -71,7 +71,7 @@ def get_optimizer(optimizer_function, learning_rate):
 
     # optimization function
     if optimizer_function == "adam":
-        optimizer = optimizers.Adam(learning_rate=learning_rate)
+        optimizer = optimizers.Adam(learning_rate=learning_rate, clipnorm=1)
     elif optimizer_function == "rmsprop":
         optimizer = optimizers.RMSProp(learning_rate=learning_rate)
     elif optimizer_function == "adagrad":
@@ -236,7 +236,7 @@ class Model:
                     self.neurons,
                     return_sequences=True,
                     dropout=self.dropout,
-                    kernel_regularizer=self.kernel_regularizer,
+                    #kernel_regularizer=self.kernel_regularizer,
                     activation=self.activation,
                 ),
                 input_shape=(self.max_length, self.n_features),
@@ -252,7 +252,7 @@ class Model:
                         self.neurons,
                         return_sequences=True,
                         dropout=self.dropout,
-                        kernel_regularizer=self.kernel_regularizer,
+                        #kernel_regularizer=self.kernel_regularizer,
                         activation=self.activation,
                     )
                 ),
