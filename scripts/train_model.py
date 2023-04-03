@@ -137,6 +137,7 @@ import pkg_resources
     "-ki",
     default="random_normal",
     type=str,
+    type=click.Choice(["zeros", "random_normal", "random_uniform", "truncated_normal"]),
     help="kernel initializer",
 )
 def main(
