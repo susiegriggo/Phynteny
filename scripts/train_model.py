@@ -11,7 +11,7 @@ import pkg_resources
 
 
 @click.command()
-#@click.option("--data", "-d", help="File path to training data")
+# @click.option("--data", "-d", help="File path to training data")
 @click.option("--x_path", "-x", help="File path to X training data")
 @click.option("--y_path", "-y", help="File path to y training data")
 @click.option(
@@ -37,7 +37,7 @@ import pkg_resources
         ]
     ),
     help="What combination of features used to train model. Must be one of  ['all', 'strand', 'none', "
-         "'intergenic', 'gene_length', 'position', 'orientation_count']",
+    "'intergenic', 'gene_length', 'position', 'orientation_count']",
 )
 @click.option(
     "--layers",
@@ -132,52 +132,61 @@ import pkg_resources
 @click.option(
     "--l2_regularize", "-l1", default=0, type=float, help="L2 regularization. Default=0"
 )
-
-
+@click.option(
+    "--kernel_initializer",
+    "-ki",
+    default="random_normal",
+    type=str,
+    help="kernel initializer",
+)
 def main(
-        x_path,
-        y_path,
-        max_length,
-        features,
-        layers,
-        memory_cells,
-        batch_size,
-        dropout,
-        activation,
-        optimizer,
-        learning_rate,
-        patience,
-        min_delta,
-        model_out,
-        history_out,
-        k_folds,
-        epochs,
-        l1_regularize,
-        l2_regularize,
+    x_path,
+    y_path,
+    max_length,
+    features,
+    layers,
+    memory_cells,
+    batch_size,
+    dropout,
+    activation,
+    optimizer,
+    learning_rate,
+    patience,
+    min_delta,
+    model_out,
+    history_out,
+    k_folds,
+    epochs,
+    l1_regularize,
+    l2_regularize,
+    kernel_initializer,
 ):
-
-    print('STARTING')
+    print("STARTING")
     # create a model object
-    model = train_model.Model(phrog_path= pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/phrog_integer.pkl'),
-                              max_length=max_length,
-                              features_include=features,
-                              layers=layers,
-                              neurons=memory_cells,
-                              batch_size=batch_size,
-                              dropout=dropout,
-                              activation=activation,
-                              optimizer_function=optimizer,
-                              learning_rate=learning_rate,
-                              patience=patience,
-                              min_delta=min_delta,
-                              l1_regularizer=l1_regularize,
-                              l2_regularizer=l2_regularize,
-                              )
+    model = train_model.Model(
+        phrog_path=pkg_resources.resource_filename(
+            "phynteny_utils", "phrog_annotation_info/phrog_integer.pkl"
+        ),
+        max_length=max_length,
+        features_include=features,
+        layers=layers,
+        neurons=memory_cells,
+        batch_size=batch_size,
+        dropout=dropout,
+        activation=activation,
+        optimizer_function=optimizer,
+        learning_rate=learning_rate,
+        patience=patience,
+        min_delta=min_delta,
+        l1_regularizer=l1_regularize,
+        l2_regularizer=l2_regularize,
+        kernel_initializer=kernel_initializer,
+    )
 
     # fit data to the model
-    #model.fit_data(data)
+    # model.fit_data(data)
 
-    print('PARSING DATA') 
+    print("PARSING DATA")
     # parse the pre-masked data
     model.parse_masked_data(x_path, y_path)
 
@@ -186,6 +195,7 @@ def main(
     model.train_crossValidation(
         model_out=model_out, history_out=history_out, n_splits=k_folds, epochs=epochs
     )
+
 
 if __name__ == "__main__":
     main()

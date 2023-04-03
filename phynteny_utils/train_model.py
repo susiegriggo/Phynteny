@@ -11,7 +11,7 @@ from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Bidirectional, TimeDistributed, Dense, LSTM
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 import tensorflow.keras.optimizers as optimizers
-import tensorflow.keras import initializers
+import tensorflow.keras.initializers as initializers
 from tensorflow.keras.regularizers import L1L2
 from sklearn.model_selection import train_test_split, StratifiedKFold
 import pickle5
@@ -266,7 +266,7 @@ class Model:
                     return_sequences=True,
                     dropout=self.dropout,
                     kernel_regularizer=self.kernel_regularizer,
-                    kernel_initializer=,
+                    kernel_initializer=kernel_initializer,
                     activation=self.activation,
                 ),
                 input_shape=(self.max_length, self.n_features),
@@ -283,7 +283,7 @@ class Model:
                         return_sequences=True,
                         dropout=self.dropout,
                         kernel_regularizer=self.kernel_regularizer,
-                        kernel_initializer=,
+                        kernel_initializer=kernel_initializer,
                         activation=self.activation,
                     )
                 ),
