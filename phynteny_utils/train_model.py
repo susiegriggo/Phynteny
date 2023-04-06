@@ -75,7 +75,7 @@ def get_optimizer(optimizer_function, learning_rate):
     if optimizer_function == "adam":
         optimizer = optimizers.Adam(learning_rate=learning_rate, clipnorm=1)
     elif optimizer_function == "rmsprop":
-        optimizer = RMSProp(learning_rate=learning_rate)
+        optimizer = RMSprop(learning_rate=learning_rate)
     elif optimizer_function == "adagrad":
         optimizer = optimizers.Adagrad(learning_rate=learning_rate)
     elif optimizer_function == "sgd":

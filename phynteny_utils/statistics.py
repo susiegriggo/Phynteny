@@ -7,19 +7,97 @@ This module uses code snippets from PHaNNs https://github.com/Adrian-Cantu/PhANN
 import numpy as np 
 import glob 
 from sklearn.metrics import classification_report 
+from sklearn.metrics import roc_auc_score, roc_curve
 
-def phynteny_score(encoding, idx, models): 
+def phynteny_score(X_encodings, num_categories, models): 
     """
     calculate the phynteny score. Tests multiple at once as it takes effort to read in the 10 models  
     
     :param encoding: list of encoding matices to generate prediction 
-    :param idx: which index in the phage to make the predictions for 
-    :param models: path to where the replicate models are located 
+    :param models: list of models which have already been read in 
     :return: per-class phynteny score for the test instance 
     """
+
+    scores_list = [] # list of the score for each prediction 
+
+    for i in range(len(X_encodings)): 
+
+        # get the index we care about for this prediction 
+        zero_row = get_masked(X_encodings[i], num_categories) 
+
+        # make prediction for each model 
+        yhat = [model.predict(X_encodings[i].reshape(1,120, 16), verbose =0)[0][zero_row] for model in models] 
+
+        # get the phynteny score for each category 
+        Y_scores = np.array(yhat).sum(axis=0) 
+        scores_list.append(Y_scores)
+
+    return np.array(scores_list)
+
+def known_category(X_encodings, y_encodings, num_categories): 
+    """
+    Return the category of a masked gene in the test set
     
-    x = 1
+    :param X_encoding: list of encoded X instances with a single row masked 
+    :param y_encoding: list of encoded y instances 
+    :return: list of masked categories 
+    """
     
+    known_category = list() 
+    
+    for i in range (len(X_encodings)): 
+        
+        # get the masked index 
+        zero_row = get_masked(X_encodings[i], num_categories)
+    
+        # get the known category of the gene 
+        y_index = np.argmax(y_encodings[i][zero_row])
+        known_category.append(y_index)
+    
+    return known_category 
+    
+def predict_softmax(X_encodings, num_categories, model): 
+    """ 
+    Predict the function of a masked gene using a single model 
+    
+    :param encoding: list of encoding matices to generate prediction 
+    :param model: model object 
+    :return: softmax prediction tensor 
+    """
+    
+    scores_list = [] # list of the score for each prediction 
+
+    for i in range(len(X_encodings)): 
+
+        # get the index we care about for this prediction 
+        zero_row = get_masked(X_encodings[i], num_categories) 
+
+        # make prediction for each model 
+        yhat = model.predict(X_encodings[i].reshape(1,120, 16), verbose =0)[0][zero_row]
+
+        scores_list.append(yhat)
+
+    return np.array(scores_list)
+
+def build_roc(scores_list, num_categories): 
+    """
+    Collect values to build the ROC curve 
+    
+    :param scores_list: list of values for each category 
+    """
+    
+    # remove the first column (unknown predictions) and normalise 
+    normed_scores_list = scores_list[:,1:]/scores_list[:,1:].sum(axis=1)[:, np.newaxis]
+    
+def norm_scores(scores_list): 
+    """
+    Building a ROC curve in using sklearn requires values to add to 10 and cannot include unknown class.
+    Function removes the unknown class and renormalises the output.
+    
+    :param scores_list: list of softmax or phynteny scores 
+    """ 
+    
+    return scores_list[:,1:]/scores_list[:,1:].sum(axis=1)[:, np.newaxis]  
     
 def get_masked(encoding, num_categories): 
     """ 
@@ -32,6 +110,33 @@ def get_masked(encoding, num_categories):
     
     return np.where(np.all(encoding[:,:num_categories] == 0, axis=1))[0][0]
 
+
+def per_category_auc(num_categories, known_category): 
+    """
+    Calculate the per category under the curve. 
+    Calculate the average AUC separately 
+    
+    :param known_category: known 
+    :return: AUC score for each category  
+    """
+    #TODO 
+    
+    AUC_list = [] 
+    
+    #for the roc curve loop through each category 
+    for i in range(1, len(num_categories-1)): 
+
+        #get items to include in this iteration 
+        include = y_index_list == i
+
+        #convert to binary items
+        binary_index = [1 for j in y_index_list[include]] + [0 for j in y_index_list[~include]] 
+        binary_scores =  list(normed_scores_list[include][:,i-1]) + list(normed_scores_list[~include][:,i-1])
+
+        #calculate the roc curve 
+        fpr, tpr, thresholds = roc_curve(binary_index, binary_scores)
+        
+    return 
 
 def class_scores(tt,scores,is_real,prot_class,df):
     """
@@ -81,12 +186,3 @@ def class_scores(tt,scores,is_real,prot_class,df):
     df=df.append(pd.Series(data_row,index=df.columns),sort=False,ignore_index=True)
     
     return df
-
-def make_predictions(): 
-    """
-    Make some predictions using the Phynteny model
-    """
-    
-    
-    
-    

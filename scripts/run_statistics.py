@@ -80,8 +80,7 @@ for i in range(0,len(all_best_val_loss)):
     support_list.append(np.array([len(c) for c in cat_list])) #number in each category 
     
     print(AUC)
-    
-    
+      
 #Get the AUC 
 AUC_df = pd.DataFrame()  
 for A in AUC_list: 
