@@ -122,6 +122,43 @@ def build_roc(scores, known_categories, category_names):
     
     return ROC_df 
     
+    
+def per_category_auc(scores, known_categories, category_names, method = 'ovr'): 
+    """
+    Calculate the per category under the curve. 
+    Calculate the average AUC separately 
+    
+    :param known_category: known category of each instance
+    :param scores: list of either softmax or phynteny scores for each instance 
+    :param 
+    :return: AUC score for each category  
+    """
+
+    # dictionary to store AUC 
+    auc_dict = {} 
+    
+    # normalise the scores such that ROC can be computed 
+    normed_scores = norm_scores(scores) 
+    known_categories = np.array(known_categories)
+    
+    # loop through each category 
+    for i in range(1, len(category_names)):
+        
+        # get items for the category in this iteration  
+        include = known_categories == i
+        
+        # convert the predictions to a series of binary classifications 
+        binary_index = [1 for j in known_categories[include]] + [0 for j in known_categories[~include]] 
+        binary_scores =  list(normed_scores[include][:,i-1]) + list(normed_scores[~include][:,i-1])
+    
+        # compute AUC  
+        auc_dict[category_names.get(i)] = roc_auc_score(binary_index, binary_scores) 
+        
+    #calculate the average auc 
+    auc_dict['average'] = roc_auc_score(known_categories, normed_scores, multi_class = 'ovr') 
+    
+    return auc_dict
+
 def norm_scores(scores_list): 
     """
     Building a ROC curve in using sklearn requires values to add to 10 and cannot include unknown class.
@@ -142,38 +179,8 @@ def get_masked(encoding, num_categories):
     """ 
     
     return np.where(np.all(encoding[:,:num_categories] == 0, axis=1))[0][0]
-
-def per_category_auc(num_categories, known_category, scores, method = 'ovr'): 
-    """
-    Calculate the per category under the curve. 
-    Calculate the average AUC separately 
-    
-    :param known_category: known category of each instance
-    :param scores: list of either softmax or phynteny scores for each instance 
-    :param 
-    :return: AUC score for each category  
-    """
-    #TODO 
-    
-    AUC_list = [] 
-    
-    normed_scores_list = norm_scores(scores)
-    
-    #for the roc curve loop through each category 
-    for i in range(1, len(num_categories-1)):
-
-        #get items to include in this iteration 
-        include = known_category == i
-
-        #convert to binary items
-        binary_index = [1 for j in known_category[include]] + [0 for j in known_category[~include]]
-        binary_scores=list(normed_scores_list[include][:,i-1]) + list(normed_scores_list[~include][:,i-1])
-
-        #calculate the roc curve 
-        fpr, tpr, thresholds = roc_curve(binary_index, binary_scores)
         
-    return 
-
+    
 def class_scores(tt,scores,is_real,prot_class,df):
     """
     Function for scoring quality of predictions and geting metrics 
@@ -210,7 +217,6 @@ def class_scores(tt,scores,is_real,prot_class,df):
     else:
         recall=TP/num_rec
 
-        
     fscore=(2*TP)/(2*TP+FP+FN)
     accuracy=(TP+TN)/(TP+TN+FP+FN)
     data_row=[prot_class,precision,recall,fscore,accuracy,tt]
@@ -227,7 +233,6 @@ def threshold_metrics(scores, known_categories, category_names):
     :param known_categories: Actual label of each sequence 
     :param category_names: dictionary of category labels 
     """
-    
     
     d = {'class':[],'precision': [], 'recall': [],'f1-score':[],'accuracy':[],'threshold':[]}
 
