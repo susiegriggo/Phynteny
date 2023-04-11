@@ -245,7 +245,7 @@ def threshold_metrics(scores, known_categories, category_names):
 
         for tt in score_range:
 
-            df_test_score=statistics.class_scores(tt,np.around(test_set_p[test_set_p>=tt-0.05],decimals=1)
+            df_test_score=class_scores(tt,np.around(test_set_p[test_set_p>=tt-0.05],decimals=1)
                                                        ,test_set_t[test_set_p>=tt-0.05]
                                                        ,num,df_test_score)
 
