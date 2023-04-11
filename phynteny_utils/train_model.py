@@ -207,8 +207,34 @@ class Model:
         y = get_dict(y_path)
         self.y = np.array(list(y.values()))
 
+        # apply steps to remove features not specified
+        self.prune_features()
+
         #update the number of known features
         self.n_features = self.X.shape[2]
+
+    def prune_features(self):
+        """
+        Remove redundant features from a dataset
+        """
+
+        if self.features_include == 'strand':
+            self.X = self.X[:,:,:self.num_functions+2]
+
+        elif self.features_include == 'none':
+            self.X = self.X[:,:,:self.num_functions]
+
+        elif self.features_include == 'position':
+            self.X = np.delete(self.X, [10, 11, 13, 14, 15], axis=2)
+
+        elif self.features_include == 'intergenic':
+            self.X = np.delete(self.X, [10,11,12,14,15], axis=2)
+
+        elif self.features_include == 'gene_length':
+            self.X = np.delete(self.X, [10,11,12,13,15], axis=2)
+
+        elif self.features_include == 'orientation_count':
+            self.X = np.delete(self.X, [10,11,12,13,14], axis=2)
 
     def get_callbacks(self, model_out):
         """
