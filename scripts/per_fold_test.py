@@ -2,7 +2,6 @@
 Performance testing for each k-fold separately
 """
 
-
 # imports
 from phynteny_utils import statistics
 import click
@@ -22,6 +21,8 @@ from sklearn.metrics import classification_report
 
 def main(base, x, y, out):
 
+    print('Getting data...')
+
     # fetch the different PHROG categories
     category_path =  pkg_resources.resource_filename("phynteny_utils", "phrog_annotation_info/integer_category.pkl")
     category_names = pickle5.load(open(category_path, 'rb'))
@@ -38,6 +39,8 @@ def main(base, x, y, out):
 
     # loop through each of the provided models
     for i in range(len(models)):
+
+        print('Processing model ' + str(i))
 
         # make predictions
         scores = statistics.predict_softmax(test_X, len(category_names), models[i])
@@ -56,6 +59,12 @@ def main(base, x, y, out):
         auc = statistics.per_category_auc(scores, known_categories, category_names)
         with open(out + 'AUC.pkl', "wb") as f:
             pickle5.dump(auc, f)
+
+        # get the thresholds
+        phynteny_df = statistics.threshold_metrics(scores, known_categories, category_names)
+        phynteny_df.to_csv(out + 'threshold_metrics', sep='\t')
+
+        print('FINISHED')
 
 if __name__ == "__main__":
     main()
