@@ -80,13 +80,13 @@ def predict_softmax(X_encodings, num_categories, model):
 
     return np.array(scores_list)
 
-def build_roc(scores, known_categories, category_names, ROC_out): 
+def build_roc(scores, known_categories, category_names): 
     """
     Collect values to build the ROC curve 
     
     :param scores: list of values for each category. Can be phynteny scores or softmax scores  
-    :param 
-    :return: 
+    :param known_categories: Actual label of each sequence 
+    :return: dataframe for plotting the ROC curve 
     """
     
     # normalise the scores such that ROC can be computed 
@@ -119,7 +119,8 @@ def build_roc(scores, known_categories, category_names, ROC_out):
     ROC_df = pd.DataFrame(tpr_list)
     ROC_df['FPR'] = mean_fpr
     ROC_df.columns = [category_names.get(i) for i in range(len(category_names))][1:] + ['FPR']
-    ROC_df.to_csv(ROC_out, sep='\t')
+    
+    return ROC_df 
     
 def norm_scores(scores_list): 
     """
@@ -141,8 +142,6 @@ def get_masked(encoding, num_categories):
     """ 
     
     return np.where(np.all(encoding[:,:num_categories] == 0, axis=1))[0][0]
-
-
 
 def per_category_auc(num_categories, known_category, scores, method = 'ovr'): 
     """
@@ -210,16 +209,48 @@ def class_scores(tt,scores,is_real,prot_class,df):
         
     else:
         recall=TP/num_rec
-    try:
-        specificity=TN/(TN+FP)
+
         
-    except ZeroDivisionError:
-        specificity=0
-        
-    false_positive_rate=FP/(FP+TN)
     fscore=(2*TP)/(2*TP+FP+FN)
     accuracy=(TP+TN)/(TP+TN+FP+FN)
-    data_row=[prot_class,precision,recall,fscore,specificity,false_positive_rate,accuracy,tt]
+    data_row=[prot_class,precision,recall,fscore,accuracy,tt]
     df=df.append(pd.Series(data_row,index=df.columns),sort=False,ignore_index=True)
     
     return df
+
+def threshold_metrics(scores, known_categories, category_names): 
+    """
+    Calculate various metrics at different Phynteny scores 
+    Modified from PhANNs https://github.com/Adrian-Cantu/PhANNs/blob/master/model_training/08_graph.py
+    
+    :param scores: phytneny scores for each category 
+    :param known_categories: Actual label of each sequence 
+    :param category_names: dictionary of category labels 
+    """
+    
+    
+    d = {'class':[],'precision': [], 'recall': [],'f1-score':[],'accuracy':[],'threshold':[]}
+
+    score_range=np.arange(0,10.1,0.1)
+    df_test_score = pd.DataFrame(data=d)
+
+    scores_index = np.array([np.argmax(i) for i in scores])
+    known_categories = np.array(known_categories)
+
+    # loop through each category and take the predictions made to that class (regardless whether successful)
+    for num in range(1,len(category_names)): 
+
+        test_set_p = scores[scores_index == num, num]
+        test_set_t = known_categories[scores_index==num]==num
+
+        for tt in score_range:
+
+            df_test_score=statistics.class_scores(tt,np.around(test_set_p[test_set_p>=tt-0.05],decimals=1)
+                                                       ,test_set_t[test_set_p>=tt-0.05]
+                                                       ,num,df_test_score)
+
+    df_test_score['class'] = [int(i) for i in df_test_score['class']]
+    df_test_score['category'] = [category_names.get(i) for i in df_test_score['class'] ] 
+
+    return df_test_score 
+    
