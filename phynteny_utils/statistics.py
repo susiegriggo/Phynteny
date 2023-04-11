@@ -6,6 +6,7 @@ This module uses code snippets from PHaNNs https://github.com/Adrian-Cantu/PhANN
 
 import numpy as np 
 import glob 
+import pandas as pd 
 from sklearn.metrics import classification_report 
 from sklearn.metrics import roc_auc_score, roc_curve
 
@@ -79,15 +80,46 @@ def predict_softmax(X_encodings, num_categories, model):
 
     return np.array(scores_list)
 
-def build_roc(scores_list, num_categories): 
+def build_roc(scores, known_categories, category_names, ROC_out): 
     """
     Collect values to build the ROC curve 
     
-    :param scores_list: list of values for each category 
+    :param scores: list of values for each category. Can be phynteny scores or softmax scores  
+    :param 
+    :return: 
     """
     
-    # remove the first column (unknown predictions) and normalise 
-    normed_scores_list = scores_list[:,1:]/scores_list[:,1:].sum(axis=1)[:, np.newaxis]
+    # normalise the scores such that ROC can be computed 
+    normed_scores = norm_scores(scores) 
+    known_categories = np.array(known_categories)
+    
+    # for output 
+    tpr_list = np.zeros((10001, len(category_names) - 1))
+    mean_fpr = np.linspace(0, 1, 10001)
+    
+    # loop through each category 
+    for i in range(1, len(category_names)):
+        
+        # get items for the category in this iteration  
+        include = known_categories == i
+        
+        # convert the predictions to a series of binary classifications 
+        binary_index = [1 for j in known_categories[include]] + [0 for j in known_categories[~include]] 
+        binary_scores =  list(normed_scores[include][:,i-1]) + list(normed_scores[~include][:,i-1])
+    
+        # compute ROC 
+        fpr, tpr, thresholds = roc_curve(binary_index, binary_scores)
+        
+        # store the data 
+        tpr = np.interp(mean_fpr, fpr, tpr)
+        tpr[0] = 0.0
+        tpr_list[:, i -1] = tpr
+
+    # save the curve for each category to a file 
+    ROC_df = pd.DataFrame(tpr_list)
+    ROC_df['FPR'] = mean_fpr
+    ROC_df.columns = [category_names.get(i) for i in range(len(category_names))][1:] + ['FPR']
+    ROC_df.to_csv(ROC_out, sep='\t')
     
 def norm_scores(scores_list): 
     """
@@ -101,7 +133,7 @@ def norm_scores(scores_list):
     
 def get_masked(encoding, num_categories): 
     """ 
-    Get which indexes are masked in the data. Important for pre-masked testing data/ 
+    Get which indexes are masked in the data. Important  pre-masked testing data/ 
     
     :param encoding: encoded matrix 
     :num_categories: number of gene functional categories in the encoding  
@@ -111,27 +143,32 @@ def get_masked(encoding, num_categories):
     return np.where(np.all(encoding[:,:num_categories] == 0, axis=1))[0][0]
 
 
-def per_category_auc(num_categories, known_category): 
+
+def per_category_auc(num_categories, known_category, scores, method = 'ovr'): 
     """
     Calculate the per category under the curve. 
     Calculate the average AUC separately 
     
-    :param known_category: known 
+    :param known_category: known category of each instance
+    :param scores: list of either softmax or phynteny scores for each instance 
+    :param 
     :return: AUC score for each category  
     """
     #TODO 
     
     AUC_list = [] 
     
+    normed_scores_list = norm_scores(scores)
+    
     #for the roc curve loop through each category 
-    for i in range(1, len(num_categories-1)): 
+    for i in range(1, len(num_categories-1)):
 
         #get items to include in this iteration 
-        include = y_index_list == i
+        include = known_category == i
 
         #convert to binary items
-        binary_index = [1 for j in y_index_list[include]] + [0 for j in y_index_list[~include]] 
-        binary_scores =  list(normed_scores_list[include][:,i-1]) + list(normed_scores_list[~include][:,i-1])
+        binary_index = [1 for j in known_category[include]] + [0 for j in known_category[~include]]
+        binary_scores=list(normed_scores_list[include][:,i-1]) + list(normed_scores_list[~include][:,i-1])
 
         #calculate the roc curve 
         fpr, tpr, thresholds = roc_curve(binary_index, binary_scores)
