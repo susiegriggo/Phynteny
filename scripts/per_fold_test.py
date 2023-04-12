@@ -26,7 +26,7 @@ def main(base, x, y, out):
     # fetch the different PHROG categories
     category_path =  pkg_resources.resource_filename("phynteny_utils", "phrog_annotation_info/integer_category.pkl")
     category_names = pickle5.load(open(category_path, 'rb'))
-
+     
     # fetch the testing data
     test_X = pickle5.load(open(x, 'rb'))
     test_X = list(test_X.values())
@@ -34,9 +34,9 @@ def main(base, x, y, out):
     test_y = list(test_y.values())
 
     # fetch the models
-    files = glob.glob(base + '\*')
+    files = glob.glob(base + '/*')
     models = [tf.keras.models.load_model(f) for f in files]
-
+     
     # loop through each of the provided models
     for i in range(len(models)):
 
@@ -48,23 +48,23 @@ def main(base, x, y, out):
 
         # build the ROC curve for this data
         ROC_df = statistics.build_roc(scores, known_categories, category_names)
-        ROC_df.to_csv(out + 'ROC.tsv', sep = '\t')
+        ROC_df.to_csv(out + '_' + str(i) + '_ROC.tsv', sep = '\t')
 
         # compute the classification report
         report = classification_report(known_categories, [np.argmax(i) for i in scores], output_dict=True)
-        with open(out + 'report.tsv', "wb") as f:
+        with open(out  + '_' + str(i) + '_report.tsv', "wb") as f:
             pickle5.dump(report, f)
 
         # calculate the AUC for each category
         auc = statistics.per_category_auc(scores, known_categories, category_names)
-        with open(out + 'AUC.pkl', "wb") as f:
+        with open(out  + '_' + str(i) +  '_AUC.pkl', "wb") as f:
             pickle5.dump(auc, f)
 
         # get the thresholds
         phynteny_df = statistics.threshold_metrics(scores, known_categories, category_names)
-        phynteny_df.to_csv(out + 'threshold_metrics', sep='\t')
+        phynteny_df.to_csv(out  + '_' + str(i) + '_threshold_metrics', sep='\t')
 
-        print('FINISHED')
+    print('FINISHED')
 
 if __name__ == "__main__":
     main()

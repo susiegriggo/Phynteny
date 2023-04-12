@@ -31,7 +31,7 @@ def main(base, x, y, out):
     test_y = list(test_y.values())
 
     # fetch the models
-    files = glob.glob(base + '\*')
+    files = glob.glob(base + '/*')
     models = [tf.keras.models.load_model(f) for f in files]
 
     # compute the phynteny scores
