@@ -10,38 +10,19 @@ import pandas as pd
 from sklearn.metrics import classification_report 
 from sklearn.metrics import roc_auc_score, roc_curve
 
-def phynteny_score(X_encodings, num_categories, models): 
+def phynteny_score(X_encodings, num_categories, models):
     """
-    calculate the phynteny score. Tests multiple at once as it takes effort to read in the 10 models  
-    
-    :param encoding: list of encoding matices to generate prediction 
-    :param models: list of models which have already been read in 
-    :return: per-class phynteny score for the test instance 
-    """
+    calculate the phynteny score. Tests multiple at once as it takes effort to read in the 10 models
 
-    scores_list = [] # list of the score for each prediction 
-
-    for i in range(len(X_encodings)): 
-
-        # get the index we care about for this prediction 
-        zero_row = get_masked(X_encodings[i], num_categories) 
-
-        # make prediction for each model 
-        yhat = [model.predict(X_encodings[i].reshape(1,120, 16), verbose =0)[0][zero_row] for model in models]
-
-        # get the phynteny score for each category 
-        Y_scores = np.array(yhat).sum(axis=0) 
-        scores_list.append(Y_scores)
-
-    return np.array(scores_list)
-
-def phynteny_score2():
-    """
-    To replace the method above
+    :param encoding: list of encoding matices to generate prediction
+    :param models: list of models which have already been read in
+    :return: per-class phynteny score for the test instance
     """
 
-    scores_list = [predict_softmax(X_encodings, num_categories, model)
+    # obtain the yhat values
+    scores_list = [predict_softmax(X_encodings, num_categories, models[i]) for i in range(len(models))]
 
+    return np.array(scores_list).sum(axis=0)
 
 def known_category(X_encodings, y_encodings, num_categories): 
     """
@@ -74,12 +55,12 @@ def predict_softmax(X_encodings, num_categories, model):
     :return: softmax prediction tensor
     """
 
+    # identify the index of the masked categories
     zero_row = [get_masked(X_encodings[i], num_categories) for i in range(len(X_encodings))]
 
+    # obtain softmax scores for the masked genes
     X_encodings = np.array(X_encodings)
-
     yhat = model.predict(X_encodings)
-
     scores_list = [yhat[i][zero_row[i]] for i in range(len(zero_row))]
 
     return np.array(scores_list)
