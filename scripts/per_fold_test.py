@@ -44,7 +44,7 @@ def main(base, x, y, out):
 
         # make predictions
         print('Making predictions')
-        scores = statistics.predict_softmax2(test_X, len(category_names), models[i])
+        scores = statistics.predict_softmax(test_X, len(category_names), models[i])
         known_categories = statistics.known_category(test_X, test_y, len(category_names))
 
         # build the ROC curve for this data

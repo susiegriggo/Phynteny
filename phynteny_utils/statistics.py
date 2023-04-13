@@ -27,13 +27,21 @@ def phynteny_score(X_encodings, num_categories, models):
         zero_row = get_masked(X_encodings[i], num_categories) 
 
         # make prediction for each model 
-        yhat = [model.predict(X_encodings[i].reshape(1,120, 16), verbose =0)[0][zero_row] for model in models] 
+        yhat = [model.predict(X_encodings[i].reshape(1,120, 16), verbose =0)[0][zero_row] for model in models]
 
         # get the phynteny score for each category 
         Y_scores = np.array(yhat).sum(axis=0) 
         scores_list.append(Y_scores)
 
     return np.array(scores_list)
+
+def phynteny_score2():
+    """
+    To replace the method above
+    """
+
+    scores_list = [predict_softmax(X_encodings, num_categories, model)
+
 
 def known_category(X_encodings, y_encodings, num_categories): 
     """
@@ -55,34 +63,15 @@ def known_category(X_encodings, y_encodings, num_categories):
         y_index = np.argmax(y_encodings[i][zero_row])
         known_category.append(y_index)
     
-    return known_category 
-    
-def predict_softmax(X_encodings, num_categories, model): 
-    """ 
-    Predict the function of a masked gene using a single model 
-    
-    :param encoding: list of encoding matices to generate prediction 
-    :param model: model object 
-    :return: softmax prediction tensor 
+    return known_category
+
+def predict_softmax(X_encodings, num_categories, model):
     """
-    
-    scores_list = [] # list of the score for each prediction 
+    Predict the function of a masked gene using a single model
 
-    for i in range(len(X_encodings)): 
-
-        # get the index we care about for this prediction 
-        zero_row = get_masked(X_encodings[i], num_categories) 
-
-        # make prediction for each model 
-        yhat = model.predict(X_encodings[i].reshape(1,120, 16), verbose =0)[0][zero_row]
-
-        scores_list.append(yhat)
-
-    return np.array(scores_list)
-
-def predict_softmax2(X_encodings, num_categories, model):
-    """
-    New version of the function above
+    :param encoding: list of encoding matices to generate prediction
+    :param model: model object
+    :return: softmax prediction tensor
     """
 
     zero_row = [get_masked(X_encodings[i], num_categories) for i in range(len(X_encodings))]
