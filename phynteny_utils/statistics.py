@@ -80,6 +80,21 @@ def predict_softmax(X_encodings, num_categories, model):
 
     return np.array(scores_list)
 
+def predict_softmax2(X_encodings, num_categories, model):
+    """
+    New version of the function above
+    """
+
+    zero_row = [get_masked(X_encodings[i], num_categories) for i in range(len(X_encodings))]
+
+    X_encodings = np.array(X_encodings)
+
+    yhat = model.predict(X_encodings)
+
+    scores_list = [yhat[i][zero_row[i]] for i in range(len(zero_row))]
+
+    return np.array(scores_list)
+
 def build_roc(scores, known_categories, category_names): 
     """
     Collect values to build the ROC curve 
