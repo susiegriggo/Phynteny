@@ -5,6 +5,7 @@ Evaluate all folds of a model and compute the phynteny score
 # imports
 from phynteny_utils import statistics
 import glob
+import numpy as np 
 import pickle5
 import click
 import tensorflow as tf
