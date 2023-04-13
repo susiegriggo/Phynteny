@@ -33,6 +33,7 @@ def phynteny_score(X_encodings, num_categories, models):
         Y_scores = np.array(yhat).sum(axis=0) 
         scores_list.append(Y_scores)
 
+     
     return np.array(scores_list)
 
 def known_category(X_encodings, y_encodings, num_categories): 
@@ -166,7 +167,7 @@ def norm_scores(scores_list):
     
     :param scores_list: list of softmax or phynteny scores 
     """ 
-    
+         
     return scores_list[:,1:]/scores_list[:,1:].sum(axis=1)[:, np.newaxis]  
     
 def get_masked(encoding, num_categories): 
