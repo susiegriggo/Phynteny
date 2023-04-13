@@ -41,7 +41,7 @@ def phynteny_score2():
     To replace the method above
     """
 
-    scores_list = [predict_softmax(X_encodings, num_categories, model)
+    scores_list = [predict_softmax(X_encodings, num_categories, model)]
 
 
 def known_category(X_encodings, y_encodings, num_categories): 
