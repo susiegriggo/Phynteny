@@ -205,8 +205,8 @@ def class_scores(tt,scores,is_real,prot_class,df):
     fscore=(2*TP)/(2*TP+FP+FN)
     accuracy=(TP+TN)/(TP+TN+FP+FN)
     data_row=[prot_class,precision,recall,fscore,accuracy,tt]
-    #df=df.append(pd.Series(data_row,index=df.columns),sort=False,ignore_index=True)
-    df = pd.concat([df, pd.Series(data_row, index=df.columns)], ignore_index=True, sort=False)
+    data = pd.DataFrame(dict(zip(df.columns, data_row)),  index=[0]) 
+    df = pd.concat([df, data], sort=False, axis =0)
 
     return df
 
