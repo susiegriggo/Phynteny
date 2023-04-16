@@ -55,7 +55,7 @@ def main(base, x, y, out):
         # compute the classification report
         print('Generating report')
         report = classification_report(known_categories, [np.argmax(i) for i in scores], output_dict=True)
-        with open(out  + '_' + str(i) + '_report.tsv', "wb") as f:
+        with open(out  + '_' + str(i) + '_report.pkl', "wb") as f:
             pickle5.dump(report, f)
 
         # calculate the AUC for each category

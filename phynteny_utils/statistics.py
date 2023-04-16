@@ -4,8 +4,8 @@ Module to handle statistics for Phynteny
 This module uses code snippets from PHaNNs https://github.com/Adrian-Cantu/PhANNs
 """ 
 
-import numpy as np 
-import glob 
+import numpy as np
+import pickle5
 import pandas as pd 
 from sklearn.metrics import classification_report 
 from sklearn.metrics import roc_auc_score, roc_curve
@@ -245,3 +245,27 @@ def threshold_metrics(scores, known_categories, category_names):
 
     return df_test_score 
     
+def threshold_metrics(known_categories, scores, out):
+    """
+    Calculate the classification report at various threshold cutoffs
+
+    :param known_categories: true category
+    :param scores: softmax output
+    :param out: prefix of the output files
+    """
+
+    max_scores = [np.max(i) for i in scores]
+
+    for i in range(0,11):
+
+        # select the relevant subset
+        include = max_scores >= i
+        this_categories = known_categories[include]
+        this_scores = scores[include]
+
+        # generate the report
+        report = classification_report(this_categories, [np.argmax(i) for i in this_scores], output_dict=True)
+
+        # save this report as a dictionary
+        with open(out + '_threshold' + str(i) + '_report.pkl', "wb") as f:
+            pickle5.dump(report, f)
