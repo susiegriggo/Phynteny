@@ -43,24 +43,24 @@ def main(base, x, y, out):
     # build the ROC curve for this data
     print('Building ROC curve')
     ROC_df = statistics.build_roc(scores, known_categories, category_names)
-    ROC_df.to_csv(out + 'ROC.tsv', sep='\t')
+    ROC_df.to_csv(out + '_ROC.tsv', sep='\t')
 
     # compute the classification report
     print('Generating metrics')
     report = statistics.classification_report(known_categories, [np.argmax(i) for i in scores], output_dict=True)
-    with open(out + 'report.tsv', "wb") as f:
+    with open(out + '_report.tsv', "wb") as f:
         pickle5.dump(report, f)
 
     # calculate the AUC for each category
     print('Calculating AUC')
     auc = statistics.per_category_auc(scores, known_categories, category_names)
-    with open(out + 'AUC.pkl', "wb") as f:
+    with open(out + '_AUC.pkl', "wb") as f:
         pickle5.dump(auc, f)
 
     # get the thresholds
     print('Generating thresholds')
     phynteny_df = statistics.threshold_metrics(scores, known_categories, category_names)
-    phynteny_df.to_csv(out + 'threshold_metrics', sep = '\t')
+    phynteny_df.to_csv(out + '_threshold_metrics.tsv', sep = '\t')
 
     print('FINISHED')
 

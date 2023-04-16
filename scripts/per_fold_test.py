@@ -67,7 +67,7 @@ def main(base, x, y, out):
         # get the thresholds
         print('Evaluating thresholds')
         phynteny_df = statistics.threshold_metrics(scores, known_categories, category_names)
-        phynteny_df.to_csv(out  + '_' + str(i) + '_threshold_metrics', sep='\t')
+        phynteny_df.to_csv(out  + '_' + str(i) + '_threshold_metrics.tsv', sep='\t')
 
     print('FINISHED')
 
