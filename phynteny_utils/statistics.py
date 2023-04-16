@@ -245,7 +245,7 @@ def threshold_metrics(scores, known_categories, category_names):
 
     return df_test_score 
     
-def threshold_metrics(known_categories, scores, out):
+def threshold_report(known_categories, scores, out):
     """
     Calculate the classification report at various threshold cutoffs
 
@@ -255,15 +255,17 @@ def threshold_metrics(known_categories, scores, out):
     """
 
     max_scores = [np.max(i) for i in scores]
-
+    
     for i in range(0,11):
 
         # select the relevant subset
-        include = max_scores >= i
-        this_categories = known_categories[include]
-        this_scores = scores[include]
+        include = np.array(max_scores) >= i
+        this_categories = np.array(known_categories)[include]
+        this_scores = np.array(scores)[include] 
 
-        # generate the report
+        # generate the report 
+        #print(this_categories) 
+        #print([np.argmax(i) for i in this_scores])
         report = classification_report(this_categories, [np.argmax(i) for i in this_scores], output_dict=True)
 
         # save this report as a dictionary

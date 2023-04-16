@@ -64,7 +64,7 @@ def main(base, x, y, out):
 
     # generate classification report at various threshold levels
     print('Generate metrics at different thresholds')
-    statistics.threshold_metrics(known_categories, scores, out)
+    statistics.threshold_report(known_categories, scores, out)
 
     print('FINISHED')
 
