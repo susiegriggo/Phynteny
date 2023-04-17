@@ -49,7 +49,7 @@ __status__ = "development"
 #)
 @click.version_option(version=__version__)
 
-def main(infile, outfile, models, thresholds):
+def main(infile, outfile, models, score):
     """
     Phynteny: synteny-based annotation of phage genes
     """
@@ -66,7 +66,7 @@ def main(infile, outfile, models, thresholds):
     keys = list(gb_dict.keys())
 
     # create predictor object
-    gene_predictor = predictor.Predictor(models, phrog_categories, thresholds, category_names)
+    gene_predictor = predictor.Predictor(models, phrog_categories, category_names)
 
     # Run Phynteny
     with click.open_file(outfile, "wt") if outfile else sys.stdout as handle:

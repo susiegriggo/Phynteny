@@ -269,7 +269,6 @@ def generate_matrix(known_categories, scores, threshold=0):
 
     return mat
 
-
 def threshold_report(known_categories, scores, out):
     """
     Calculate the classification report at various threshold cutoffs

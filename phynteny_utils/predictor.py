@@ -36,7 +36,7 @@ def get_models(models):
 
 class Predictor:
     def __init__(
-        self, models, phrog_categories_path, thresholds_path, category_names_path
+        self, models, phrog_categories_path, category_names_path
     ):
         self.models = get_models(models)
         self.n_features = (
@@ -52,7 +52,6 @@ class Predictor:
             .get("batch_input_shape")[1]
         )
         self.phrog_categories = get_dict(phrog_categories_path)
-        self.thresholds = get_dict(thresholds_path)
         self.category_names = get_dict(category_names_path)
         self.num_functions = len(self.category_names)
 
@@ -82,8 +81,25 @@ class Predictor:
 
         phynteny = []
 
+
+        #get the unknowns as an X array
+        X = [format_data.generate_prediction(
+                    encodings,
+                    features,
+                    self.num_functions,
+                    self.n_features,
+                    self.max_length,
+                    i,
+                ) for i in unk_idx ]
+
+        #get the scores for each unknown
+        scores = statistics.phynteny_score(np.array(X).reshape(len(X), self.max_length, self.n_features), self.num_functions, self.models)
+
+        #write a loop to go through and evaluate the scores
+
         # mask each unknown function
         for i in range(len(encodings[0])):
+
             if i in unk_idx:
                 # encode for the missing function
                 X = format_data.generate_prediction(
@@ -97,8 +113,7 @@ class Predictor:
 
                 # predict the missing function
                 #TODO introduce the phynteny score here and compare with the threshold
-                scores = statistics.phynteny_score(X, self.num_functions, self.models)
-
+                #yhat = statistics.phynteny_score(X, self.num_functions, self.models)
 
                 #original in this block
                 #yhat = self.models.predict(X, verbose=False)
@@ -115,6 +130,8 @@ class Predictor:
         """
         Get the best prediction
         """
+
+        #rewrite this function
 
         # remove the unknown category and take the prediction
         softmax = np.zeros(self.num_functions)

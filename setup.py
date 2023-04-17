@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import setuptools
-
+import glob
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -9,8 +9,9 @@ with open("README.md", "r") as fh:
 packages = setuptools.find_packages()
 print(packages) 
 package_data = {"phynteny_utils": ["phynteny_utils/*"]}
+model_files = glob.glob('phynteny_utils/model/*')
 
-data_files = [(".", ["LICENSE", "README.md"]), ('data', ['phynteny_utils/phrog_annotation_info/integer_category.pkl', 'phynteny_utils/phrog_annotation_info/phrog_annot_v4.tsv', 'phynteny_utils/phrog_annotation_info/phrog_integer.pkl', 'phynteny_utils/model/all_chunk_trained_LSTMbest_val_loss.h5', 'phynteny_utils/model/all_chunk_trained_LSTMbest_val_loss_thresholds.pkl'])]
+data_files = [(".", ["LICENSE", "README.md"]), ('data', ['phynteny_utils/phrog_annotation_info/integer_category.pkl', 'phynteny_utils/phrog_annotation_info/phrog_annot_v4.tsv', 'phynteny_utils/phrog_annotation_info/phrog_integer.pkl'] + model_files)]
 
 setuptools.setup(
     name="Phynteny",
