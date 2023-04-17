@@ -27,29 +27,22 @@ __status__ = "development"
     help="where to write the output genbank file",
 )
 @click.option(
-    "-s",
-    "--score",
-    type=int,
-    help="Phynteny score to use as a cut-off value",
-    default=5
-)
-@click.option(
     "-m",
-    "--models",
+    "--model",
     type=click.Path(exists=True),
     help="Path to custom LSTM model",
-    default=pkg_resources.resource_filename('phynteny_utils', 'model'),
+    default=pkg_resources.resource_filename('phynteny_utils', 'model/all_chunk_trained_LSTMbest_val_loss.h5'),
 )
-#@click.option(
-#    "-t",
-#    "--thresholds",
-#    type=click.Path(exists=True),
-#    help="Path to dictionaries for a custom LSTM model",
-#    default=pkg_resources.resource_filename('phynteny_utils', 'model/all_chunk_trained_LSTMbest_val_loss_thresholds.pkl'),
-#)
+@click.option(
+    "-t",
+    "--thresholds",
+    type=click.Path(exists=True),
+    help="Path to dictionaries for a custom LSTM model",
+    default=pkg_resources.resource_filename('phynteny_utils', 'model/all_chunk_trained_LSTMbest_val_loss_thresholds.pkl'),
+)
 @click.version_option(version=__version__)
 
-def main(infile, outfile, models, score):
+def main(infile, outfile, model, thresholds):
     """
     Phynteny: synteny-based annotation of phage genes
     """
@@ -66,7 +59,7 @@ def main(infile, outfile, models, score):
     keys = list(gb_dict.keys())
 
     # create predictor object
-    gene_predictor = predictor.Predictor(models, phrog_categories, category_names)
+    gene_predictor = predictor.Predictor(model, phrog_categories, thresholds, category_names)
 
     # Run Phynteny
     with click.open_file(outfile, "wt") if outfile else sys.stdout as handle:

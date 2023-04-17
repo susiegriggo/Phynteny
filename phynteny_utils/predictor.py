@@ -7,8 +7,6 @@ import tensorflow as tf
 import pickle
 from phynteny_utils import format_data
 import numpy as np
-import glob
-from phynteny_utils import statistics
 
 
 def get_dict(dict_path):
@@ -22,45 +20,35 @@ def get_dict(dict_path):
 
     return dictionary
 
-def get_models(models):
-    """
-    Get the parameters for the model
-
-    :param models: path to the directory containing the models
-    """
-
-    files = glob.glob(models + '/*')
-    models = [tf.keras.models.load_model(f) for f in files]
-
-    return models
 
 class Predictor:
     def __init__(
-        self, models, phrog_categories_path, category_names_path, threshold = 5
+        self, model, phrog_categories_path, thresholds_path, category_names_path
     ):
-        self.models = get_models(models)
+        self.model = tf.keras.models.load_model(model)
         self.n_features = (
-            self.models[0].get_config()
+            self.model.get_config()
             .get("layers")[0]
             .get("config")
             .get("batch_input_shape")[2]
         )
         self.max_length = (
-            self.models[0].get_config()
+            self.model.get_config()
             .get("layers")[0]
             .get("config")
             .get("batch_input_shape")[1]
         )
         self.phrog_categories = get_dict(phrog_categories_path)
+        self.thresholds = get_dict(thresholds_path)
         self.category_names = get_dict(category_names_path)
         self.num_functions = len(self.category_names)
-        self.threshold = threshold
 
     def predict_annotations(self, phage_dict):
         """
         predict phage annotations
         """
 
+        # TODO add 0 into phrog_categories
         encodings = [
             [self.phrog_categories.get(p) for p in phage_dict.get(q).get("phrogs")]
             for q in list(phage_dict.keys())
@@ -82,31 +70,10 @@ class Predictor:
 
         phynteny = []
 
-        #get the unknowns as an X array
-        #X = [format_data.generate_prediction(
-        #            encodings,
-        #            features,
-        #            self.num_functions,
-        #            self.n_features,
-        #            self.max_length,
-        #            i,
-        #        ) for i in unk_idx]
-
-        # get the scores for each unknown
-        #scores = statistics.phynteny_score(np.array(X).reshape(len(X), self.max_length, self.n_features), self.num_functions, self.models)
-
-        # filter for the best score
-        #predictions = [self.get_best_prediction(s) for s in scores]
-
-        #print(encodings)
-        #print(predictions)
-
-
         # mask each unknown function
         for i in range(len(encodings[0])):
-
             if i in unk_idx:
-
+                # encode for the missing function
                 X = format_data.generate_prediction(
                     encodings,
                     features,
@@ -116,15 +83,12 @@ class Predictor:
                     i,
                 )
 
-
-                yhat = statistics.phynteny_score(X, self.num_functions, self.models)
-
-                print(yhat)
-                #original in this block
-                #yhat = self.models.predict(X, verbose=False)
-
-               # label = predictions[np.where(np.array(unk_idx) == i)[0][0]]
-                label = np.argmax(yhat)
+                # predict the missing function
+                yhat = self.model.predict(X, verbose=False)
+                #print(yhat[0, i])
+                #print(np.max(yhat[0, i]))
+                print(np.argmax(yhat[0,i]))
+                label = self.get_best_prediction(yhat[0][i])
                 phynteny.append(label)
 
             else:
@@ -132,21 +96,19 @@ class Predictor:
 
         return phynteny
 
-    def get_best_prediction(self, s):
+    def get_best_prediction(self, v):
         """
         Get the best prediction
         """
 
-        # determine whether best prediction fits the most likely category
-        if np.max(s) >= self.threshold:
+        # remove the unknown category and take the prediction
+        softmax = np.zeros(self.num_functions)
+        softmax[1:] = v[1:] / np.sum(v[1:])
+        prediction = np.argmax(softmax)
 
-            # fetch the category for the prediction
-            prediction = np.argmax(s)
+        # compare the prediction with the thresholds
+        if np.max(softmax) > self.thresholds.get(self.category_names.get(prediction)):
             return self.category_names.get(prediction)
 
-        # if it does not exceed the threshold then don't make a prediction
         else:
-
             return "no prediction"
-
-
