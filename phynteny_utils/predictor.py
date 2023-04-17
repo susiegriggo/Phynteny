@@ -7,7 +7,8 @@ import tensorflow as tf
 import pickle
 from phynteny_utils import format_data
 import numpy as np
-
+import glob
+from phynteny_utils import statistics
 
 def get_dict(dict_path):
     """
@@ -20,95 +21,91 @@ def get_dict(dict_path):
 
     return dictionary
 
+def get_models(models ):
+    """
 
+    """
+    print(models + '/*')
+    files = glob.glob(models + '/*')
+
+
+    return [tf.keras.models.load_model(m) for m in files]
 class Predictor:
     def __init__(
-        self, model, phrog_categories_path, thresholds_path, category_names_path
+        self, models, phrog_categories_path, threshold, category_names_path
     ):
-        self.model = tf.keras.models.load_model(model)
+        self.models = get_models(models)
         self.n_features = (
-            self.model.get_config()
+            self.models[0].get_config()
             .get("layers")[0]
             .get("config")
             .get("batch_input_shape")[2]
         )
         self.max_length = (
-            self.model.get_config()
+            self.models[0].get_config()
             .get("layers")[0]
             .get("config")
             .get("batch_input_shape")[1]
         )
         self.phrog_categories = get_dict(phrog_categories_path)
-        self.thresholds = get_dict(thresholds_path)
+        self.threshold = threshold
         self.category_names = get_dict(category_names_path)
         self.num_functions = len(self.category_names)
 
     def predict_annotations(self, phage_dict):
         """
-        predict phage annotations
+
         """
 
-        # TODO add 0 into phrog_categories
         encodings = [
             [self.phrog_categories.get(p) for p in phage_dict.get(q).get("phrogs")]
             for q in list(phage_dict.keys())
         ]
+
         features = [
             format_data.get_features(phage_dict.get(q), features_included="all")
             for q in list(phage_dict.keys())
         ]
 
-        # get the index of the unknowns
         unk_idx = [i for i, x in enumerate(encodings[0]) if x == 0]
 
         if len(unk_idx) == 0:
             print(
                 "Your phage "
                 + str(list(phage_dict.keys())[0])
-                + "is already completely annotated!"
+                + " is already completely annotated!"
             )
 
-        phynteny = []
+            phynteny = [self.category_names.get(e) for e in encodings[0]]
 
-        # mask each unknown function
-        for i in range(len(encodings[0])):
-            if i in unk_idx:
-                # encode for the missing function
-                X = format_data.generate_prediction(
-                    encodings,
-                    features,
-                    self.num_functions,
-                    self.n_features,
-                    self.max_length,
-                    i,
-                )
+        else:
+            # make data with the categories masked
+            X = [format_data.generate_prediction(
+                encodings,
+                features,
+                self.num_functions,
+                self.n_features,
+                self.max_length,
+                i,
+            ) for i in unk_idx]
 
-                # predict the missing function
-                yhat = self.model.predict(X, verbose=False)
-                #print(yhat[0, i])
-                #print(np.max(yhat[0, i]))
-                print(np.argmax(yhat[0,i]))
-                label = self.get_best_prediction(yhat[0][i])
-                phynteny.append(label)
+            yhat = statistics.phynteny_score(np.array(X).reshape(len(X), self.max_length, self.n_features), self.num_functions, self.models)
 
-            else:
-                phynteny.append(self.category_names.get(encodings[0][i]))
+            scores = [yhat[i] for i in range(len(unk_idx))]
+
+            predictions = [self.get_best_prediction(s) for s in scores]
+            print('FOUND ' + str(len([i for i in predictions if i != 0])) + ' missing annotation(s)!')
+            encodings = np.array(encodings)
+            encodings[:, unk_idx] = predictions
+            phynteny = [self.category_names.get(e) for e in encodings[0]]
 
         return phynteny
 
-    def get_best_prediction(self, v):
-        """
-        Get the best prediction
-        """
+    def get_best_prediction(self, s):
 
-        # remove the unknown category and take the prediction
-        softmax = np.zeros(self.num_functions)
-        softmax[1:] = v[1:] / np.sum(v[1:])
-        prediction = np.argmax(softmax)
-
-        # compare the prediction with the thresholds
-        if np.max(softmax) > self.thresholds.get(self.category_names.get(prediction)):
-            return self.category_names.get(prediction)
+        if np.max(s) >= self.threshold:
+            return np.argmax(s)
 
         else:
-            return "no prediction"
+            return 0
+

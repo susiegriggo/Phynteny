@@ -31,18 +31,18 @@ __status__ = "development"
     "--model",
     type=click.Path(exists=True),
     help="Path to custom LSTM model",
-    default=pkg_resources.resource_filename('phynteny_utils', 'model/all_chunk_trained_LSTMbest_val_loss.h5'),
+    default=pkg_resources.resource_filename('phynteny_utils', 'test_model'),
 )
 @click.option(
     "-t",
-    "--thresholds",
-    type=click.Path(exists=True),
-    help="Path to dictionaries for a custom LSTM model",
-    default=pkg_resources.resource_filename('phynteny_utils', 'model/all_chunk_trained_LSTMbest_val_loss_thresholds.pkl'),
+    "--threshold",
+    type=int,
+    help="Threshold phynteny score to use as a cutoff",
+    default=5
 )
 @click.version_option(version=__version__)
 
-def main(infile, outfile, model, thresholds):
+def main(infile, outfile, model, threshold):
     """
     Phynteny: synteny-based annotation of phage genes
     """
@@ -59,7 +59,7 @@ def main(infile, outfile, model, thresholds):
     keys = list(gb_dict.keys())
 
     # create predictor object
-    gene_predictor = predictor.Predictor(model, phrog_categories, thresholds, category_names)
+    gene_predictor = predictor.Predictor(model, phrog_categories, threshold, category_names)
 
     # Run Phynteny
     with click.open_file(outfile, "wt") if outfile else sys.stdout as handle:
@@ -86,7 +86,7 @@ def main(infile, outfile, model, thresholds):
 
             # write to genbank file
             SeqIO.write(gb_dict.get(key), handle, "genbank") 
-    
+
     if outfile: 
         print('DONE') 
 
