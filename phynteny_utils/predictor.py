@@ -36,7 +36,7 @@ def get_models(models):
 
 class Predictor:
     def __init__(
-        self, models, phrog_categories_path, category_names_path
+        self, models, phrog_categories_path, category_names_path, threshold = 5
     ):
         self.models = get_models(models)
         self.n_features = (
@@ -54,6 +54,7 @@ class Predictor:
         self.phrog_categories = get_dict(phrog_categories_path)
         self.category_names = get_dict(category_names_path)
         self.num_functions = len(self.category_names)
+        self.threshold = threshold
 
     def predict_annotations(self, phage_dict):
         """
@@ -81,27 +82,31 @@ class Predictor:
 
         phynteny = []
 
-
         #get the unknowns as an X array
-        X = [format_data.generate_prediction(
-                    encodings,
-                    features,
-                    self.num_functions,
-                    self.n_features,
-                    self.max_length,
-                    i,
-                ) for i in unk_idx ]
+        #X = [format_data.generate_prediction(
+        #            encodings,
+        #            features,
+        #            self.num_functions,
+        #            self.n_features,
+        #            self.max_length,
+        #            i,
+        #        ) for i in unk_idx]
 
-        #get the scores for each unknown
-        scores = statistics.phynteny_score(np.array(X).reshape(len(X), self.max_length, self.n_features), self.num_functions, self.models)
+        # get the scores for each unknown
+        #scores = statistics.phynteny_score(np.array(X).reshape(len(X), self.max_length, self.n_features), self.num_functions, self.models)
 
-        #write a loop to go through and evaluate the scores
+        # filter for the best score
+        #predictions = [self.get_best_prediction(s) for s in scores]
+
+        #print(encodings)
+        #print(predictions)
+
 
         # mask each unknown function
         for i in range(len(encodings[0])):
 
             if i in unk_idx:
-                # encode for the missing function
+
                 X = format_data.generate_prediction(
                     encodings,
                     features,
@@ -111,14 +116,15 @@ class Predictor:
                     i,
                 )
 
-                # predict the missing function
-                #TODO introduce the phynteny score here and compare with the threshold
-                #yhat = statistics.phynteny_score(X, self.num_functions, self.models)
 
+                yhat = statistics.phynteny_score(X, self.num_functions, self.models)
+
+                print(yhat)
                 #original in this block
                 #yhat = self.models.predict(X, verbose=False)
 
-                label = self.get_best_prediction(yhat[0][i])
+               # label = predictions[np.where(np.array(unk_idx) == i)[0][0]]
+                label = np.argmax(yhat)
                 phynteny.append(label)
 
             else:
@@ -126,23 +132,21 @@ class Predictor:
 
         return phynteny
 
-    def get_best_prediction(self, v):
+    def get_best_prediction(self, s):
         """
         Get the best prediction
         """
 
-        #rewrite this function
+        # determine whether best prediction fits the most likely category
+        if np.max(s) >= self.threshold:
 
-        # remove the unknown category and take the prediction
-        softmax = np.zeros(self.num_functions)
-        softmax[1:] = v[1:] / np.sum(v[1:])
-        prediction = np.argmax(softmax)
-
-        # compare the prediction with the thresholds
-        if np.max(softmax) > self.thresholds.get(self.category_names.get(prediction)):
+            # fetch the category for the prediction
+            prediction = np.argmax(s)
             return self.category_names.get(prediction)
 
-        #TODO change this code such that rather than using the score above the threshold use the phynteny score
+        # if it does not exceed the threshold then don't make a prediction
         else:
+
             return "no prediction"
+
 
