@@ -68,7 +68,7 @@ class Predictor:
         ]
 
         unk_idx = [i for i, x in enumerate(encodings[0]) if x == 0]
-
+        print(len(encodings)) 
         if len(unk_idx) == 0:
             print(
                 "Your phage "
@@ -76,6 +76,15 @@ class Predictor:
                 + " is already completely annotated!"
             )
 
+            phynteny = [self.category_names.get(e) for e in encodings[0]]
+
+        elif len(encodings[0]) > 120: 
+            print(
+                "Your phage "
+                + str(list(phage_dict.keys())[0])
+                + " has more genes than the maximum of 120!"
+            )
+        
             phynteny = [self.category_names.get(e) for e in encodings[0]]
 
         else:
