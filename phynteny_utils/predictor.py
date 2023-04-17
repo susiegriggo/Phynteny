@@ -7,6 +7,8 @@ import tensorflow as tf
 import pickle
 from phynteny_utils import format_data
 import numpy as np
+import glob
+from phynteny_utils import statistics
 
 
 def get_dict(dict_path):
@@ -20,20 +22,31 @@ def get_dict(dict_path):
 
     return dictionary
 
+def get_models(models):
+    """
+    Get the parameters for the model
+
+    :param models: path to the directory containing the models
+    """
+
+    files = glob.glob(models + '/*')
+    models = [tf.keras.models.load_model(f) for f in files]
+
+    return models
 
 class Predictor:
     def __init__(
-        self, model, phrog_categories_path, thresholds_path, category_names_path
+        self, models, phrog_categories_path, thresholds_path, category_names_path
     ):
-        self.model = tf.keras.models.load_model(model)
+        self.models = get_models(models)
         self.n_features = (
-            self.model.get_config()
+            self.models[0].get_config()
             .get("layers")[0]
             .get("config")
             .get("batch_input_shape")[2]
         )
         self.max_length = (
-            self.model.get_config()
+            self.models[0].get_config()
             .get("layers")[0]
             .get("config")
             .get("batch_input_shape")[1]
@@ -48,7 +61,6 @@ class Predictor:
         predict phage annotations
         """
 
-        # TODO add 0 into phrog_categories
         encodings = [
             [self.phrog_categories.get(p) for p in phage_dict.get(q).get("phrogs")]
             for q in list(phage_dict.keys())
@@ -84,7 +96,13 @@ class Predictor:
                 )
 
                 # predict the missing function
-                yhat = self.model.predict(X, verbose=False)
+                #TODO introduce the phynteny score here and compare with the threshold
+                scores = statistics.phynteny_score(X, self.num_functions, self.models)
+
+
+                #original in this block
+                #yhat = self.models.predict(X, verbose=False)
+
                 label = self.get_best_prediction(yhat[0][i])
                 phynteny.append(label)
 
@@ -107,5 +125,7 @@ class Predictor:
         if np.max(softmax) > self.thresholds.get(self.category_names.get(prediction)):
             return self.category_names.get(prediction)
 
+        #TODO change this code such that rather than using the score above the threshold use the phynteny score
         else:
             return "no prediction"
+
