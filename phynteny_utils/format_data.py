@@ -215,7 +215,6 @@ def generate_example(sequence, features, num_functions, n_features, max_length, 
 
     return X, y
 
-
 def generate_prediction(sequence, features, num_functions, n_features, max_length, idx):
     """
     Prepare data to predict the function of all hypothetical genes in a sequence
@@ -297,7 +296,6 @@ def generate_dataset(data, features_included, num_functions, max_length):
     y = np.array(y).reshape(len(keys), max_length, num_functions)
 
     return X, y
-
 
 def test_train(data, path, num_functions, max_genes=120, test_size=10):
     """

@@ -8,7 +8,7 @@ Think about using classes in this script -how to handle the features like max le
 
 # imports
 from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Bidirectional, TimeDistributed, Dense, LSTM
+from tensorflow.keras.layers import Bidirectional, TimeDistributed, Dense, LSTM, Masking
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 import tensorflow.keras.optimizers as optimizers
 from tensorflow.keras.optimizers.experimental import RMSprop
@@ -284,6 +284,9 @@ class Model:
 
         # get the kernel initializer
         kernel_initializer = get_initializer(self.kernel_intializer)
+
+        # add the masking layer
+        model.add(Masking(mask_value=-1, input_shape=(self.max_length, self.n_features)))
 
         # input layer
         model.add(

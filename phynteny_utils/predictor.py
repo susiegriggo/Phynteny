@@ -1,7 +1,6 @@
 """
 Module to create a predictor object
 """
-
 # imports
 import tensorflow as tf
 import pickle
@@ -28,8 +27,8 @@ def get_models(models ):
     print(models + '/*')
     files = glob.glob(models + '/*')
 
-
     return [tf.keras.models.load_model(m) for m in files]
+
 class Predictor:
     def __init__(
         self, models, phrog_categories_path, threshold, category_names_path
@@ -88,6 +87,8 @@ class Predictor:
             phynteny = [self.category_names.get(e) for e in encodings[0]]
 
         else:
+
+
             # make data with the categories masked
             X = [format_data.generate_prediction(
                 encodings,
