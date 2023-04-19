@@ -4,6 +4,10 @@ Script to train model
 Use to parameter sweep to determine optimal batch size, epochs, dropout, memory cells
 
 Think about using classes in this script -how to handle the features like max length etc
+
+THIS VERSION NEEDS CLEANING UP. IF IT WORKS THEN TAKE ADDITIONAL STEPS
+
+CURRENTLY TRAINS USING NO HIDDEN LAYERS
 """
 
 # imports
@@ -279,6 +283,7 @@ class Model:
         :return: model ready to be trained
         """
 
+        print('building model')
         # define the model
         model = Sequential()
 
@@ -290,13 +295,13 @@ class Model:
             Bidirectional(
                 LSTM(
                     self.neurons,
-                    return_sequences=True,
+                    #return_sequences=True,
                     dropout=self.dropout,
                     kernel_regularizer=self.kernel_regularizer,
                     kernel_initializer=kernel_initializer,
                     activation=self.activation,
                 ),
-                input_shape=(self.max_length, self.n_features),
+                input_shape=(self.max_length, self.num_functions),
             )
         )
 
@@ -307,18 +312,18 @@ class Model:
                 Bidirectional(
                     LSTM(
                         self.neurons,
-                        return_sequences=True,
+                        #return_sequences=True,
                         dropout=self.dropout,
                         kernel_regularizer=self.kernel_regularizer,
                         kernel_initializer=kernel_initializer,
                         activation=self.activation,
-                    )
+                    ),
                 ),
             )
 
         # output layer
-        model.add(TimeDistributed(Dense(self.num_functions, activation="softmax")))
-
+        #model.add(TimeDistributed(Dense(self.num_functions, activation="softmax")))
+        model.add(Dense(self.num_functions, activation="softmax"))
      
         # get the optimization function
         optimizer = get_optimizer(
@@ -402,14 +407,15 @@ class Model:
 
         
         # get the predicted category of the train data
-        masked_cat = [
-            np.where(
-                self.y[i, np.where(~self.X[i, :, 0 : self.num_functions].any(axis=1))[0][0]]
-                == 1
-            )[0][0]
-            for i in range(len(self.X))
-        ]
-    
+        #masked_cat = [
+        #    np.where(
+        #        self.y[i, np.where(~self.X[i, :, 0 : self.num_functions].any(axis=1))[0][0]]
+        #        == 1
+        #    )[0][0]
+        #    for i in range(len(self.X))
+        #]
+        masked_cat = [np.where(self.y[i][0] == 1)[0][0] for i in range(len(self.y))]
+
         skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
 
         # count the number of folds
@@ -426,6 +432,10 @@ class Model:
             X_val = self.X[val_index, :, :]
             y_val = self.y[val_index, :, :]
 
+            #reshape
+            y_train = y_train.reshape((len(y_train),self.num_functions))
+            y_val = y_val.reshape((len(y_val),self.num_functions)
+
             # use the compile function here
             self.train_model(
                 X_train,
@@ -437,7 +447,6 @@ class Model:
                 epochs=epochs,
                 save=save,
             )
-
 
             # update counter
             counter += 1
