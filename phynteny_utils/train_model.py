@@ -291,11 +291,27 @@ class Model:
         kernel_initializer = get_initializer(self.kernel_intializer)
 
         # input layer
-        model.add(
+        if self.layers == 0: 
+            model.add(
             Bidirectional(
                 LSTM(
                     self.neurons,
                     #return_sequences=True,
+                    dropout=self.dropout,
+                    kernel_regularizer=self.kernel_regularizer,
+                    kernel_initializer=kernel_initializer,
+                    activation=self.activation,
+                ),
+                input_shape=(self.max_length, self.num_functions),
+            )
+        )
+        
+        else:
+            model.add(
+            Bidirectional(
+                LSTM(
+                    self.neurons,
+                    return_sequences=True,
                     dropout=self.dropout,
                     kernel_regularizer=self.kernel_regularizer,
                     kernel_initializer=kernel_initializer,
@@ -432,9 +448,10 @@ class Model:
             X_val = self.X[val_index, :, :]
             y_val = self.y[val_index, :, :]
 
-            #reshape
+            #reshap
+            print(y_train.shape) 
             y_train = y_train.reshape((len(y_train),self.num_functions))
-            y_val = y_val.reshape((len(y_val),self.num_functions)
+            y_val = y_val.reshape((len(y_val),self.num_functions)) 
 
             # use the compile function here
             self.train_model(
