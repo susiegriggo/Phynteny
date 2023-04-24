@@ -8,7 +8,7 @@ import random
 import pickle5
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
-
+from phynteny_utils import statistics 
 
 def get_dict(dict_path):
     """
@@ -224,7 +224,7 @@ def generate_dataset(data, num_functions, max_length):
 
     # reshape the data
     X = np.array(X).reshape(len(keys), max_length, num_functions)
-    y = np.array(y).reshape(len(keys), max_length, num_functions)
+    y = np.array(y).reshape(len(keys), num_functions)
 
     return X, y
 
@@ -244,16 +244,20 @@ def test_train(data, path, num_functions, max_genes=120, test_size=10):
     keys = list(data.keys())
 
     # encode the data
-    X, y = generate_dataset(data, "all", num_functions, max_genes)
+    X, y = generate_dataset(data,num_functions, max_genes)
     X_dict = dict(zip(keys, X))
     y_dict = dict(zip(keys, y))
 
     # generate a list describing which categories get masked
-    categories = [
-        np.where(y[i, np.where(~X[i, :, 0:num_functions].any(axis=1))[0][0]] == 1)[0][0]
-        for i in range(len(X))
-    ]
+    #categories = [
+    #    np.where(y[i, np.where(~X[i, :, 0:num_functions].any(axis=1))[0][0]] == 1)[0][0]
+    #    for i in range(len(X))
+    #]
+    #masked = [statistics.get_masked(X[i], num_functions) for i in range(len(X))] 
+    categories = [np.where(y[i] == 1)[0][0]  for i in range(len(X))] 
 
+    #TODO change this to the get masked category 
+    print(categories) 
     train_keys, test_keys, train_cat, test_cat = train_test_split(
         [i for i in range(len(categories))],
         categories,
