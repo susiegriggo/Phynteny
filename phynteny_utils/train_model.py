@@ -2,12 +2,6 @@
 Script to train model 
 
 Use to parameter sweep to determine optimal batch size, epochs, dropout, memory cells
-
-Think about using classes in this script -how to handle the features like max length etc
-
-THIS VERSION NEEDS CLEANING UP. IF IT WORKS THEN TAKE ADDITIONAL STEPS
-
-CURRENTLY TRAINS USING NO HIDDEN LAYERS
 """
 
 # imports
@@ -28,7 +22,6 @@ import absl.logging
 import tensorflow as tf  
 absl.logging.set_verbosity(absl.logging.ERROR)
 
-
 def get_dict(dict_path):
     """
     Helper function to import dictionaries
@@ -39,32 +32,6 @@ def get_dict(dict_path):
     handle.close()
 
     return dictionary
-
-
-def feature_check(features_include):
-    """
-    Check the combination of features is possible
-
-    :param features_include: string describing the list of features
-    """
-
-    if features_include not in [
-        "all",
-        "strand",
-        "none",
-        "intergenic",
-        "gene_length",
-        "position",
-        "orientation_count",
-    ]:
-        raise Exception(
-            "Not an possible combination of features!\n"
-            "Must be one of: 'all', 'none', 'intergenic', 'gene_length', 'position', 'orientation_count', "
-            "'strand'"
-        )
-
-    return features_include
-
 
 def get_optimizer(optimizer_function, learning_rate):
     """
@@ -122,7 +89,6 @@ class Model:
             "phynteny_utils", "phrog_annotation_info/phrog_integer.pkl"
         ),
         max_length=120,
-        features_include="all",
         layers=1,
         neurons=100,
         batch_size=32,
@@ -138,8 +104,6 @@ class Model:
     ):
         """
         :param phrog_categories_path: location of the dictionary describing the phrog_categories :param
-        features_include: string describing a subset of features to use - one of ['all', 'strand', 'none',
-        'gene_start', 'intergenic', 'gene_length', 'position', 'orientation_count']
         :param max_length: maximum length of prophage to consider
         :param layers: number of hidden layers to use in the model
         :param neurons: number of memory cells in hidden layers
@@ -155,7 +119,6 @@ class Model:
 
         # set general information for the model
         self.phrog_categories = get_dict(phrog_path)
-        self.features_include = feature_check(features_include)
         self.num_functions = len(
             list(set(self.phrog_categories.values()))
         )  # dimension describing the number of functions
@@ -179,7 +142,6 @@ class Model:
         # placeholder variables
         self.X = []
         self.y = []
-        self.n_features = []
 
     def fit_data(self, data_path):
         """
@@ -191,18 +153,13 @@ class Model:
 
         # process the data
         self.X, self.y = format_data.generate_dataset(
-            data, self.features_include, self.num_functions, self.max_length
+            data, self.num_functions, self.max_length
         )
-        self.n_features = self.X.shape[2]
-
-        #TODO add a warning if the data exceeds the maximum length
-        #TODO make it possible to fit in data which has already been masked
 
     def parse_masked_data(self, X_path, y_path):
         """
         Parse a pre-masked dataset
         """
-
         # get the X data
         X = get_dict(X_path)
         self.X = np.array(list(X.values()))
@@ -210,35 +167,6 @@ class Model:
         # get the y data
         y = get_dict(y_path)
         self.y = np.array(list(y.values()))
-
-        # apply steps to remove features not specified
-        self.prune_features()
-
-        #update the number of known features
-        self.n_features = self.X.shape[2]
-
-    def prune_features(self):
-        """
-        Remove redundant features from a dataset
-        """
-
-        if self.features_include == 'strand':
-            self.X = self.X[:,:,:self.num_functions+2]
-
-        elif self.features_include == 'none':
-            self.X = self.X[:,:,:self.num_functions]
-
-        elif self.features_include == 'position':
-            self.X = np.delete(self.X, [10, 11, 13, 14, 15], axis=2)
-
-        elif self.features_include == 'intergenic':
-            self.X = np.delete(self.X, [10,11,12,14,15], axis=2)
-
-        elif self.features_include == 'gene_length':
-            self.X = np.delete(self.X, [10,11,12,13,15], axis=2)
-
-        elif self.features_include == 'orientation_count':
-            self.X = np.delete(self.X, [10,11,12,13,14], axis=2)
 
     def get_callbacks(self, model_out):
         """
@@ -513,7 +441,6 @@ def check_parameters(hyperparameters, num_trials):
 
     poss_parameters = [
         "max_length",
-        "features_include",
         "layers",
         "neurons",
         "batch_size",
@@ -536,7 +463,7 @@ def check_parameters(hyperparameters, num_trials):
         # Check that the parameter is allowed
         if k not in poss_parameters:
             raise ValueError(
-                " illegal parameter value. Parameters must be one of 'max_length', 'features_include', "
+                " illegal parameter value. Parameters must be one of 'max_length', "
                 "'layers', 'neurons', 'batch_size', 'dropout', 'activation', 'optimizer_function', "
                 "'learning_rate', 'patience', 'min_delta', 'l1_regularizer', 'l2_regularizer'"
             )

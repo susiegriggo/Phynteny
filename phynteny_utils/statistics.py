@@ -35,10 +35,7 @@ def known_category(X_encodings, y_encodings, num_categories):
     
     known_category = list() 
     
-    for i in range (len(X_encodings)): 
-        
-        # get the masked index 
-        #zero_row = get_masked(X_encodings[i], num_categories)
+    for i in range (len(X_encodings)):
     
         # get the known category of the gene 
         y_index = np.argmax(y_encodings[i])
@@ -55,13 +52,9 @@ def predict_softmax(X_encodings, num_categories, model):
     :return: softmax prediction tensor
     """
 
-    # identify the index of the masked categories
-    zero_row = [get_masked(X_encodings[i], num_categories) for i in range(len(X_encodings))]
-
     # obtain softmax scores for the masked genes
     X_encodings = np.array(X_encodings)
     yhat = model.predict(X_encodings)
-    #scores_list = [yhat[i][zero_row[i]] for i in range(len(zero_row))]
     scores_list = yhat 
 
     return np.array(scores_list)
@@ -164,10 +157,6 @@ def get_masked(encoding, num_categories):
     :return: list of masked indexes 
     """ 
 
-    #print(np.where(np.all(encoding[:,:num_categories] == 0, axis=1)))
-    #print('Number of categories: ' + str(num_categories)) 
-    #print(encoding) 
-    #print('Number of categories: ' + str(num_categories))
     return np.where(np.all(encoding[:,:num_categories] == 0, axis=1))[0][0]
         
     
