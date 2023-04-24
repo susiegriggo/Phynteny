@@ -542,7 +542,5 @@ def random_search(
             best_params = params
             best_loss = val_loss
 
-        # TODO compare the accuracy
-
     print(f"Best params: {best_params}")
     print(f"Best validation loss: {best_loss:.4f}")

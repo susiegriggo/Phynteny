@@ -76,6 +76,5 @@ def main(input_data, gene_categories, maximum_genes, prefix):
 
     print("DONE")
 
-
 if __name__ == "__main__":
     main()
