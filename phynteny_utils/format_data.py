@@ -146,13 +146,15 @@ def generate_example(sequence, num_functions, max_length, idx):
     y = np.array(one_hot_encode(padded_sequence, num_functions))
     X = np.array(one_hot_encode(padded_sequence, num_functions))
 
-
     # replace the function encoding for the masked sequence
-    X[idx, 0:num_functions] = np.zeros(num_functions)
+    X[idx] = np.zeros(num_functions)
+
+    #return y just as this masked function
+    y = y[idx]
 
     # reshape the matrices
     X = X.reshape((1, max_length, num_functions))
-    y = y.reshape((1, max_length, num_functions))
+    y = y.reshape((1, num_functions))
 
     return X, y
 
