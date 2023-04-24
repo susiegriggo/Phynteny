@@ -47,7 +47,6 @@ def main(base, x, y, out):
 
     # compute the classification report
     print('Generating metrics')
-    #TODO - repeat this at various threshold levels
     report = statistics.classification_report(known_categories, [np.argmax(i) for i in scores], output_dict=True)
     with open(out + 'report.pkl', "wb") as f:
         pickle5.dump(report, f)

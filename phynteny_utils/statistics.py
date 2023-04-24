@@ -219,7 +219,7 @@ def threshold_metrics(scores, known_categories, category_names):
     
     d = {'class':[],'precision': [], 'recall': [],'f1-score':[],'accuracy':[],'threshold':[], 'support': []}
 
-    score_range=np.arange(0,10.1,0.1)
+    score_range=np.arange(0,10.1,0.01)
     df_test_score = pd.DataFrame(data=d)
 
     scores_index = np.array([np.argmax(i) for i in scores])
