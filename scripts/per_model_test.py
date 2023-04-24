@@ -47,8 +47,9 @@ def main(base, x, y, out):
 
     # compute the classification report
     print('Generating metrics')
+    #TODO - repeat this at various threshold levels
     report = statistics.classification_report(known_categories, [np.argmax(i) for i in scores], output_dict=True)
-    with open(out + 'report.tsv', "wb") as f:
+    with open(out + 'report.pkl', "wb") as f:
         pickle5.dump(report, f)
 
     # calculate the AUC for each category
@@ -60,7 +61,7 @@ def main(base, x, y, out):
     # get the thresholds
     print('Generating thresholds')
     phynteny_df = statistics.threshold_metrics(scores, known_categories, category_names)
-    phynteny_df.to_csv(out + 'threshold_metrics', sep = '\t')
+    phynteny_df.to_csv(out + 'threshold_metrics.tsv', sep = '\t')
 
     print('FINISHED')
 

@@ -172,6 +172,10 @@ def class_scores(tt,scores,is_real,prot_class,df):
     """
     
     is_predicted=[x>=tt-0.05 for x in scores]
+
+    #TODO check that this here is correct
+    support = len(is_predicted)
+
     TP=sum(np.logical_and(is_real,is_predicted))
     FN=sum(np.logical_and(is_real,np.logical_not(is_predicted)))
     TN=sum(np.logical_and(np.logical_not(is_real),np.logical_not(is_predicted)))
@@ -198,7 +202,7 @@ def class_scores(tt,scores,is_real,prot_class,df):
 
     fscore=(2*TP)/(2*TP+FP+FN)
     accuracy=(TP+TN)/(TP+TN+FP+FN)
-    data_row=[prot_class,precision,recall,fscore,accuracy,tt]
+    data_row=[prot_class,precision,recall,fscore,accuracy,tt, support]
     df=df.append(pd.Series(data_row,index=df.columns),sort=False,ignore_index=True)
     
     return df
@@ -213,7 +217,7 @@ def threshold_metrics(scores, known_categories, category_names):
     :param category_names: dictionary of category labels 
     """
     
-    d = {'class':[],'precision': [], 'recall': [],'f1-score':[],'accuracy':[],'threshold':[]}
+    d = {'class':[],'precision': [], 'recall': [],'f1-score':[],'accuracy':[],'threshold':[], 'support': []}
 
     score_range=np.arange(0,10.1,0.1)
     df_test_score = pd.DataFrame(data=d)
@@ -232,6 +236,9 @@ def threshold_metrics(scores, known_categories, category_names):
             df_test_score=class_scores(tt,np.around(test_set_p[test_set_p>=tt-0.05],decimals=1)
                                                        ,test_set_t[test_set_p>=tt-0.05]
                                                        ,num,df_test_score)
+
+    #TODO test the effect of removing the 0.05. Why did PHANNs include this to begin with
+
 
     df_test_score['class'] = [int(i) for i in df_test_score['class']]
     df_test_score['category'] = [category_names.get(i) for i in df_test_score['class'] ] 
