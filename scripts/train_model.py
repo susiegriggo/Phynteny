@@ -22,24 +22,6 @@ import pkg_resources
     help="Maximum length of a phage genome",
 )
 @click.option(
-    "--features",
-    "-f",
-    default="all",
-    type=click.Choice(
-        [
-            "all",
-            "strand",
-            "none",
-            "intergenic",
-            "gene_length",
-            "position",
-            "orientation_count",
-        ]
-    ),
-    help="What combination of features used to train model. Must be one of  ['all', 'strand', 'none', "
-    "'intergenic', 'gene_length', 'position', 'orientation_count']",
-)
-@click.option(
     "--layers",
     "-l",
     default=1,
@@ -145,7 +127,6 @@ def main(
     x_path,
     y_path,
     max_length,
-    features,
     layers,
     memory_cells,
     batch_size,
@@ -170,7 +151,6 @@ def main(
             "phynteny_utils", "phrog_annotation_info/phrog_integer.pkl"
         ),
         max_length=max_length,
-        features_include=features,
         layers=layers,
         neurons=memory_cells,
         batch_size=batch_size,

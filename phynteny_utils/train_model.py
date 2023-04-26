@@ -344,22 +344,10 @@ class Model:
         :param epochs: number of epochs to train for
         """
         
-        # separate into testing and training data - testing data reserved
-        #X_1, X_test, y_1, y_test = train_test_split(
-        #    self.X, self.y, test_size=float(1 / 11), random_state=42
-        #)  # TODO move the test and train split out of this module - perhaps do this in the generate training data script
+        # get the masked category in each instance 
+        masked_cat = [np.where(self.y[i] == 1)[0][0] for i in range(len(self.y))]
 
-        
-        # get the predicted category of the train data
-        #masked_cat = [
-        #    np.where(
-        #        self.y[i, np.where(~self.X[i, :, 0 : self.num_functions].any(axis=1))[0][0]]
-        #        == 1
-        #    )[0][0]
-        #    for i in range(len(self.X))
-        #]
-        masked_cat = [np.where(self.y[i][0] == 1)[0][0] for i in range(len(self.y))]
-
+        # split into kfolds which are stratified 
         skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
 
         # count the number of folds
@@ -369,14 +357,14 @@ class Model:
         for train_index, val_index in skf.split(np.zeros(len(masked_cat)), masked_cat):
             
             # generate stratified test and train sets
-            X_train = self.X[train_index, :, :]
-            y_train = self.y[train_index, :, :]
-
+            X_train = self.X[train_index, :, :] 
+            y_train = self.y[train_index, :]
+            
             # generate validation data for the training
             X_val = self.X[val_index, :, :]
-            y_val = self.y[val_index, :, :]
+            y_val = self.y[val_index, :]
 
-            #reshap
+            #reshape
             print(y_train.shape) 
             y_train = y_train.reshape((len(y_train),self.num_functions))
             y_val = y_val.reshape((len(y_val),self.num_functions)) 

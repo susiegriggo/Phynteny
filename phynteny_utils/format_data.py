@@ -253,8 +253,6 @@ def test_train(data, path, num_functions, max_genes=120, test_size=10):
     #masked = [statistics.get_masked(X[i], num_functions) for i in range(len(X))] 
     categories = [np.where(y[i] == 1)[0][0]  for i in range(len(X))] 
 
-    #TODO change this to the get masked category 
-    print(categories) 
     train_keys, test_keys, train_cat, test_cat = train_test_split(
         [i for i in range(len(categories))],
         categories,
