@@ -226,7 +226,7 @@ class Model:
         print('Number of layers: ' + str(self.layers))
 
         # loop to add layers to the model
-        for layer in range(self.layers + 1):
+        for layer in range(self.layers):
 
             # add the input layer
             if layer < self.layers - 1:
@@ -250,19 +250,19 @@ class Model:
             else:
 
                 print('adding the last layer')
-                if self.layers == 0:
-                    model.add(
-                        Bidirectional(
-                            LSTM(
-                                self.neurons,
-                                dropout=self.dropout,
-                                kernel_regularizer=self.kernel_regularizer,
-                                kernel_initializer=kernel_initializer,
-                                activation=self.activation,
-                            ),
-                            input_shape=(self.max_length, self.num_functions),
-                        )
+                
+                model.add(
+                    Bidirectional(
+                        LSTM(
+                            self.neurons,
+                            dropout=self.dropout,
+                            kernel_regularizer=self.kernel_regularizer,
+                            kernel_initializer=kernel_initializer,
+                            activation=self.activation,
+                        ),
+                        input_shape=(self.max_length, self.num_functions),
                     )
+                )
 
         # output layer
         model.add(Dense(self.num_functions, activation="softmax"))
