@@ -19,8 +19,10 @@ import numpy as np
 import random
 import pkg_resources
 import absl.logging
-import tensorflow as tf  
+import tensorflow as tf
+
 absl.logging.set_verbosity(absl.logging.ERROR)
+
 
 def get_dict(dict_path):
     """
@@ -32,6 +34,7 @@ def get_dict(dict_path):
     handle.close()
 
     return dictionary
+
 
 def get_optimizer(optimizer_function, learning_rate):
     """
@@ -58,6 +61,7 @@ def get_optimizer(optimizer_function, learning_rate):
 
     return optimizer_function
 
+
 def get_initializer(initializer_function):
     """
     Get the kernel initializer to train the LSTM
@@ -82,25 +86,26 @@ def get_initializer(initializer_function):
 
     return kernel_initializer
 
+
 class Model:
     def __init__(
-        self,
-        phrog_path=pkg_resources.resource_filename(
-            "phynteny_utils", "phrog_annotation_info/phrog_integer.pkl"
-        ),
-        max_length=120,
-        layers=1,
-        neurons=100,
-        batch_size=32,
-        dropout=0.1,
-        activation="tanh",
-        optimizer_function="adam",
-        learning_rate=0.0001,
-        patience=5,
-        min_delta=0.0001,
-        l1_regularizer=0,
-        l2_regularizer=0,
-        kernel_initializer='zeros'
+            self,
+            phrog_path=pkg_resources.resource_filename(
+                "phynteny_utils", "phrog_annotation_info/phrog_integer.pkl"
+            ),
+            max_length=120,
+            layers=1,
+            neurons=100,
+            batch_size=32,
+            dropout=0.1,
+            activation="tanh",
+            optimizer_function="adam",
+            learning_rate=0.0001,
+            patience=5,
+            min_delta=0.0001,
+            l1_regularizer=0,
+            l2_regularizer=0,
+            kernel_initializer='zeros'
     ):
         """
         :param phrog_categories_path: location of the dictionary describing the phrog_categories :param
@@ -217,85 +222,73 @@ class Model:
 
         # get the kernel initializer
         kernel_initializer = get_initializer(self.kernel_intializer)
-        print('NUMB of LAYERS: ' + str(self.layers)) 
-        # input layer
-        if self.layers == 0: 
-            model.add(
-            Bidirectional(
-                LSTM(
-                    self.neurons,
-                    #return_sequences=True,
-                    dropout=self.dropout,
-                    kernel_regularizer=self.kernel_regularizer,
-                    kernel_initializer=kernel_initializer,
-                    activation=self.activation,
-                ),
-                input_shape=(self.max_length, self.num_functions),
-            )
-        )
-        
-        else:
-            model.add(
-            Bidirectional(
-                LSTM(
-                    self.neurons,
-                    return_sequences=True,
-                    dropout=self.dropout,
-                    kernel_regularizer=self.kernel_regularizer,
-                    kernel_initializer=kernel_initializer,
-                    activation=self.activation,
-                ),
-                input_shape=(self.max_length, self.num_functions),
-            )
-        )
 
-        # loop which controls the number of hidden layers
-    
-        for layer in range(self.layers):
-            print('Hidden layer')
-             
-            model.add(
-                Bidirectional(
-                    LSTM(
-                        self.neurons,
-                        #return_sequences=True,
-                        dropout=self.dropout,
-                        kernel_regularizer=self.kernel_regularizer,
-                        kernel_initializer=kernel_initializer,
-                        activation=self.activation,
-                    ),
-                ),
-            )
-            
+        print('Number of layers: ' + str(self.layers))
 
-        #need to return sequence on all but the very last layer so need to rewrite this loop 
+        # loop to add layers to the model
+        for layer in range(self.layers + 1):
+
+            # add the input layer
+            if layer < self.layers - 1:
+                print('adding a layer')
+                model.add(
+                    Bidirectional(
+                        LSTM(
+                            self.neurons,
+                            return_sequences=True,
+                            dropout=self.dropout,
+                            kernel_regularizer=self.kernel_regularizer,
+                            kernel_initializer=kernel_initializer,
+                            activation=self.activation,
+                        ),
+                        input_shape=(self.max_length, self.num_functions),
+                    )
+                )
+
+
+            # add the final hidden layer
+            else:
+
+                print('adding the last layer')
+                if self.layers == 0:
+                    model.add(
+                        Bidirectional(
+                            LSTM(
+                                self.neurons,
+                                dropout=self.dropout,
+                                kernel_regularizer=self.kernel_regularizer,
+                                kernel_initializer=kernel_initializer,
+                                activation=self.activation,
+                            ),
+                            input_shape=(self.max_length, self.num_functions),
+                        )
+                    )
 
         # output layer
-        #model.add(TimeDistributed(Dense(self.num_functions, activation="softmax")))
         model.add(Dense(self.num_functions, activation="softmax"))
-     
+
         # get the optimization function
         optimizer = get_optimizer(
             self.optimizer_function, self.learning_rate
-        )  
+        )
 
         model.compile(
             loss="categorical_crossentropy", metrics=["accuracy"], optimizer=optimizer
-        ) 
+        )
         print(model.summary(), flush=True)
-         
+
         return model
 
     def train_model(
-        self,
-        X_1,
-        y_1,
-        X_val,
-        y_val,
-        model_out="model",
-        history_out="history",
-        epochs=140,
-        save=True,
+            self,
+            X_1,
+            y_1,
+            X_val,
+            y_val,
+            model_out="model",
+            history_out="history",
+            epochs=140,
+            save=True,
     ):
         """
         Function to train the LSTM model and save the trained model
@@ -312,7 +305,7 @@ class Model:
 
         # model with the best validation set accuracy therefore maximise
         model = self.generate_LSTM()
-         
+
         history = model.fit(
             X_1,
             y_1,
@@ -332,12 +325,12 @@ class Model:
             pickle5.dump(history.history, handle, protocol=pickle5.HIGHEST_PROTOCOL)
 
     def train_crossValidation(
-        self,
-        model_out="model",
-        history_out="history",
-        n_splits=10,
-        epochs=140,
-        save=True,
+            self,
+            model_out="model",
+            history_out="history",
+            n_splits=10,
+            epochs=140,
+            save=True,
     ):
         """
         Perform stratified cross-validation
@@ -348,7 +341,7 @@ class Model:
         :param n_splits: number of k-folds to include. 1 is added to this to also generate a test set of equal size
         :param epochs: number of epochs to train for
         """
-        
+
         # get the masked category in each instance 
         masked_cat = [np.where(self.y[i] == 1)[0][0] for i in range(len(self.y))]
 
@@ -360,19 +353,18 @@ class Model:
 
         # investigate each k-fold
         for train_index, val_index in skf.split(np.zeros(len(masked_cat)), masked_cat):
-            
             # generate stratified test and train sets
-            X_train = self.X[train_index, :, :] 
+            X_train = self.X[train_index, :, :]
             y_train = self.y[train_index, :]
-            
+
             # generate validation data for the training
             X_val = self.X[val_index, :, :]
             y_val = self.y[val_index, :]
 
-            #reshape
-            print(y_train.shape) 
-            y_train = y_train.reshape((len(y_train),self.num_functions))
-            y_val = y_val.reshape((len(y_val),self.num_functions)) 
+            # reshape
+            print(y_train.shape)
+            y_train = y_train.reshape((len(y_train), self.num_functions))
+            y_val = y_val.reshape((len(y_val), self.num_functions))
 
             # use the compile function here
             self.train_model(
@@ -473,14 +465,14 @@ def check_parameters(hyperparameters, num_trials):
 
 
 def random_search(
-    data_path,
-    hyperparameters,
-    num_trials,
-    model_out="model",
-    history_out="history",
-    k_folds=10,
-    epochs=140,
-    save=False,
+        data_path,
+        hyperparameters,
+        num_trials,
+        model_out="model",
+        history_out="history",
+        k_folds=10,
+        epochs=140,
+        save=False,
 ):
     """
     Method for random parameter search
