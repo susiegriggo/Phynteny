@@ -217,7 +217,7 @@ class Model:
 
         # get the kernel initializer
         kernel_initializer = get_initializer(self.kernel_intializer)
-
+        print('NUMB of LAYERS: ' + str(self.layers)) 
         # input layer
         if self.layers == 0: 
             model.add(
@@ -250,8 +250,10 @@ class Model:
         )
 
         # loop which controls the number of hidden layers
+    
         for layer in range(self.layers):
-            
+            print('Hidden layer')
+             
             model.add(
                 Bidirectional(
                     LSTM(
@@ -264,6 +266,9 @@ class Model:
                     ),
                 ),
             )
+            
+
+        #need to return sequence on all but the very last layer so need to rewrite this loop 
 
         # output layer
         #model.add(TimeDistributed(Dense(self.num_functions, activation="softmax")))
