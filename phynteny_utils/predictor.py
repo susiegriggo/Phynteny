@@ -28,8 +28,8 @@ def get_models(models ):
     print(models + '/*')
     files = glob.glob(models + '/*')
 
-
     return [tf.keras.models.load_model(m) for m in files]
+
 class Predictor:
     def __init__(
         self, models, phrog_categories_path, threshold, category_names_path
@@ -77,6 +77,7 @@ class Predictor:
             phynteny = [self.category_names.get(e) for e in encodings[0]]
 
         else:
+
             # make data with the categories masked
             X = [format_data.generate_prediction(
                 encodings,
@@ -84,8 +85,8 @@ class Predictor:
                 self.max_length,
                 i,
             ) for i in unk_idx]
-
-            yhat = statistics.phynteny_score(np.array(X).reshape(len(X), self.max_length), self.num_functions, self.models)
+            
+            yhat = statistics.phynteny_score(np.array(X).reshape(len(X), self.max_length, self.num_functions), self.num_functions, self.models)
 
             scores = [yhat[i] for i in range(len(unk_idx))]
 
