@@ -238,8 +238,6 @@ def threshold_metrics(scores, known_categories, category_names):
                                                        ,num,df_test_score)
 
     #TODO test the effect of removing the 0.05. Why did PHANNs include this to begin with
-
-
     df_test_score['class'] = [int(i) for i in df_test_score['class']]
     df_test_score['category'] = [category_names.get(i) for i in df_test_score['class'] ] 
 

@@ -88,7 +88,7 @@ def main(infile, outfile, model, threshold):
             SeqIO.write(gb_dict.get(key), handle, "genbank") 
 
     if outfile: 
-        print('DONE') 
+        print('DONE')
 
 if __name__ == "__main__":
     main()

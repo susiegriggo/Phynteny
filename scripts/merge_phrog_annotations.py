@@ -57,18 +57,3 @@ for d in directories:
                             cds = [i for i in this_prophage.features if i.type == 'CDS']
 
                             # loop through each protein
-                            for c in cds:
-
-                                if 'protein_id' in c.qualifiers.keys():
-
-                                    pid = c.qualifiers.get('protein_id')
-
-                                    if phrogs.get(pid[0]) == None:
-                                        c.qualifiers['phrog'] = 'No_PHROG'
-                                    else:
-                                        c.qualifiers['phrog'] = phrogs.get(pid[0])
-
-                            # write genbank file
-                            SeqIO.write(gb_dict.get(key), handle, 'genbank')
-
-                    handle.close()

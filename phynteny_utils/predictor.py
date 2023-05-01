@@ -23,24 +23,17 @@ def get_dict(dict_path):
 
 def get_models(models ):
     """
-
+    get models stored in a specified path
     """
     print(models + '/*')
     files = glob.glob(models + '/*')
-
-
     return [tf.keras.models.load_model(m) for m in files]
+
 class Predictor:
     def __init__(
         self, models, phrog_categories_path, threshold, category_names_path
     ):
         self.models = get_models(models)
-        self.n_features = (
-            self.models[0].get_config()
-            .get("layers")[0]
-            .get("config")
-            .get("batch_input_shape")[2]
-        )
         self.max_length = (
             self.models[0].get_config()
             .get("layers")[0]
@@ -59,11 +52,6 @@ class Predictor:
 
         encodings = [
             [self.phrog_categories.get(p) for p in phage_dict.get(q).get("phrogs")]
-            for q in list(phage_dict.keys())
-        ]
-
-        features = [
-            format_data.get_features(phage_dict.get(q), features_included="all")
             for q in list(phage_dict.keys())
         ]
 
@@ -91,14 +79,12 @@ class Predictor:
             # make data with the categories masked
             X = [format_data.generate_prediction(
                 encodings,
-                features,
                 self.num_functions,
-                self.n_features,
                 self.max_length,
                 i,
             ) for i in unk_idx]
 
-            yhat = statistics.phynteny_score(np.array(X).reshape(len(X), self.max_length, self.n_features), self.num_functions, self.models)
+            yhat = statistics.phynteny_score(np.array(X).reshape(len(X), self.max_length, self.num_functions), self.num_functions, self.models)
 
             scores = [yhat[i] for i in range(len(unk_idx))]
 

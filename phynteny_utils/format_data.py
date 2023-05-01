@@ -158,7 +158,7 @@ def generate_example(sequence, num_functions, max_length, idx):
 
     return X, y
 
-def generate_prediction(sequence,num_functions,  max_length, idx):
+def generate_prediction(sequence, num_functions, max_length, idx):
     """
     Prepare data to predict the function of all hypothetical genes in a sequence
 
