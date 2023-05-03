@@ -25,10 +25,8 @@ def get_models(models ):
     """
 
     """
-    print(models + '/*')
     files = glob.glob(models + '/*')
-
-    return [tf.keras.models.load_model(m) for m in files]
+    return [tf.keras.models.load_model(m) for m in files if 'h5' in m]
 
 class Predictor:
     def __init__(
@@ -57,7 +55,7 @@ class Predictor:
         ]
 
         unk_idx = [i for i, x in enumerate(encodings[0]) if x == 0]
-        print(len(encodings)) 
+         
         if len(unk_idx) == 0:
             print(
                 "Your phage "
@@ -99,7 +97,7 @@ class Predictor:
         return phynteny
 
     def get_best_prediction(self, s):
-
+         
         if np.max(s) >= self.threshold:
             return np.argmax(s)
 
