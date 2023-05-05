@@ -9,7 +9,8 @@ import click
 from phynteny_utils import handle_genbank
 from phynteny_utils import predictor
 from Bio import SeqIO
-import pkg_resources 
+import pkg_resources
+import pickle5
 
 __author__ = "Susanna Grigson"
 __maintainer__ = "Susanna Grigson"
@@ -31,18 +32,18 @@ __status__ = "development"
     "--model",
     type=click.Path(exists=True),
     help="Path to custom LSTM model",
-    default=pkg_resources.resource_filename('phynteny_utils', 'test_model'),
+    default=pkg_resources.resource_filename('phynteny_utils', 'model'),
 )
 @click.option(
     "-t",
-    "--threshold",
-    type=int,
-    help="Threshold phynteny score to use as a cutoff",
-    default=5
+    "--threshold_path",
+    type=click.Path(exists=True),
+    help="Dictionary of phynteny scores to use as a cutoff",
+    default=pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/phrog_threshold.pkl')
 )
 @click.version_option(version=__version__)
 
-def main(infile, outfile, model, threshold):
+def main(infile, outfile, model, threshold_path):
     """
     Phynteny: synteny-based annotation of phage genes
     """
@@ -50,6 +51,13 @@ def main(infile, outfile, model, threshold):
     # get the absolute paths to phrog annotation files, model and thresholds 
     phrog_categories = pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/phrog_integer.pkl')
     category_names = pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/integer_category.pkl')
+
+    # formulate the dictionary object
+    #threshold_dict = pickle5.load(open(threshold_path, 'rb'))
+    #category_dict = pickle5.load(open(category_names, 'rb'))
+    #print(threshold_dict)
+    #print(category_dict)
+    #convert to numbers using the integer category
     
     # get entries in the genbank file
     gb_dict = handle_genbank.get_genbank(infile)
@@ -59,7 +67,7 @@ def main(infile, outfile, model, threshold):
     keys = list(gb_dict.keys())
 
     # create predictor object
-    gene_predictor = predictor.Predictor(model, phrog_categories, threshold, category_names)
+    gene_predictor = predictor.Predictor(model, phrog_categories, threshold_path, category_names)
 
     # Run Phynteny
     with click.open_file(outfile, "wt") if outfile else sys.stdout as handle:
