@@ -51,15 +51,9 @@ def main(infile, outfile, model, threshold_path):
     # get the absolute paths to phrog annotation files, model and thresholds 
     phrog_categories = pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/phrog_integer.pkl')
     category_names = pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/integer_category.pkl')
-
-    # formulate the dictionary object
-    #threshold_dict = pickle5.load(open(threshold_path, 'rb'))
-    #category_dict = pickle5.load(open(category_names, 'rb'))
-    #print(threshold_dict)
-    #print(category_dict)
-    #convert to numbers using the integer category
-    
+ 
     # get entries in the genbank file
+    print('Reading genbank file!')
     gb_dict = handle_genbank.get_genbank(infile)
     if not gb_dict:
         click.echo("Error: no sequences found in genbank file")
@@ -68,7 +62,7 @@ def main(infile, outfile, model, threshold_path):
 
     # create predictor object
     gene_predictor = predictor.Predictor(model, phrog_categories, threshold_path, category_names)
-
+    print(model) 
     # Run Phynteny
     with click.open_file(outfile, "wt") if outfile else sys.stdout as handle:
 
@@ -95,6 +89,7 @@ def main(infile, outfile, model, threshold_path):
             # write to genbank file
             SeqIO.write(gb_dict.get(key), handle, "genbank") 
 
+            # TODO write to a table format as well that contains the positions and the location of each annotation 
     if outfile: 
         print('DONE')
 
