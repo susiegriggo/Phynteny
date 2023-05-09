@@ -52,13 +52,6 @@ def main(infile, outfile, model, threshold_path):
     phrog_categories = pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/phrog_integer.pkl')
     category_names = pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/integer_category.pkl')
 
-    # formulate the dictionary object
-    #threshold_dict = pickle5.load(open(threshold_path, 'rb'))
-    #category_dict = pickle5.load(open(category_names, 'rb'))
-    #print(threshold_dict)
-    #print(category_dict)
-    #convert to numbers using the integer category
-    
     # get entries in the genbank file
     gb_dict = handle_genbank.get_genbank(infile)
     if not gb_dict:
@@ -93,7 +86,7 @@ def main(infile, outfile, model, threshold_path):
                 cds[i].qualifiers["phynteny"] = phynteny[i]
 
             # write to genbank file
-            SeqIO.write(gb_dict.get(key), handle, "genbank") 
+            SeqIO.write(gb_dict.get(key), handle, "genbank")
 
     if outfile: 
         print('DONE')
