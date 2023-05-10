@@ -15,7 +15,7 @@ directories = glob2.glob('/home/edwa0468/phage/Prophage/phispy/phispy/GCA/' + '/
 
 for d in directories:
 
-    e = glob2.glob(d + '/**', recursive=True)
+    e = glob2.glob(d + '/**',cd GI recursive=True)
     zipped_gdict = [i for i in e if i[-6:] == 'gbk.gz']
 
     for file in zipped_gdict:
