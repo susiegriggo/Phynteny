@@ -3,13 +3,11 @@ Python script to convert phynteny generate file to a table which describes the i
 """
 
 # imports
-import pandas as pd
 from phynteny_utils import handle_genbank
 from phynteny_utils import format_data
 import click
 import sys
 import pkg_resources
-
 
 @click.command()
 @click.argument("infile", type=click.Path(exists=True))
@@ -19,6 +17,7 @@ import pkg_resources
     type=click.Path(),
     help="where to write the output genbank file",
 )
+
 def main(infile, outfile):
     # get the absolute paths to phrog annotation files, model and thresholds
     print('STARTING', flush=True)
@@ -40,35 +39,26 @@ def main(infile, outfile):
         sys.exit()
     keys = list(gb_dict.keys())
 
-    df = pd.DataFrame()
-    counter = 0
-
     print('looping through the genbank file', flush=True)
-    for k in keys:
-        print(k, flush=True)
-        cds = [f for f in gb_dict.get(k).features if f.type == 'CDS']
+    with open(outfile, 'w') as f:
+        f.write("start\tend\tstrand\tphrog_category\tphynteny_category\tphage\n")
+        for k in keys:
+            print(k, flush=True)
+            cds = [f for f in gb_dict.get(k).features if f.type == 'CDS']
 
-        # extract the features for the cds
-        start = [c.location.start for c in cds]
-        end = [c.location.end for c in cds]
-        strand = [c.strand for c in cds]
-        phrog = [c.qualifiers.get('phrog')[0] for c in cds]
-        phynteny = [c.qualifiers.get('phynteny')[0] for c in cds]
-        known_category = [category_names.get(phrog_categories.get(p)) for p in phrog]
+            # extract the features for the cds
+            start = [c.location.start for c in cds]
+            end = [c.location.end for c in cds]
+            strand = [c.strand for c in cds]
+            phrog = [c.qualifiers.get('phrog')[0] for c in cds]
+            phynteny = [c.qualifiers.get('phynteny')[0] for c in cds]
+            known_category = [category_names.get(phrog_categories.get(p)) for p in phrog]
 
-        # make a dataframe
-        this_df = pd.DataFrame({"start": start, "end": end, "strand": strand, "phrog_category": known_category,
-                                "phynteny_category": phynteny, "phage": [k for i in range(len(cds))]})
-        if counter == 0:
-            df = this_df
-        else:
-            df = pd.concat([df, this_df], axis=1)
-        counter += 1
+            # write to the file
+            for i in range(len(cds)):
+                f.write(f"{start[i]}\t{end[i]}\t{strand[i]}\t{known_category[i]}\t{phynteny[i]}\t{k}\n")
 
     print('saving', flush=True)
-    # save the df to a file
-    df.to_csv(outfile, sep='\t')
-
 
 if __name__ == "__main__":
     main()
