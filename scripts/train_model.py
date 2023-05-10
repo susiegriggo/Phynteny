@@ -9,7 +9,6 @@ from phynteny_utils import train_model
 import click
 import pkg_resources
 
-
 @click.command()
 # @click.option("--data", "-d", help="File path to training data")
 @click.option("--x_path", "-x", help="File path to X training data")

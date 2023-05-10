@@ -1,5 +1,7 @@
 """
 Module to create a predictor object
+
+Is an option to parse an custom dictionary for the thresholds if the user isn't bothered by the cutoffs
 """
 
 # imports
@@ -29,9 +31,18 @@ def get_models(models ):
     print(files) 
     return [tf.keras.models.load_model(m) for m in files if 'h5' in m]
 
+def make_thresholds(threshold_dict, category_names):
+    """
+    Make threshold dictionary
+    """
+
+    tmp = dict(zip(list(category_names.values()), list(category_names.keys())))
+    vals = [tmp.get(k) for k in list(threshold_dict.keys())]
+    return dict(zip(vals, threshold_dict.values()))
+
 class Predictor:
     def __init__(
-        self, models, phrog_categories_path, threshold, category_names_path
+        self, models, phrog_categories_path, threshold_dict, category_names_path
     ):
         self.models = get_models(models)
         self.max_length = (
@@ -41,8 +52,9 @@ class Predictor:
             .get("batch_input_shape")[1]
         )
         self.phrog_categories = get_dict(phrog_categories_path)
-        self.threshold = threshold
+        self.threshold_dict = get_dict(threshold_dict)
         self.category_names = get_dict(category_names_path)
+        self.eval_thresh = make_thresholds(self.threshold_dict, self.category_names)
         self.num_functions = len(self.category_names)
 
     def predict_annotations(self, phage_dict):
@@ -108,3 +120,13 @@ class Predictor:
         else:
             return 0
 
+    def get_best_prediction(self, s):
+        """
+        Evaluate the best category using the pre-computed thresholds
+        """
+
+        if max(s) >= self.eval_thresh.get(np.argmax(s)):
+            return np.argmax(s)
+
+        else:
+            return 0

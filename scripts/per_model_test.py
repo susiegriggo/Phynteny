@@ -39,7 +39,7 @@ def main(base, x, y, out):
     print('Computing Phynteny Scores')
     scores = statistics.phynteny_score(test_X, len(category_names), models)
     known_categories = statistics.known_category(test_X, test_y, len(category_names))
-
+    print(scores.shape) 
     # build the ROC curve for this data
     print('Building ROC curve')
     print('scores')
