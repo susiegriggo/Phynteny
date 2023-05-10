@@ -26,6 +26,7 @@ def get_models(models ):
 
     """
     files = glob.glob(models + '/*')
+    print(files) 
     return [tf.keras.models.load_model(m) for m in files if 'h5' in m]
 
 class Predictor:
@@ -84,8 +85,11 @@ class Predictor:
                 i,
             ) for i in unk_idx]
             
-            yhat = statistics.phynteny_score(np.array(X).reshape(len(X), self.max_length, self.num_functions), self.num_functions, self.models)
+            print(self.max_length) 
+            print(self.num_functions)
 
+            yhat = statistics.phynteny_score(np.array(X).reshape(len(X), self.max_length, self.num_functions), self.num_functions, self.models)
+            
             scores = [yhat[i] for i in range(len(unk_idx))]
 
             predictions = [self.get_best_prediction(s) for s in scores]

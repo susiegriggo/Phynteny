@@ -27,9 +27,9 @@ def main(base, x, y, out):
 
     # fetch the testing data
     test_X = pickle5.load(open(x, 'rb'))
-    test_X = list(test_X.values())
+    test_X = list(test_X.values())[:100]
     test_y = pickle5.load(open(y, 'rb'))
-    test_y = list(test_y.values())
+    test_y = list(test_y.values())[:100]
 
     # fetch the models
     files = glob.glob(base + '/*')
@@ -42,6 +42,13 @@ def main(base, x, y, out):
 
     # build the ROC curve for this data
     print('Building ROC curve')
+    print('scores')
+    #print(scores) 
+    #print('known categories')
+    #print(known_categories) 
+    #print('category names')
+    #print(category_names)
+    #print(scores.shape) 
     ROC_df = statistics.build_roc(scores, known_categories, category_names)
     ROC_df.to_csv(out + 'ROC.tsv', sep='\t')
 
