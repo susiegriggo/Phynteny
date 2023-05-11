@@ -24,12 +24,11 @@ test. Phynteny takes a genbank file containing PHROG annotations as input. If yo
 ```
 phynteny test_phage.gbk  -o test_phage_reannotated.gbk 
 ```
-
 If you wish to specify your own LSTM model and thresholds, you can run: 
+
 ```
 phynteny test_phage.gbk -o test_phage_reannotated.gbk -m your_model.h5 -t custom_thresholds.pkl 
 ```
-
 where custom_thresholds is dictionary contanining a softmax threshold for each of the nine PHROG categories 
 
 ## Training Phynteny 
@@ -42,16 +41,14 @@ Use `-i` as a text file with the paths to the genbank files
 python generate_training_data.py -i genbank_files.txt -o training_dataset.pkl -max_genes 120 -gene_cat 4 -c 11
 python train_model.py ... 
 ```
-
 This command generates training data including prophages with a maximum of 120 genes where each contains at least four different PHROG categories. The output data is separated into 11 different chunks which can be used for training with k-fold validation. 
 
 **WARNING** Without a GPU training will take a very very long time! 
 
-scripts are included to test your train models. Can refer to the included notebooks. 
+Scripts are included to test and train models. Can refer to the included notebooks to help choose optimal thresholds and evaluate performance. 
 
 ## Bugs and Suggestions 
 If you break Phynteny or would like to make any suggestions please open an issue or email me at susie.grigson@flinders.edu.au 
-
 
 ## Citation 
 TODO 
