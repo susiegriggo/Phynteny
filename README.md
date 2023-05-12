@@ -34,7 +34,7 @@ If you wish to specify your own LSTM model and thresholds, you can run:
 phynteny your_phage.gbk -o your_phage_reannotated.gbk -m your_model.h5 -t custom_thresholds.pkl 
 ```
 
-where custom_thresholds is dictionary contanining a softmax threshold for each of the nine PHROG categories. 
+where ```custom_thresholds.pkl``` is a dictionary contanining a softmax threshold for each of the nine PHROG categories. 
 
 ## Training Phynteny 
 Phynteny has already been trained for you on a [massive dataset of prophages](https://www.biorxiv.org/content/10.1101/2023.04.20.537752v1.abstract)!  
