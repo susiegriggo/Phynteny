@@ -169,7 +169,7 @@ def generate_prediction(sequence, num_functions, max_length, idx):
     """
 
     # construct features
-    seq_len = len(sequence)
+    seq_len = len(sequence) 
     padded_sequence = pad_sequences(sequence, padding="post", maxlen=max_length)[0]
 
     X = np.array(one_hot_encode(padded_sequence, num_functions))
