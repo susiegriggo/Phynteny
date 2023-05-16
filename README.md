@@ -51,5 +51,6 @@ Scripts are included to test and train models. Can refer to the included noteboo
 If you break Phynteny or would like to make any suggestions please open an issue or email me at susie.grigson@flinders.edu.au 
 
 ## Citation 
-TODO 
-If you use pharokka to first annotate your phage please site it as well! 
+If you use pharokka to first annotate your phage please site it as well! <br> 
+
+George Bouras, Roshan Nepal, Ghais Houtak, Alkis James Psaltis, Peter-John Wormald, Sarah Vreugde, Pharokka: a fast scalable bacteriophage annotation tool, Bioinformatics, Volume 39, Issue 1, January 2023, btac776, https://doi.org/10.1093/bioinformatics/btac776
