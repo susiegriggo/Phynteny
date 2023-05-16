@@ -170,7 +170,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
         fwd_list,
         plotstyle="arrow",
         r_lim=(75, 80),
-        fc=dna_col + 80,
+        fc=dna_col + "80",
     )
 
     rev_list = []
