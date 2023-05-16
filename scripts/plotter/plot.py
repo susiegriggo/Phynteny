@@ -28,7 +28,11 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
     cds_track.axis(fc="#EEEEEE", ec="none")
 
 #### plot each PHROG fwd and reverse
-## colours 
+## colours
+
+## update colours
+
+
 
 #4deeea              
 #74ee15
@@ -43,7 +47,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
 
 # unknown 
 
-    unk_col = '#4deeea'
+    unk_col = "#AAAAAA"
 
     unk_fwd_list = []
     for f in gff.extract_features("CDS", target_strand=1):
@@ -71,7 +75,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
 
 # other
 
-    other_col = '#4deeea'
+    other_col = "#a6761d"
 
     fwd_list = []
     for f in gff.extract_features("CDS", target_strand=1):
@@ -99,7 +103,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
 
 # tail 
 
-    tail_col = '#74ee15'
+    tail_col = "#e6ab02"
 
     fwd_list = []
     for f in gff.extract_features("CDS", target_strand=1):
@@ -127,7 +131,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
 
 # transcription regulation
 
-    transcription_col = '#ffe700'
+    transcription_col = "#80b1d3"
 
     fwd_list = []
     for f in gff.extract_features("CDS", target_strand=1):
@@ -155,7 +159,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
 
 # DNA, RNA and nucleotide metabolism
 
-    dna_col = '#f000ff'
+    dna_col = "#e7298a"
 
     fwd_list = []
     for f in gff.extract_features("CDS", target_strand=1):
@@ -183,7 +187,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
 
 #lysis
 
-    lysis_col = '#001eff'
+    lysis_col = "#66a61e"
 
     fwd_list = []
     for f in gff.extract_features("CDS", target_strand=1):
@@ -211,7 +215,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
 
 # moron, auxiliary metabolic gene and host takeover
 
-    moron_col = '#8900ff'
+    moron_col = "#cab2d6"
 
     fwd_list = []
     for f in gff.extract_features("CDS", target_strand=1):
@@ -239,7 +243,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
 
 # integration and excision
 
-    int_col = '#E0B0FF'
+    int_col = "#1b9e77"
 
     fwd_list = []
     for f in gff.extract_features("CDS", target_strand=1):
@@ -268,7 +272,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
 
 # head and packaging
 
-    head_col = '#ff008d'
+    head_col = "#7570b3"
 
     fwd_list = []
     for f in gff.extract_features("CDS", target_strand=1):
@@ -296,7 +300,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
 
 # connector
 
-    con_col = '#808080'
+    con_col = "#d95f02"
 
     fwd_list = []
     for f in gff.extract_features("CDS", target_strand=1):
