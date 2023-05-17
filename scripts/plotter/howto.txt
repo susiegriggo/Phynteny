@@ -2,4 +2,7 @@ George's pharokka plotter script
 
 Make changes to have this work on phynteny annotations 
 
-Instead of giving pharokka out directory see if I can give it just the phynteny genbank file and the pharokka gff file 
+Instead of giving pharokka out directory see if I can give it just the phynteny genbank file and the pharokka gff file
+
+# example of how to run the pharokka plotter 
+python pharokka_plotter.py -i ~/scratch/phynteny_data/testing_data/ibd/fasta/phage_comp_227_cycle_1.fa -n plot_test --gff ~/scratch/phynteny_data/testing_data/ibd/pharokka/phage_comp_227_cycle_1.pharokka.out/pharokka.gff --genbank phage_comp_277_cycle_1.phynteny.gbk  

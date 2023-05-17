@@ -13,7 +13,8 @@ import sys
 def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_title, truncate, outfile, dpi, label_size, label_hypotheticals, remove_other_features_labels):
 
     gff = Gff(gff_file)
-
+    #print(gff.extract_features("CDS", target_strand=-1)) 
+    
     # get only to range of gff - as by default gbk takes all contigs, gff only the first
     gbk = Genbank(gbk_file, max_range = gff.range_size)
 
@@ -51,6 +52,8 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
 
     unk_fwd_list = []
     for f in gff.extract_features("CDS", target_strand=1):
+        #print(f) 
+
         if f.qualifiers.get("function")[0] == 'unknown function' and f.qualifiers.get("phynteny")[0] == 'unknown function':
             unk_fwd_list.append(f)
 
@@ -63,7 +66,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
 
     unk_rev_list = []
     for f in gff.extract_features("CDS", target_strand=-1):
-        if f.qualifiers.get("function")[0] == 'unknown function':
+        if f.qualifiers.get("function")[0] == 'unknown function' and f.qualifiers.get("phynteny")[0] == 'unknown function':
             unk_rev_list.append(f)
 
     cds_track.genomic_features(
@@ -102,7 +105,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
     )
 
     # phynteny predictions
-
+    
     fwd_list = []
     for f in gff.extract_features("CDS", target_strand=1):
         if f.qualifiers.get("phynteny")[0] == 'other' and f.qualifiers.get("function")[0] == 'unknown function':
@@ -126,7 +129,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
         r_lim=(70, 75),
         fc=other_col + "80",
     )
-
+    
 # tail 
 
     tail_col = "#e6ab02"
@@ -156,7 +159,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
     )
 
     # phynteny predictions
-
+    
     fwd_list = []
     for f in gff.extract_features("CDS", target_strand=1):
         if f.qualifiers.get("phynteny")[0] == 'tail' and f.qualifiers.get("function")[0] == 'unknown function':
@@ -180,7 +183,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
         r_lim=(70, 75),
         fc=tail_col + "80",
     )
-
+    
 # transcription regulation
 
     transcription_col = "#80b1d3"
@@ -210,7 +213,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
     )
 
     # phynteny predictions
-
+    
     fwd_list = []
     for f in gff.extract_features("CDS", target_strand=1):
         if f.qualifiers.get("phynteny")[0] == 'transcription regulation' and f.qualifiers.get("function")[0] == 'unknown function':
@@ -234,7 +237,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
         r_lim=(70, 75),
         fc=transcription_col + "80",
     )
-
+    
 # DNA, RNA and nucleotide metabolism
 
     dna_col = "#e7298a"
@@ -264,6 +267,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
     )
 
     # phynteny predictions
+    
     fwd_list = []
     for f in gff.extract_features("CDS", target_strand=1):
         if f.qualifiers.get("phynteny")[0] == 'DNA' and f.qualifiers.get("function")[0] == 'unknown function':
@@ -287,7 +291,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
         r_lim=(70, 75),
         fc=dna_col + "80",
     )
-
+    
 
 #lysis
 
@@ -318,6 +322,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
     )
 
     # phynteny predictions
+    
     fwd_list = []
     for f in gff.extract_features("CDS", target_strand=1):
         if f.qualifiers.get("phynteny")[0] == 'lysis' and f.qualifiers.get("function")[0] == 'unknown function':
@@ -341,6 +346,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
         r_lim=(70, 75),
         fc=lysis_col +"80",
     )
+    
 
 # moron, auxiliary metabolic gene and host takeover
 
@@ -369,8 +375,10 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
         r_lim=(70, 75),
         fc=moron_col,
     )
+    
 
     # phynteny predictions
+    
     fwd_list = []
     for f in gff.extract_features("CDS", target_strand=1):
         if f.qualifiers.get("phynteny")[0] == 'moron' and f.qualifiers.get("function")[0] == 'unknown function':
@@ -394,6 +402,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
         r_lim=(70, 75),
         fc=moron_col + "80",
     )
+    
 
     # integration and excision
 
@@ -424,7 +433,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
     )
 
     # phynteny predictions
-
+    
     fwd_list = []
     for f in gff.extract_features("CDS", target_strand=1):
         if f.qualifiers.get("phynteny")[0] == 'integration and excision' and f.qualifiers.get("function")[0] == 'unknown function':
@@ -449,7 +458,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
         fc=int_col + "80",
     )
 
-
+    
 # head and packaging
 
     head_col = "#7570b3"
@@ -479,6 +488,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
     )
 
     #phynteny predictions
+    
     fwd_list = []
     for f in gff.extract_features("CDS", target_strand=1):
         if f.qualifiers.get("phynteny")[0] == 'head and packaging' and f.qualifiers.get("function")[0] == 'unknown function':
@@ -502,7 +512,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
         r_lim=(70, 75),
         fc=head_col + "80",
     )
-
+    
 # connector
 
     con_col = "#d95f02"
@@ -532,7 +542,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
     )
 
     # phynteny predictions
-
+    
     fwd_list = []
     for f in gff.extract_features("CDS", target_strand=1):
         if f.qualifiers.get("phynteny")[0] == 'connector' and f.qualifiers.get("function")[0] == 'unknown function':
@@ -556,7 +566,7 @@ def create_plot( gff_file,gbk_file,  interval, annotations, title_size, plot_tit
         r_lim=(70, 75),
         fc=con_col + "80",
     )
-
+     
 ###################################################
 #### Extra Features
 ###################################################

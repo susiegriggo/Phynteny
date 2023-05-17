@@ -1,10 +1,3 @@
-"""
-Copied from pharokka 
-
-Work with this to plot phynteny annotations and use nicer colours 
-""" 
-
-
 #!/usr/bin/env python3
 import argparse
 import os
