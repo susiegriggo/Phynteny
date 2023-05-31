@@ -34,30 +34,42 @@ def main(infile, outfile):
     # get entries in the genbank file
     print('Reading the genbank file', flush=True)
     gb_dict = handle_genbank.get_genbank(infile)
+    
     if not gb_dict:
         click.echo("Error: no sequences found in genbank file")
         sys.exit()
     keys = list(gb_dict.keys())
+    
 
     print('looping through the genbank file', flush=True)
     with open(outfile, 'w') as f:
-        f.write("start\tend\tstrand\tphrog_category\tphynteny_category\tphage\n")
+        f.write("start\tend\tstrand\tphrog_id\tphrog_category\tphynteny_category\tphage\n")
+
+         
         for k in keys:
-            print(k, flush=True)
+            #print(k, flush=True)
             cds = [f for f in gb_dict.get(k).features if f.type == 'CDS']
 
             # extract the features for the cds
             start = [c.location.start for c in cds]
             end = [c.location.end for c in cds]
             strand = [c.strand for c in cds]
-            phrog = [c.qualifiers.get('phrog')[0] for c in cds]
+            
+            phrog = []
+            
+            for c in cds: 
+                if 'phrog' in c.qualifiers.keys(): 
+                    phrog.append(c.qualifiers.get('phrog')[0])
+                else: 
+                    phrog.append('No_PHROG')
+             
             phynteny = [c.qualifiers.get('phynteny')[0] for c in cds]
             known_category = [category_names.get(phrog_categories.get(p)) for p in phrog]
-
-            # write to the file
+            
             for i in range(len(cds)):
-                f.write(f"{start[i]}\t{end[i]}\t{strand[i]}\t{known_category[i]}\t{phynteny[i]}\t{k}\n")
-
+                f.write(f"{start[i]}\t{end[i]}\t{strand[i]}\t{phrog[i]}\t{known_category[i]}\t{phynteny[i]}\t{k}\n")
+             
+            
     print('saving', flush=True)
 
 if __name__ == "__main__":
