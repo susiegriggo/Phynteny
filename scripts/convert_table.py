@@ -43,7 +43,7 @@ def main(infile, outfile):
 
     print('looping through the genbank file', flush=True)
     with open(outfile, 'w') as f:
-        f.write("start\tend\tstrand\tphrog_id\tphrog_category\tphynteny_category\tphage\n")
+        f.write("ID\tstart\tend\tstrand\tphrog_id\tphrog_category\tphynteny_category\tphage\n")
 
          
         for k in keys:
@@ -54,7 +54,7 @@ def main(infile, outfile):
             start = [c.location.start for c in cds]
             end = [c.location.end for c in cds]
             strand = [c.strand for c in cds]
-            
+            ID = [c.qualifiers.get('ID')[0] for c in cds]  
             phrog = []
             
             for c in cds: 
@@ -67,7 +67,7 @@ def main(infile, outfile):
             known_category = [category_names.get(phrog_categories.get(p)) for p in phrog]
             
             for i in range(len(cds)):
-                f.write(f"{start[i]}\t{end[i]}\t{strand[i]}\t{phrog[i]}\t{known_category[i]}\t{phynteny[i]}\t{k}\n")
+                f.write(f"{ID[i]}\t{start[i]}\t{end[i]}\t{strand[i]}\t{phrog[i]}\t{known_category[i]}\t{phynteny[i]}\t{k}\n")
              
             
     print('saving', flush=True)

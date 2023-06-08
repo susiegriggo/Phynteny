@@ -17,7 +17,9 @@ import pkg_resources
 @click.option('--base', '-b', type=click.Path(), help='base to where the model paths are located. All k-folds should be placed in the same directory')
 @click.option('-x', type=click.Path(), help='file path to the testing data X components')
 @click.option('-y', type=click.Path(), help='file path to the testing data y components')
+@click.option('-out', type=click.Path(), help='output confidence dictionary')
 @click.option('--out', '-o', type=click.Path(), help='output file path')
+
 
 def main(base, x, y, out):
 
@@ -40,46 +42,15 @@ def main(base, x, y, out):
     # compute the phynteny scores
     print('Computing Phynteny Scores')
     scores = statistics.phynteny_score(test_X, len(category_names), models)
-    print(pd.DataFrame(test_y))
-    print(pd.DataFrame(scores))
-
-    scores_df = pd.DataFrame(scores)
-    test_y_df = pd.DataFrame(test_y)
-
-    scores_df.to_csv('ex_scores_df.tsv', sep = '\t')
-    test_y_df.to_csv('ex_test_y_df.tsv', sep = '\t')
-
-    known_categories = statistics.known_category(test_X, test_y, len(category_names))
-    #print(known_categories)
-    # distinguish flase positive predictions from false negative predictions and generate the conusion matrix
-
-
-    # build the ROC curve for this data
-    print('Building ROC curve')
-    print('scores')
     
-    ROC_df = statistics.build_roc(scores, known_categories, category_names)
-    ROC_df.to_csv(out + 'ROC.tsv', sep='\t')
+    # get the labels and the predcted labels 
+    label = np.array([np.argmax(i) for i in test_y])
+    prediction = np.array([np.argmax(score) for idx, score in enumerate(scores)])
 
-    """
-    # compute the classification report
-    print('Generating metrics')
-    report = statistics.classification_report(known_categories, [np.argmax(i) for i in scores], output_dict=True)
-    with open(out + 'report.pkl', "wb") as f:
-        pickle5.dump(report, f)
-
-    # calculate the AUC for each category
-    print('Calculating AUC')
-    auc = statistics.per_category_auc(scores, known_categories, category_names)
-    with open(out + 'AUC.pkl', "wb") as f:
-        pickle5.dump(auc, f)
-
-    # get the thresholds
-    print('Generating thresholds')
-    phynteny_df = statistics.threshold_metrics(scores, known_categories, category_names)
-    phynteny_df.to_csv(out + 'threshold_metrics.tsv', sep = '\t')
-    """
-
+    # generate dictionary to sae the confidence dictionary 
+    bandwidth = np.arange(0,5, 0.005)[1:]
+    confidence_dict = statistics.build_confidence_dict(label, prediction, scores, bandwidth)
+    
     print('FINISHED')
 
 if __name__ == "__main__":

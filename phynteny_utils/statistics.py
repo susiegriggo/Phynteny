@@ -24,6 +24,54 @@ def phynteny_score(X_encodings, num_categories, models):
 
     return np.array(scores_list).sum(axis=0)
 
+
+def build_confidence_dict(label, prediction, bandwidth):
+
+    # range over values to compute kernel density over
+    vals = np.arange(1.5, 10, 0.001)
+
+    # save a dictionary which contains all the information required to compute confidence scores
+    confidence_dict = dict()
+
+    # loop through the categories
+    for cat in range(1,10):
+
+        # fetch the true labels of the predictions of this category
+        this_labels = label[prediction == cat]
+
+        # fetch the scores associated with these predictions
+        this_scores = scores[prediction == cat]
+
+        # separate false positives and true positives
+        TP_scores = this_scores[this_labels == cat]
+        FP_scores = this_scores[this_labels != cat]
+
+        # loop through potential bandwidths
+        for b in bandwidth:
+
+            # compute the kernel density
+            kde_TP = KernelDensity(kernel='gaussian', bandwidth=b)
+            kde_TP.fit(TP_scores[:, cat].reshape(-1,1))
+            e_TP = np.exp(kde_TP.score_samples(vals.reshape(-1,1)))
+
+            kde_FP = KernelDensity(kernel='gaussian', bandwidth=b)
+            kde_FP.fit(FP_scores[:, cat].reshape(-1,1))
+            e_FP = np.exp(kde_FP.score_samples(vals.reshape(-1,1)))
+
+            conf_kde = (e_TP*len(TP_scores))/(e_TP*len(TP_scores) + e_FP*len(FP_scores))
+
+            if count_critical_points(conf_kde) <= 1:
+                break
+
+        #save the best estimators
+        confidence_dict[categories.get(cat)] = {"kde_TP": kde_TP,
+                                                "kde_FP": kde_FP,
+                                                "num_TP": len(TP_scores),
+                                                "num_FP": len(FP_scores),
+                                                "bandwidth": b}
+
+    return confidence_dict 
+
 def known_category(X_encodings, y_encodings, num_categories): 
     """
     Return the category of a masked gene in the test set
@@ -242,4 +290,44 @@ def threshold_metrics(scores, known_categories, category_names):
     df_test_score['category'] = [category_names.get(i) for i in df_test_score['class'] ] 
 
     return df_test_score 
+
+def count_critical_points(arr):
+    return np.sum(np.diff(np.sign(np.diff(arr))) != 0)
+
+def compute_confidence(scores, confidence_dict):
+    """
+    Function which computes the confidence of a Phynteny prediction
+    Input is a vector of Phynteny scores
+    """
+
+    # get the prediction for each score
+    score_predictions = np.array([np.argmax(score) for idx, score in enumerate(scores)])
+
+    # make an array to store the confidence of each prediction
+    confidence_out = np.zeros(len(scores))
+    predictions_out = np.zeros(len(scores))
+
+    # loop through each of potential categories
+    for i in range(1,10):
+
+        # get the scores relevant to the current category
+        cat_scores = scores[score_predictions == i]
+
+        # compute the kernel density estimates
+        e_TP = np.exp(confidence_dict.get(categories.get(i)).get('kde_TP').score_samples(cat_scores[:,i].reshape(-1,1)))
+        e_FP = np.exp(confidence_dict.get(categories.get(i)).get('kde_FP').score_samples(cat_scores[:,i].reshape(-1,1)))
+
+        # fetch the number of TP and FP
+        num_TP = confidence_dict.get(categories.get(i)).get('num_TP')
+        num_FP = confidence_dict.get(categories.get(i)).get('num_FP')
+
+        # compute the confidence scores
+        conf_kde = (e_TP*num_TP)/(e_TP*num_TP + e_FP*num_FP)
+
+        # save the scores to the output vector
+        confidence_out[score_predictions == i ] = conf_kde
+        predictions_out[score_predictions == i] = [i for k in range(len(conf_kde))]
+
+    return predictions_out, confidence_out
+
     
