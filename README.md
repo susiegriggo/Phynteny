@@ -45,7 +45,7 @@ This command generates training data including prophages with a maximum of 120 g
 
 **WARNING** Without a GPU training will take a very very long time! 
 
-Scripts are included to test and train models. Notebooks will be included soon to help choose optimal thresholds and evaluate performance. 
+Once you've trained your model you will need to take steps to generate an object specific to your model which can be used to compute the confidence of your predictions. We compute confidence using kernel densities (you can read why [here](https://arxiv.org/abs/2207.06529))
 
 ## Bugs and Suggestions 
 If you break Phynteny or would like to make any suggestions please open an issue or email me at susie.grigson@flinders.edu.au 
