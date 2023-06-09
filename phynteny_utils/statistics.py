@@ -48,7 +48,7 @@ def build_confidence_dict(label, prediction, scores, bandwidth):
         FP_scores = this_scores[this_labels != cat]
 
         # loop through potential bandwidths
-        for b in tqdm(range(len(bandwidth)):
+        for b in tqdm(range(len(bandwidth))):
 
             # compute the kernel density
             kde_TP = KernelDensity(kernel='gaussian', bandwidth=bandwidth[b])
