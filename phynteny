@@ -35,20 +35,20 @@ __status__ = "development"
     default=pkg_resources.resource_filename('phynteny_utils', 'model'),
 )
 @click.option(
-    "-t",
-    "--threshold_path",
+    "-c",
+    "--confidence_path",
     type=click.Path(exists=True),
-    help="Dictionary of phynteny scores to use as a cutoff",
-    default=pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/phrog_threshold.pkl')
+    help="Dictionary of kernel desnity estimators to use for predicting confidence",
+    default=pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/confidence_kde.pkl')
 )
 @click.version_option(version=__version__)
 
-def main(infile, outfile, model, threshold_path):
+def main(infile, outfile, model, confidence_path):
     """
     Phynteny: synteny-based annotation of phage genes
     """
 
-    # get the absolute paths to phrog annotation files, model and thresholds 
+    # get the absolute paths to phrog annotation files, model and confidence_kde
     phrog_categories = pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/phrog_integer.pkl')
     category_names = pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/integer_category.pkl')
 
@@ -61,7 +61,7 @@ def main(infile, outfile, model, threshold_path):
     keys = list(gb_dict.keys())
 
     # create predictor object
-    gene_predictor = predictor.Predictor(model, phrog_categories, threshold_path, category_names)
+    gene_predictor = predictor.Predictor(model, phrog_categories, confidence_path, category_names)
     print(model) 
     # Run Phynteny
     with click.open_file(outfile, "wt") if outfile else sys.stdout as handle:
@@ -79,12 +79,14 @@ def main(infile, outfile, model, threshold_path):
             ]
 
             # make predictions
-            phynteny = gene_predictor.predict_annotations(phages)
+            predictons, scores, confidence = gene_predictor.predict_annotations(phages)
 
             # update with these annotations
             cds = [i for i in gb_dict.get(key).features if i.type == "CDS"]
             for i in range(len(cds)):
-                cds[i].qualifiers["phynteny"] = phynteny[i]
+                cds[i].qualifiers["phynteny"] = predictons[i]
+                cds[i].qualifiers["phynteny_score"] = scores[i]
+                cds[i].qualifiers["phynteny_confidence"] = confidence[i]
 
             # write to genbank file
             SeqIO.write(gb_dict.get(key), handle, "genbank")

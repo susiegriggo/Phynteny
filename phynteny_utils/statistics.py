@@ -4,10 +4,10 @@ Module to handle statistics for Phynteny
 This module uses code snippets from PHaNNs https://github.com/Adrian-Cantu/PhANNs
 """ 
 
-import numpy as np 
-import glob 
-import pandas as pd 
-from sklearn.metrics import classification_report 
+import numpy as np
+import pandas as pd
+from tqdm import tqdm
+from sklearn.neighbors import KernelDensity
 from sklearn.metrics import roc_auc_score, roc_curve
 
 def phynteny_score(X_encodings, num_categories, models):
@@ -24,8 +24,7 @@ def phynteny_score(X_encodings, num_categories, models):
 
     return np.array(scores_list).sum(axis=0)
 
-
-def build_confidence_dict(label, prediction, bandwidth):
+def build_confidence_dict(label, prediction, scores, bandwidth):
 
     # range over values to compute kernel density over
     vals = np.arange(1.5, 10, 0.001)
@@ -34,8 +33,10 @@ def build_confidence_dict(label, prediction, bandwidth):
     confidence_dict = dict()
 
     # loop through the categories
+    print('Computing kernel denisty for each category...')
     for cat in range(1,10):
 
+        print('processing '+ str(cat))
         # fetch the true labels of the predictions of this category
         this_labels = label[prediction == cat]
 
@@ -47,10 +48,10 @@ def build_confidence_dict(label, prediction, bandwidth):
         FP_scores = this_scores[this_labels != cat]
 
         # loop through potential bandwidths
-        for b in bandwidth:
+        for b in tqdm(range(len(bandwidth)):
 
             # compute the kernel density
-            kde_TP = KernelDensity(kernel='gaussian', bandwidth=b)
+            kde_TP = KernelDensity(kernel='gaussian', bandwidth=bandwidth[b])
             kde_TP.fit(TP_scores[:, cat].reshape(-1,1))
             e_TP = np.exp(kde_TP.score_samples(vals.reshape(-1,1)))
 
@@ -68,7 +69,7 @@ def build_confidence_dict(label, prediction, bandwidth):
                                                 "kde_FP": kde_FP,
                                                 "num_TP": len(TP_scores),
                                                 "num_FP": len(FP_scores),
-                                                "bandwidth": b}
+                                                "bandwidth": bandwidth[b]}
 
     return confidence_dict 
 
