@@ -24,7 +24,7 @@ def phynteny_score(X_encodings, num_categories, models):
 
     return np.array(scores_list).sum(axis=0)
 
-def build_confidence_dict(label, prediction, scores, bandwidth):
+def build_confidence_dict(label, prediction, scores, bandwidth, categories):
 
     # range over values to compute kernel density over
     vals = np.arange(1.5, 10, 0.001)
@@ -55,7 +55,7 @@ def build_confidence_dict(label, prediction, scores, bandwidth):
             kde_TP.fit(TP_scores[:, cat].reshape(-1,1))
             e_TP = np.exp(kde_TP.score_samples(vals.reshape(-1,1)))
 
-            kde_FP = KernelDensity(kernel='gaussian', bandwidth=b)
+            kde_FP = KernelDensity(kernel='gaussian', bandwidth=bandwidth[b])
             kde_FP.fit(FP_scores[:, cat].reshape(-1,1))
             e_FP = np.exp(kde_FP.score_samples(vals.reshape(-1,1)))
 

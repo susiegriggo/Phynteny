@@ -31,9 +31,9 @@ def main(base, x, y, out):
 
     # fetch the testing data
     test_X = pickle.load(open(x, 'rb'))
-    test_X = list(test_X.values())[:100]
+    test_X = list(test_X.values())[:1000]
     test_y = pickle.load(open(y, 'rb'))
-    test_y = list(test_y.values())[:100]
+    test_y = list(test_y.values())[:1000]
 
     # fetch the models
     files = glob.glob(base + '/*')
@@ -49,7 +49,7 @@ def main(base, x, y, out):
 
     # generate dictionary to sae the confidence dictionary 
     bandwidth = np.arange(0,5, 0.005)[1:]
-    confidence_dict = statistics.build_confidence_dict(label, prediction, scores, bandwidth)
+    confidence_dict = statistics.build_confidence_dict(label, prediction, scores, bandwidth, categories)
     
     print('FINISHED')
 
