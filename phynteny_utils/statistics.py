@@ -48,14 +48,14 @@ def build_confidence_dict(label, prediction, scores, bandwidth, categories):
         FP_scores = this_scores[this_labels != cat]
 
         # loop through potential bandwidths
-        for b in tqdm(range(len(bandwidth))):
+        for b in bandwidth:
 
             # compute the kernel density
-            kde_TP = KernelDensity(kernel='gaussian', bandwidth=bandwidth[b])
+            kde_TP = KernelDensity(kernel='gaussian', bandwidth=b)
             kde_TP.fit(TP_scores[:, cat].reshape(-1,1))
             e_TP = np.exp(kde_TP.score_samples(vals.reshape(-1,1)))
 
-            kde_FP = KernelDensity(kernel='gaussian', bandwidth=bandwidth[b])
+            kde_FP = KernelDensity(kernel='gaussian', bandwidth=b)
             kde_FP.fit(FP_scores[:, cat].reshape(-1,1))
             e_FP = np.exp(kde_FP.score_samples(vals.reshape(-1,1)))
 
@@ -69,7 +69,7 @@ def build_confidence_dict(label, prediction, scores, bandwidth, categories):
                                                 "kde_FP": kde_FP,
                                                 "num_TP": len(TP_scores),
                                                 "num_FP": len(FP_scores),
-                                                "bandwidth": bandwidth[b]}
+                                                "bandwidth": b}
 
     return confidence_dict 
 
