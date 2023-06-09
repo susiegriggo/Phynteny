@@ -50,6 +50,9 @@ def main(base, x, y, out):
     # generate dictionary to sae the confidence dictionary 
     bandwidth = np.arange(0,5, 0.005)[1:]
     confidence_dict = statistics.build_confidence_dict(label, prediction, scores, bandwidth, category_names)
+
+    # save the confidence dictionary 
+    pickle.dump(confidence_dict, open(out, 'wb'))
     
     print('FINISHED')
 
