@@ -67,6 +67,9 @@ class Predictor:
             )
 
             phynteny = [self.category_names.get(e) for e in encodings[0]]
+            predictions = [] 
+            scores = []
+            confidence = [] 
 
         elif len(encodings[0]) > 120: 
             print(
@@ -76,6 +79,9 @@ class Predictor:
             )
         
             phynteny = [self.category_names.get(e) for e in encodings[0]]
+            predictions = []
+            scores = [] 
+            confidence = [] 
 
         else:
 
@@ -98,8 +104,8 @@ class Predictor:
             # TODO change this so that we are not using this apporach
             # Refers to the entire block of code below
             # Need to write in way of getting the confidence dict or parsing it in to the model
-
-            predictions, confidence = statistics.compute_confidence(scores, confidence_dict=d)
+             
+            predictions, confidence = statistics.compute_confidence(scores, self.confidence_dict, self.category_names)
 
             #predictions = [self.get_best_prediction(s) for s in scores]
             #print('FOUND ' + str(len([i for i in predictions if i != 0])) + ' missing annotation(s)!')
@@ -109,7 +115,7 @@ class Predictor:
             #confidence = []
 
 
-        return predictions, scores, confidence
+        return unk_idx, predictions, scores, confidence
 
     def get_best_prediction(self, s):
          """

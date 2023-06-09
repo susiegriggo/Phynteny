@@ -11,6 +11,7 @@ from phynteny_utils import predictor
 from Bio import SeqIO
 import pkg_resources
 import pickle5
+import numpy as np 
 
 __author__ = "Susanna Grigson"
 __maintainer__ = "Susanna Grigson"
@@ -68,6 +69,7 @@ def main(infile, outfile, model, confidence_path):
 
         for key in keys:
 
+            # print the phage 
             print('Annotating the phage: ' + key, flush=True) 
 
             # get current phage
@@ -79,19 +81,24 @@ def main(infile, outfile, model, confidence_path):
             ]
 
             # make predictions
-            predictons, scores, confidence = gene_predictor.predict_annotations(phages)
-
+            unk_idx, predictions, scores, confidence = gene_predictor.predict_annotations(phages)
+            
+            #print(len(predictions))
+             
             # update with these annotations
             cds = [i for i in gb_dict.get(key).features if i.type == "CDS"]
-            for i in range(len(cds)):
-                cds[i].qualifiers["phynteny"] = predictons[i]
-                cds[i].qualifiers["phynteny_score"] = scores[i]
-                cds[i].qualifiers["phynteny_confidence"] = confidence[i]
+            
+            # return everything back 
+            for i in range(len(unk_idx)):
+                cds[unk_idx[i]].qualifiers["phynteny"] = category_names.get(predictions[i]) 
+                cds[unk_idx[i]].qualifiers["phynteny_score"] = np.max(scores[i])
+                cds[unk_idx[i]].qualifiers["phynteny_confidence"] = confidence[i]
 
             # write to genbank file
             SeqIO.write(gb_dict.get(key), handle, "genbank")
 
             # TODO write to a table format as well that contains the positions and the location of each annotation 
+    
     if outfile: 
         print('DONE')
 

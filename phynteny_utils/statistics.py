@@ -295,7 +295,7 @@ def threshold_metrics(scores, known_categories, category_names):
 def count_critical_points(arr):
     return np.sum(np.diff(np.sign(np.diff(arr))) != 0)
 
-def compute_confidence(scores, confidence_dict):
+def compute_confidence(scores, confidence_dict, categories):
     """
     Function which computes the confidence of a Phynteny prediction
     Input is a vector of Phynteny scores
@@ -303,7 +303,7 @@ def compute_confidence(scores, confidence_dict):
 
     # get the prediction for each score
     score_predictions = np.array([np.argmax(score) for idx, score in enumerate(scores)])
-
+    
     # make an array to store the confidence of each prediction
     confidence_out = np.zeros(len(scores))
     predictions_out = np.zeros(len(scores))
@@ -312,22 +312,24 @@ def compute_confidence(scores, confidence_dict):
     for i in range(1,10):
 
         # get the scores relevant to the current category
-        cat_scores = scores[score_predictions == i]
+        cat_scores = np.array(scores)[score_predictions == i]
 
-        # compute the kernel density estimates
-        e_TP = np.exp(confidence_dict.get(categories.get(i)).get('kde_TP').score_samples(cat_scores[:,i].reshape(-1,1)))
-        e_FP = np.exp(confidence_dict.get(categories.get(i)).get('kde_FP').score_samples(cat_scores[:,i].reshape(-1,1)))
+        if len(cat_scores) > 0: 
+            # compute the kernel density estimates
+            e_TP = np.exp(confidence_dict.get(categories.get(i)).get('kde_TP').score_samples(cat_scores[:,i].reshape(-1,1)))
+            e_FP = np.exp(confidence_dict.get(categories.get(i)).get('kde_FP').score_samples(cat_scores[:,i].reshape(-1,1)))
 
-        # fetch the number of TP and FP
-        num_TP = confidence_dict.get(categories.get(i)).get('num_TP')
-        num_FP = confidence_dict.get(categories.get(i)).get('num_FP')
+            # fetch the number of TP and FP
+            num_TP = confidence_dict.get(categories.get(i)).get('num_TP')
+            num_FP = confidence_dict.get(categories.get(i)).get('num_FP')
 
-        # compute the confidence scores
-        conf_kde = (e_TP*num_TP)/(e_TP*num_TP + e_FP*num_FP)
+            # compute the confidence scores
+            conf_kde = (e_TP*num_TP)/(e_TP*num_TP + e_FP*num_FP)
 
-        # save the scores to the output vector
-        confidence_out[score_predictions == i ] = conf_kde
-        predictions_out[score_predictions == i] = [i for k in range(len(conf_kde))]
+            # save the scores to the output vector
+            confidence_out[score_predictions == i ] = conf_kde
+            predictions_out[score_predictions == i] = [i for k in range(len(conf_kde))]
+
 
     return predictions_out, confidence_out
 
