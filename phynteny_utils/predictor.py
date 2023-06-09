@@ -1,7 +1,7 @@
 """
 Module to create a predictor object
 
-Is an option to parse an custom dictionary for the thresholds if the user isn't bothered by the cutoffs
+Is an option to parse an custom dictionary for the confidence kde if the user trains their own model
 """
 
 # imports
@@ -31,18 +31,9 @@ def get_models(models ):
     print(files) 
     return [tf.keras.models.load_model(m) for m in files if 'h5' in m]
 
-def make_thresholds(threshold_dict, category_names):
-    """
-    Make threshold dictionary
-    """
-
-    tmp = dict(zip(list(category_names.values()), list(category_names.keys())))
-    vals = [tmp.get(k) for k in list(threshold_dict.keys())]
-    return dict(zip(vals, threshold_dict.values()))
-
 class Predictor:
     def __init__(
-        self, models, phrog_categories_path, threshold_dict, category_names_path
+        self, models, phrog_categories_path, confidence_dict, category_names_path
     ):
         self.models = get_models(models)
         self.max_length = (
@@ -52,9 +43,8 @@ class Predictor:
             .get("batch_input_shape")[1]
         )
         self.phrog_categories = get_dict(phrog_categories_path)
-        self.threshold_dict = get_dict(threshold_dict)
+        self.confidence_dict = get_dict(confidence_dict)
         self.category_names = get_dict(category_names_path)
-        self.eval_thresh = make_thresholds(self.threshold_dict, self.category_names)
         self.num_functions = len(self.category_names)
 
     def predict_annotations(self, phage_dict):
@@ -104,21 +94,30 @@ class Predictor:
             
             scores = [yhat[i] for i in range(len(unk_idx))]
 
-            predictions = [self.get_best_prediction(s) for s in scores]
-            print('FOUND ' + str(len([i for i in predictions if i != 0])) + ' missing annotation(s)!')
-            encodings = np.array(encodings)
-            encodings[:, unk_idx] = predictions
-            phynteny = [self.category_names.get(e) for e in encodings[0]]
 
-        return phynteny
+            # TODO change this so that we are not using this apporach
+            # Refers to the entire block of code below
+            # Need to write in way of getting the confidence dict or parsing it in to the model
+
+            predictions, confidence = statistics.compute_confidence(scores, confidence_dict=d)
+
+            #predictions = [self.get_best_prediction(s) for s in scores]
+            #print('FOUND ' + str(len([i for i in predictions if i != 0])) + ' missing annotation(s)!')
+            #encodings = np.array(encodings)
+            #encodings[:, unk_idx] = predictions
+            #phynteny = [self.category_names.get(e) for e in encodings[0]]
+            #confidence = []
+
+
+        return predictions, scores, confidence
 
     def get_best_prediction(self, s):
-         
-        if np.max(s) >= self.threshold:
-            return np.argmax(s)
+         """
+         Updated procedure for fetching the prediction
+         """
 
-        else:
-            return 0
+        # compute the phynteny score and confidence and return
+
 
     def get_best_prediction(self, s):
         """
