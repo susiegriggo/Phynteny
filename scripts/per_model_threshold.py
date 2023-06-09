@@ -31,9 +31,9 @@ def main(base, x, y, out):
 
     # fetch the testing data
     test_X = pickle.load(open(x, 'rb'))
-    test_X = list(test_X.values())[:1000]
+    test_X = list(test_X.values())
     test_y = pickle.load(open(y, 'rb'))
-    test_y = list(test_y.values())[:1000]
+    test_y = list(test_y.values())
 
     # fetch the models
     files = glob.glob(base + '/*')
