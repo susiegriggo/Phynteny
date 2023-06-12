@@ -43,7 +43,7 @@ def main(infile, outfile):
 
     print('looping through the genbank file', flush=True)
     with open(outfile, 'w') as f:
-        f.write("ID\tstart\tend\tstrand\tphrog_id\tphrog_category\tphynteny_category\tphage\n")
+        f.write("ID\tstart\tend\tstrand\tphrog_id\tphrog_category\tphynteny_category\tphynteny_score\tconfidence\tphage\n")
 
          
         for k in keys:
@@ -63,11 +63,13 @@ def main(infile, outfile):
                 else: 
                     phrog.append('No_PHROG')
              
-            phynteny = [c.qualifiers.get('phynteny')[0] for c in cds]
+            phynteny_category = [c.qualifiers.get('phynteny')[0] for c in cds]
+            phynteny_score  = [c.qualifiers.get('phynteny_score')[0] for c in cds]
+            phyntey_confidence = [c.qualifiers.get('confidence')[0] for c in cds]
             known_category = [category_names.get(phrog_categories.get(p)) for p in phrog]
             
             for i in range(len(cds)):
-                f.write(f"{ID[i]}\t{start[i]}\t{end[i]}\t{strand[i]}\t{phrog[i]}\t{known_category[i]}\t{phynteny[i]}\t{k}\n")
+                f.write(f"{ID[i]}\t{start[i]}\t{end[i]}\t{strand[i]}\t{phrog[i]}\t{known_category[i]}\t{phynteny_category[i]}\t{phynteny_score[i]}\t{phyntey_confidence[i]}\t{k}\n")
              
             
     print('saving', flush=True)
