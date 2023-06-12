@@ -140,9 +140,7 @@ def main(infile, out, model, confidence_path):
                     phynteny_category.append(np.nan)
                     phynteny_score.append(np.nan)
                     phynteny_confidence.append(np.nan)
-            
-            
-            print(phrog) 
+             
 
             known_category = [categories.get(phrog_integer.get(p)) for p in phrog]
             known_category = ['unknown function' if c == None else c for c in known_category]

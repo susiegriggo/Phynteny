@@ -100,10 +100,10 @@ def predict_softmax(X_encodings, num_categories, model):
     :param model: model object
     :return: softmax prediction tensor
     """
-
+    
     # obtain softmax scores for the masked genes
     X_encodings = np.array(X_encodings)
-    yhat = model.predict(X_encodings)
+    yhat = model(X_encodings, training=False)
     scores_list = yhat 
 
     return np.array(scores_list)

@@ -99,7 +99,7 @@ class Predictor:
             
             print(self.max_length) 
             print(self.num_functions)
-
+            
             yhat = statistics.phynteny_score(np.array(X).reshape(len(X), self.max_length, self.num_functions), self.num_functions, self.models)
             
             scores = [yhat[i] for i in range(len(unk_idx))]
