@@ -25,7 +25,8 @@ __status__ = "development"
 @click.option(
     "-o",
     "--out",
-    type=click.Path(), 
+    type=click.STRING,
+    default='', 
     help="prefix for output",
 )
 @click.option(
@@ -52,9 +53,8 @@ def main(infile, out, model, confidence_path):
     # get the absolute paths to phrog annotation files, model and confidence_kde
     phrog_categories = pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/phrog_integer.pkl')
     category_names = pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/integer_category.pkl')
-    categories = pickle5.load(open(category_names, 'rb')) 
-
     categories = pickle.load(open(category_names, 'rb'))
+    phrog_integer = pickle.load(open(phrog_categories, 'rb'))
 
     # get entries in the genbank file
     print('Reading genbank file!')
@@ -64,15 +64,16 @@ def main(infile, out, model, confidence_path):
         sys.exit()
     keys = list(gb_dict.keys())
 
-    # create predictor objecty
+    # create predictor object
     gene_predictor = predictor.Predictor(model, phrog_categories, confidence_path, category_names)
-    print(model)
+    print('running') 
+
 
     # Run Phynteny
-    with click.open_file(out + '.gbk', "wt") if out else sys.stdout as handle:
+    with open(out + '.gbk', "wt") if out!=''  else sys.stdout as handle:
 
         for key in keys:
-
+             
             # print the phage 
             print('Annotating the phage: ' + key, flush=True) 
 
@@ -99,9 +100,10 @@ def main(infile, out, model, confidence_path):
             # write to genbank file
             SeqIO.write(gb_dict.get(key), handle, "genbank")
 
-
+    
     # convert annotations made to a text file
-    with open(out + '.tsv', 'w') as f:
+    #with open(out + '.tsv', 'w') as f:
+    with click.open_file(out + '.tsv', "wt") if out else sys.stdout as f:
         f.write(
             "ID\tstart\tend\tstrand\tphrog_id\tphrog_category\tphynteny_category\tphynteny_score\tconfidence\tphage\n")
 
@@ -123,28 +125,33 @@ def main(infile, out, model, confidence_path):
 
 
             for c in cds:
+
                 if 'phrog' in c.qualifiers.keys():
                     phrog.append(c.qualifiers.get('phrog')[0])
                 else:
                     phrog.append('No_PHROG')
 
                 if 'phynteny' in c.qualifiers.keys():
-                    phynteny_category.append(c.qualifiers.get('phynteny')[0])
-                    phynteny_score.append(c.qualifiers.get('phynteny_score')[0])
-                    phynteny_confidence.append(c.qualifiers.get('confidence')[0])
+                    phynteny_category.append(c.qualifiers.get('phynteny'))
+                    phynteny_score.append(c.qualifiers.get('phynteny_score'))
+                    phynteny_confidence.append(c.qualifiers.get('phynteny_confidence'))
 
                 else:
                     phynteny_category.append(np.nan)
                     phynteny_score.append(np.nan)
-                    phynteny_category.append(np.nan)
+                    phynteny_confidence.append(np.nan)
+            
+            
+            print(phrog) 
 
-            known_category = [category_names.get(phrog_categories.get(p)) for p in phrog]
+            known_category = [categories.get(phrog_integer.get(p)) for p in phrog]
+            known_category = ['unknown function' if c == None else c for c in known_category]
 
             for i in range(len(cds)):
                 f.write(
                     f"{ID[i]}\t{start[i]}\t{end[i]}\t{strand[i]}\t{phrog[i]}\t{known_category[i]}\t{phynteny_category[i]}\t{phynteny_score[i]}\t{phynteny_confidence[i]}\t{k}\n")
 
-
+    
     if out:
         print('DONE')
 

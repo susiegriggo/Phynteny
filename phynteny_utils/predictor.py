@@ -19,6 +19,7 @@ def get_dict(dict_path):
 
     with open(dict_path, "rb") as handle:
         dictionary = pickle.load(handle)
+
     handle.close()
 
     return dictionary
@@ -35,18 +36,21 @@ class Predictor:
     def __init__(
         self, models, phrog_categories_path, confidence_dict, category_names_path
     ):
+        
         self.models = get_models(models)
+        print('models')
         self.max_length = (
             self.models[0].get_config()
             .get("layers")[0]
             .get("config")
             .get("batch_input_shape")[1]
         )
+        
         self.phrog_categories = get_dict(phrog_categories_path)
         self.confidence_dict = get_dict(confidence_dict)
         self.category_names = get_dict(category_names_path)
         self.num_functions = len(self.category_names)
-
+        
     def predict_annotations(self, phage_dict):
         """
 
