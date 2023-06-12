@@ -21,7 +21,6 @@ def get_dict(dict_path):
 
     return dictionary
 
-
 def encode_strand(strand):
     """
     One hot encode the direction of each gene
