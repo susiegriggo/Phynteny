@@ -45,6 +45,7 @@ setuptools.setup(
         "pandas",
         "click", 
         "joblib",
+        "tensorflow==2.9.0"
     ],
     python_requires=">=3.7",
 )
