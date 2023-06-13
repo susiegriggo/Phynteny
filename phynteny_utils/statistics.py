@@ -6,7 +6,6 @@ This module uses code snippets from PHaNNs https://github.com/Adrian-Cantu/PhANN
 
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
 from sklearn.neighbors import KernelDensity
 from sklearn.metrics import roc_auc_score, roc_curve
 
