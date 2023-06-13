@@ -62,7 +62,7 @@ def main(infile, out, model, confidence_path):
     if not gb_dict:
         click.echo("Error: no sequences found in genbank file")
         sys.exit()
-
+    print(model) 
     # create predictor object
     gene_predictor = predictor.Predictor(model, phrog_categories, confidence_path, category_names)
 

@@ -10,6 +10,7 @@ import pickle
 from phynteny_utils import format_data
 import numpy as np
 import glob
+import sys 
 from phynteny_utils import statistics
 from phynteny_utils import handle_genbank
 from Bio import SeqIO
