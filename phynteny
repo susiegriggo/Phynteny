@@ -33,7 +33,7 @@ __status__ = "development"
     "-m",
     "--model",
     type=click.Path(exists=True),
-    help="Path to custom LSTM model",
+    help="Path to custom LSTM models",
     default=pkg_resources.resource_filename('phynteny_utils', 'model'),
 )
 @click.option(
