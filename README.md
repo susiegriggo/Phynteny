@@ -10,7 +10,7 @@ Phynteny is still a work in progress and the LSTM model has not yet been optimis
 
 
 ## Dependencies
-Phynteny installation requires Python 3.7 or above. You will need the following python dependencies to run MetaCoAG and related support scripts. The latest tested versions of the dependencies are listed as well.
+Phynteny installation requires Python 3.7 or above. You will need the following python dependencies to run Phynteny and it's related support scripts. The latest tested versions of the dependencies are: 
 * tensorflow - version 2.9.0
 
 We reccomend GPU support if you are training Phynteny. This required CUDA and cuDNN 
