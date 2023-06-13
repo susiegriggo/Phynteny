@@ -17,7 +17,6 @@ import pkg_resources
 @click.option('--base', '-b', type=click.Path(), help='base to where the model paths are located. All k-folds should be placed in the same directory')
 @click.option('-x', type=click.Path(), help='file path to the testing data X components')
 @click.option('-y', type=click.Path(), help='file path to the testing data y components')
-@click.option('-out', type=click.Path(), help='output confidence dictionary')
 @click.option('--out', '-o', type=click.Path(), help='output file path')
 
 
