@@ -19,6 +19,9 @@ import click
 def get_dict(dict_path):
     """
     Helper function to import dictionaries
+
+    :param dict_path: path to the dictionary to read
+    :return: dictionary object
     """
 
     with open(dict_path, "rb") as handle:
@@ -28,15 +31,25 @@ def get_dict(dict_path):
 
     return dictionary
 
-
 def get_models(models):
-    """ """
+    """
+    Load in genbank models
+
+    :param models: path of directory where model obejcts are located
+    :return: list of models to iterate over
+    """
     files = glob.glob(models + "/*")
     return [tf.keras.models.load_model(m) for m in files if "h5" in m]
 
 def run_phynteny(outfile, gene_predictor, gb_dict, categories):
     """
     Run Phynteny
+
+    :param outfile: path to output genbank file
+    :param gene_predictor: gene_predictor obejct to use for predictions
+    :param gb_dict: dictionary of phages and their annotations
+    :param categories: dictionary mapping PHROG categories to their corresponding integer
+    :return: annotated dictionary
     """
 
     # get the list of phages to loop through
@@ -96,7 +109,6 @@ def generate_table(outfile, gb_dict, categories, phrog_integer):
             # print(k, flush=True)
             cds = [f for f in gb_dict.get(k).features if f.type == 'CDS']
 
-
             # extract the features for the cds
             start = [c.location.start for c in cds]
             end = [c.location.end for c in cds]
@@ -109,6 +121,7 @@ def generate_table(outfile, gb_dict, categories, phrog_integer):
             phynteny_score = []
             phynteny_confidence = []
 
+            # extract details for genes
             for c in cds:
 
                 if 'phrog' in c.qualifiers.keys():
@@ -133,6 +146,7 @@ def generate_table(outfile, gb_dict, categories, phrog_integer):
             known_category = [categories.get(phrog_integer.get(p)) for p in phrog]
             known_category = ['unknown function' if c == None else c for c in known_category]
 
+            # write to table
             for i in range(len(cds)):
                 f.write(
                     f"{ID[i]}\t{start[i]}\t{end[i]}\t{strand[i]}\t{phrog[i]}\t{known_category[i]}\t{phynteny_category[i]}\t{phynteny_score[i]}\t{phynteny_confidence[i]}\t{k}\n")
@@ -140,6 +154,10 @@ def generate_table(outfile, gb_dict, categories, phrog_integer):
     return found
 
 class Predictor:
+    """
+    Predictor object for predicting function of unknown genes
+    """
+
     def __init__(
         self, models, phrog_categories_path, confidence_dict, category_names_path
     ):
