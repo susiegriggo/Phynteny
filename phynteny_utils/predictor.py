@@ -144,7 +144,8 @@ def generate_table(outfile, gb_dict, categories, phrog_integer):
                     phynteny_score.append(np.nan)
                     phynteny_confidence.append(np.nan)
 
-            known_category = [categories.get(phrog_integer.get(p)) for p in phrog]
+            phrog = [int(p) if p != 'No_PHROG' else p for p in phrog] 
+            known_category = [categories.get(phrog_integer.get(p)) for p in phrog]  
             known_category = ['unknown function' if c == None else c for c in known_category]
 
             # write to table
