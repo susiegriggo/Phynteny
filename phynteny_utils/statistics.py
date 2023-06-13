@@ -322,6 +322,52 @@ def threshold_metrics(scores, known_categories, category_names):
 
     return df_test_score
 
+def confidence_metrics(scores, confidence_out, known_categories, category_names):
+    """
+    Calculate various metrics at different Phynteny scores
+    Modified from PhANNs https://github.com/Adrian-Cantu/PhANNs/blob/master/model_training/08_graph.py
+
+    :param scores: phynteny scores for each category
+    :param confidence_out: confidence associated with the best prediction
+    :param known_categories: Actual label of each sequence
+    :param category_names: dictionary of category labels
+    """
+
+    d = {
+        "class": [],
+        "precision": [],
+        "recall": [],
+        "f1-score": [],
+        "accuracy": [],
+        "confidence": [],
+        "support": [],
+    }
+
+    score_range = np.arange(0, 1.01, 0.001)
+    df_test_score = pd.DataFrame(data=d)
+
+    scores_index = np.array([np.argmax(i) for i in scores])
+    known_categories = np.array(known_categories)
+
+    # loop through each category and take the predictions made to that class (regardless whether successful)
+    for num in range(1, len(category_names)):
+        test_set_p = confidence_out[scores_index == num, num]
+        test_set_t = known_categories[scores_index == num] == num
+
+        for tt in score_range:
+            df_test_score = class_scores(
+                tt,
+                np.around(test_set_p[test_set_p >= tt - 0.05], decimals=1),
+                test_set_t[test_set_p >= tt - 0.05],
+                num,
+                df_test_score,
+            )
+
+    # TODO test the effect of removing the 0.05. Why did PHANNs include this to begin with
+    df_test_score["class"] = [int(i) for i in df_test_score["class"]]
+    df_test_score["category"] = [category_names.get(i) for i in df_test_score["class"]]
+
+    return df_test_score
 
 def count_critical_points(arr):
     return np.sum(np.diff(np.sign(np.diff(arr))) != 0)

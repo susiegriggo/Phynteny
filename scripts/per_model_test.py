@@ -25,6 +25,10 @@ def main(base, x, y, out):
     category_path = pkg_resources.resource_filename("phynteny_utils", "phrog_annotation_info/integer_category.pkl")
     category_names = pickle5.load(open(category_path, 'rb'))
 
+    #import the confidence dict
+    confidence_path = pkg_resources.resource_filename("phynteny_utils", "phrog_annotation_info/confidence_dict.pkl")
+    confidence_dict = pickle5.load(open(confidence_path, 'rb'))
+
     # fetch the testing data
     test_X = pickle5.load(open(x, 'rb'))
     test_X = list(test_X.values())[:100]
@@ -38,23 +42,21 @@ def main(base, x, y, out):
     # compute the phynteny scores
     print('Computing Phynteny Scores')
     scores = statistics.phynteny_score(test_X, len(category_names), models)
+
+    # compute the confidence scores using the computed kernel densities
+    predictions_out, confidence_out = statistics.compute_confidence(scores, confidence_dict, category_names)
+
+    # Build the ROC curve based on the Phynteny scores
+    # Would this be any different based on the transformed confidence (probs not)
     known_categories = statistics.known_category(test_X, test_y, len(category_names))
-    print(scores.shape) 
-    # build the ROC curve for this data
     print('Building ROC curve')
-    print('scores')
-    #print(scores) 
-    #print('known categories')
-    #print(known_categories) 
-    #print('category names')
-    #print(category_names)
-    #print(scores.shape) 
     ROC_df = statistics.build_roc(scores, known_categories, category_names)
     ROC_df.to_csv(out + 'ROC.tsv', sep='\t')
 
     # compute the classification report
     print('Generating metrics')
-    report = statistics.classification_report(known_categories, [np.argmax(i) for i in scores], output_dict=True)
+    # updated to use confidence scores instead
+    report = statistics.classification_report(known_categories, [np.argmax(i) for i in confidence_out], output_dict=True)
     with open(out + 'report.pkl', "wb") as f:
         pickle5.dump(report, f)
 
@@ -67,7 +69,13 @@ def main(base, x, y, out):
     # get the thresholds
     print('Generating thresholds')
     phynteny_df = statistics.threshold_metrics(scores, known_categories, category_names)
-    phynteny_df.to_csv(out + 'threshold_metrics.tsv', sep = '\t')
+    phynteny_df.to_csv(out + 'phynteny_score_metrics.tsv', sep = '\t')
+
+    # repeat on the confidence scores
+    # get the thresholds
+    print('Comparing confidence')
+    phynteny_df = statistics.confidence_metrics(scores, confidence_out, known_categories, category_names)
+    phynteny_df.to_csv(out + 'confidence_metrics.tsv', sep='\t')
 
     print('FINISHED')
 
