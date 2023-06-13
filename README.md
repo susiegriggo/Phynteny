@@ -8,6 +8,15 @@
 
 Phynteny is still a work in progress and the LSTM model has not yet been optimised. Use with caution! 
 
+
+## Dependencies
+Phynteny installation requires Python 3.7 or above. You will need the following python dependencies to run Phynteny and it's related support scripts. The latest tested versions of the dependencies are: 
+* tensorflow - version 2.9.0
+
+We reccomend GPU support if you are training Phynteny. This required CUDA and cuDNN 
+* CUDA toolkit- version 11.2 
+* cuDNN - version 8.1.1 
+
 ## Installation 
 
 ```
