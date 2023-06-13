@@ -11,9 +11,14 @@ Phynteny is still a work in progress and the LSTM model has not yet been optimis
 
 ## Dependencies
 Phynteny installation requires Python 3.7 or above. You will need the following python dependencies to run Phynteny and it's related support scripts. The latest tested versions of the dependencies are: 
+* sklearn - version 1.2.2 
+* biopython - version 1.81
+* numpy - version 1.21.0
 * tensorflow - version 2.9.0
+* pandas - version 2.0.2
+* click - version 8.1.3 <br> 
 
-We reccomend GPU support if you are training Phynteny. This required CUDA and cuDNN 
+We reccomend GPU support if you are training Phynteny. This requires CUDA and cuDNN:
 * CUDA toolkit- version 11.2 
 * cuDNN - version 8.1.1 
 
