@@ -72,6 +72,9 @@ Once you've trained your model you will need to take steps to generate an object
 ```
 python scripts/compute_confidence.py -b model_directory -x testing_data_X.pkl -y testing_data_y.pkl -o confidence_densities 
 ```
+## Performance 
+
+Coming soon: Notebooks demonstrating the performance of the model 
 
 ## Bugs and Suggestions 
 If you break Phynteny or would like to make any suggestions please open an issue or email me at susie.grigson@flinders.edu.au 
