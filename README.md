@@ -27,7 +27,7 @@ phynteny test_phage.gbk  -o test_phage_phynteny
 
 **Custom** 
 
-If you wish to specify your own LSTM model and thresholds, run: 
+If you wish to specify your own LSTM model, run: 
 
 ```
 phynteny test_phage.gbk -o test_phage_phynteny -m your_models -t confidence_dict.pkl 
