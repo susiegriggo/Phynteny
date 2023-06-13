@@ -9,9 +9,7 @@ import click
 import pickle
 from phynteny_utils import handle_genbank
 from phynteny_utils import predictor
-from Bio import SeqIO
 import pkg_resources
-import numpy as np 
 
 __author__ = "Susanna Grigson"
 __maintainer__ = "Susanna Grigson"
@@ -20,13 +18,14 @@ __version__ = "0"
 __email__ = "susie.grigson@gmail.com"
 __status__ = "development"
 
+
 @click.command()
 @click.argument("infile", type=click.Path(exists=True))
 @click.option(
     "-o",
     "--out",
     type=click.STRING,
-    default='', 
+    default='',
     help="prefix for output",
 )
 @click.option(
@@ -45,6 +44,7 @@ __status__ = "development"
 )
 @click.version_option(version=__version__)
 
+
 def main(infile, out, model, confidence_path):
     """
     Phynteny: synteny-based annotation of phage genes
@@ -62,97 +62,21 @@ def main(infile, out, model, confidence_path):
     if not gb_dict:
         click.echo("Error: no sequences found in genbank file")
         sys.exit()
-    keys = list(gb_dict.keys())
 
     # create predictor object
     gene_predictor = predictor.Predictor(model, phrog_categories, confidence_path, category_names)
-    print('running') 
 
+    # generate predictions
+    print('Predicting...')
+    phynteny_dict = predictor.run_phynteny(out + '.gbk', gene_predictor, gb_dict, categories)
 
-    # Run Phynteny
-    with open(out + '.gbk', "wt") if out!=''  else sys.stdout as handle:
+    # output to a table
+    print('Generating table...')
+    found = predictor.generate_table(out + '.tsv', phynteny_dict, categories, phrog_integer)
 
-        for key in keys:
-             
-            # print the phage 
-            print('Annotating the phage: ' + key, flush=True) 
+    print('\nDone :)')
+    print('Phynteny found ' + str(found) + ' genes with 90% confidence')
 
-            # get current phage
-            phages = {key: handle_genbank.extract_features(gb_dict.get(key))}
-
-            # get phrog annotations
-            phages[key]["phrogs"] = [
-                0 if i == "No_PHROG" else int(i) for i in phages[key]["phrogs"]
-            ]
-
-            # make predictions
-            unk_idx, predictions, scores, confidence = gene_predictor.predict_annotations(phages)
-             
-            # update with these annotations
-            cds = [i for i in gb_dict.get(key).features if i.type == "CDS"]
-            print(category_names)  
-            # return everything back 
-            for i in range(len(unk_idx)):
-                cds[unk_idx[i]].qualifiers["phynteny"] = categories.get(predictions[i]) 
-                cds[unk_idx[i]].qualifiers["phynteny_score"] = np.max(scores[i])
-                cds[unk_idx[i]].qualifiers["phynteny_confidence"] = confidence[i]
-
-            # write to genbank file
-            SeqIO.write(gb_dict.get(key), handle, "genbank")
-
-    
-    # convert annotations made to a text file
-    #with open(out + '.tsv', 'w') as f:
-    with click.open_file(out + '.tsv', "wt") if out else sys.stdout as f:
-        f.write(
-            "ID\tstart\tend\tstrand\tphrog_id\tphrog_category\tphynteny_category\tphynteny_score\tconfidence\tphage\n")
-
-        for k in keys:
-            # print(k, flush=True)
-            cds = [f for f in gb_dict.get(k).features if f.type == 'CDS']
-
-            # extract the features for the cds
-            start = [c.location.start for c in cds]
-            end = [c.location.end for c in cds]
-            strand = [c.strand for c in cds]
-            ID = [c.qualifiers.get('ID')[0] for c in cds]
-
-            # lists to iterate through
-            phrog = []
-            phynteny_category = []
-            phynteny_score = []
-            phynteny_confidence = []
-
-
-            for c in cds:
-
-                if 'phrog' in c.qualifiers.keys():
-                    phrog.append(c.qualifiers.get('phrog')[0])
-                else:
-                    phrog.append('No_PHROG')
-
-                if 'phynteny' in c.qualifiers.keys():
-                    phynteny_category.append(c.qualifiers.get('phynteny'))
-                    phynteny_score.append(c.qualifiers.get('phynteny_score'))
-                    phynteny_confidence.append(c.qualifiers.get('phynteny_confidence'))
-
-                else:
-                    phynteny_category.append(np.nan)
-                    phynteny_score.append(np.nan)
-                    phynteny_confidence.append(np.nan)
-             
-
-            known_category = [categories.get(phrog_integer.get(p)) for p in phrog]
-            known_category = ['unknown function' if c == None else c for c in known_category]
-
-            for i in range(len(cds)):
-                f.write(
-                    f"{ID[i]}\t{start[i]}\t{end[i]}\t{strand[i]}\t{phrog[i]}\t{known_category[i]}\t{phynteny_category[i]}\t{phynteny_score[i]}\t{phynteny_confidence[i]}\t{k}\n")
-
-    
-    if out:
-        print('DONE')
 
 if __name__ == "__main__":
     main()
-

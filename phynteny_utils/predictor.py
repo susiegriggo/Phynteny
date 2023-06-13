@@ -11,6 +11,9 @@ from phynteny_utils import format_data
 import numpy as np
 import glob
 from phynteny_utils import statistics
+from phynteny_utils import handle_genbank
+from Bio import SeqIO
+import click
 
 
 def get_dict(dict_path):
@@ -29,16 +32,118 @@ def get_dict(dict_path):
 def get_models(models):
     """ """
     files = glob.glob(models + "/*")
-    print(files)
     return [tf.keras.models.load_model(m) for m in files if "h5" in m]
 
+def run_phynteny(outfile, gene_predictor, gb_dict, categories):
+    """
+    Run Phynteny
+    """
+
+    # get the list of phages to loop through
+    keys = list(gb_dict.keys())
+
+    # Run Phynteny
+    with open(outfile, "wt") if outfile != '.gbk' else sys.stdout as handle:
+
+        for key in keys:
+
+            # print the phage
+            print('Annotating the phage: ' + key, flush=True)
+
+            # get current phage
+            phages = {key: handle_genbank.extract_features(gb_dict.get(key))}
+
+            # get phrog annotations
+            phages[key]["phrogs"] = [
+                0 if i == "No_PHROG" else int(i) for i in phages[key]["phrogs"]
+            ]
+
+            # make predictions
+            unk_idx, predictions, scores, confidence = gene_predictor.predict_annotations(phages)
+
+            # update with these annotations
+            cds = [i for i in gb_dict.get(key).features if i.type == "CDS"]
+
+            # return everything back
+            for i in range(len(unk_idx)):
+                cds[unk_idx[i]].qualifiers["phynteny"] = categories.get(predictions[i])
+                cds[unk_idx[i]].qualifiers["phynteny_score"] = np.max(scores[i])
+                cds[unk_idx[i]].qualifiers["phynteny_confidence"] = confidence[i]
+
+            # write to genbank file
+            SeqIO.write(gb_dict.get(key), handle, "genbank")
+
+    return gb_dict
+
+def generate_table(outfile, gb_dict, categories, phrog_integer):
+    """
+    Generate table summary of the annotations made
+    """
+
+    # get the list of phages to loop through
+    keys = list(gb_dict.keys())
+
+    # count the number of genes found
+    found = 0
+
+    # convert annotations made to a text file
+    with click.open_file(outfile, "wt") if outfile != '.tsv' else sys.stdout as f:
+        f.write(
+            "ID\tstart\tend\tstrand\tphrog_id\tphrog_category\tphynteny_category\tphynteny_score\tconfidence\tphage\n")
+
+        for k in keys:
+
+            # print(k, flush=True)
+            cds = [f for f in gb_dict.get(k).features if f.type == 'CDS']
+
+
+            # extract the features for the cds
+            start = [c.location.start for c in cds]
+            end = [c.location.end for c in cds]
+            strand = [c.strand for c in cds]
+            ID = [c.qualifiers.get('ID')[0] if 'ID' in c.qualifiers else '' for  c in cds]
+
+            # lists to iterate through
+            phrog = []
+            phynteny_category = []
+            phynteny_score = []
+            phynteny_confidence = []
+
+            for c in cds:
+
+                if 'phrog' in c.qualifiers.keys():
+                    phrog.append(c.qualifiers.get('phrog')[0])
+                else:
+                    phrog.append('No_PHROG')
+
+                if 'phynteny' in c.qualifiers.keys():
+                    phynteny_category.append(c.qualifiers.get('phynteny'))
+                    phynteny_score.append(c.qualifiers.get('phynteny_score'))
+                    phynteny_confidence.append(c.qualifiers.get('phynteny_confidence'))
+
+                    # update the number of genes found
+                    if float(c.qualifiers.get('phynteny_confidence')) > 0.9:
+                        found += 1
+
+                else:
+                    phynteny_category.append(np.nan)
+                    phynteny_score.append(np.nan)
+                    phynteny_confidence.append(np.nan)
+
+            known_category = [categories.get(phrog_integer.get(p)) for p in phrog]
+            known_category = ['unknown function' if c == None else c for c in known_category]
+
+            for i in range(len(cds)):
+                f.write(
+                    f"{ID[i]}\t{start[i]}\t{end[i]}\t{strand[i]}\t{phrog[i]}\t{known_category[i]}\t{phynteny_category[i]}\t{phynteny_score[i]}\t{phynteny_confidence[i]}\t{k}\n")
+
+    return found
 
 class Predictor:
     def __init__(
         self, models, phrog_categories_path, confidence_dict, category_names_path
     ):
         self.models = get_models(models)
-        print("models")
         self.max_length = (
             self.models[0]
             .get_config()
@@ -98,9 +203,6 @@ class Predictor:
                 for i in unk_idx
             ]
 
-            print(self.max_length)
-            print(self.num_functions)
-
             yhat = statistics.phynteny_score(
                 np.array(X).reshape(len(X), self.max_length, self.num_functions),
                 self.num_functions,
@@ -109,37 +211,12 @@ class Predictor:
 
             scores = [yhat[i] for i in range(len(unk_idx))]
 
-            # TODO change this so that we are not using this apporach
-            # Refers to the entire block of code below
-            # Need to write in way of getting the confidence dict or parsing it in to the model
 
             predictions, confidence = statistics.compute_confidence(
                 scores, self.confidence_dict, self.category_names
             )
 
-            # predictions = [self.get_best_prediction(s) for s in scores]
-            # print('FOUND ' + str(len([i for i in predictions if i != 0])) + ' missing annotation(s)!')
-            # encodings = np.array(encodings)
-            # encodings[:, unk_idx] = predictions
-            # phynteny = [self.category_names.get(e) for e in encodings[0]]
-            # confidence = []
 
         return unk_idx, predictions, scores, confidence
 
-    def get_best_prediction(self, s):
-        """
-        Updated procedure for fetching the prediction
-        """
 
-    # compute the phynteny score and confidence and return
-
-    def get_best_prediction(self, s):
-        """
-        Evaluate the best category using the pre-computed thresholds
-        """
-
-        if max(s) >= self.eval_thresh.get(np.argmax(s)):
-            return np.argmax(s)
-
-        else:
-            return 0
