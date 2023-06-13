@@ -17,6 +17,7 @@ Phynteny installation requires Python 3.7 or above. You will need the following 
 * tensorflow - version 2.9.0
 * pandas - version 2.0.2
 * click - version 8.1.3 <br> 
+
 We reccomend GPU support if you are training Phynteny. This requires CUDA and cuDNN:
 * CUDA toolkit- version 11.2 
 * cuDNN - version 8.1.1 
