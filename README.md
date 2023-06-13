@@ -40,7 +40,7 @@ Phynteny is trained using genbank files containing PHROG annotations such as tho
 
 ```
 python scripts/generate_training_data.py -i genbank_files.txt -p phynteny_data -max_genes 120 -g 4
-'''
+```
 
 After this, we can train the model by running the `train_model.py` script. This uses cross-validation to produce several models. The parameters for the LSTM can be adjusted including the numer of hidden layers, memory cells and dropout. For the full list run the command `python scripts/train_model.py --help`. Otherwise we can this command which will generate models with the prefix, `your_trained_phynteny`. 
 
