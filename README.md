@@ -35,7 +35,7 @@ pip install .
 
 Phynteny takes a genbank file containing PHROG annotations as input. If you phage is not yet in this format, [pharokka](https://github.com/gbouras13/pharokka) can take your phage (in fasta format) to a genbank file with PHROG annotations.  Phynteny will then return a genbank files and a table containing the details of the predictions made using phynteny. Each prediction is accompanied by a 'phyteny score' which ranges between 1-10 and a recalibrated confidence score. 
 
-**Reccomended:**  
+**Reccomended**  
 ```
 phynteny test_phage.gbk  -o test_phage_phynteny
 ```
