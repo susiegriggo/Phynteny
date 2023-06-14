@@ -271,7 +271,11 @@ def class_scores(tt, scores, is_real, prot_class, df):
     fscore = (2 * TP) / (2 * TP + FP + FN)
     accuracy = (TP + TN) / (TP + TN + FP + FN)
     data_row = [prot_class, precision, recall, fscore, accuracy, tt, support]
-    df = df.append(pd.Series(data_row, index=df.columns), sort=False, ignore_index=True)
+    
+    new_row = pd.DataFrame([data_row], columns=df.columns)
+    df = pd.merge(df, new_row, how='outer')
+    
+    #df = df.append(pd.Series(data_row, index=df.columns), sort=False, ignore_index=True)
 
     return df
 
@@ -351,7 +355,7 @@ def confidence_metrics(scores, confidence_out, known_categories, category_names)
 
     # loop through each category and take the predictions made to that class (regardless whether successful)
     for num in range(1, len(category_names)):
-        test_set_p = confidence_out[scores_index == num, num]
+        test_set_p = confidence_out[scores_index == num]
         test_set_t = known_categories[scores_index == num] == num
 
         for tt in score_range:
