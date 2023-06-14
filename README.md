@@ -11,16 +11,17 @@ Phynteny is still a work in progress and the LSTM model has not yet been optimis
 
 ## Dependencies
 Phynteny installation requires Python 3.7 or above. You will need the following python dependencies to run Phynteny and it's related support scripts. The latest tested versions of the dependencies are: 
-* sklearn - version 1.2.2 
-* biopython - version 1.81
-* numpy - version 1.21.0
-* tensorflow - version 2.9.0
-* pandas - version 2.0.2
-* click - version 8.1.3 <br> 
+* [python](https://www.python.org/) - version 3.9.0 
+* [sklearn](https://scikit-learn.org/stable/) - version 1.2.2 
+* [biopython](https://biopython.org/) - version 1.81
+* [numpy](https://numpy.org/) - version 1.21.0
+* [tensorflow](https://www.tensorflow.org/) - version 2.9.0
+* [pandas](https://pandas.pydata.org/) - version 2.0.2
+* [click](https://click.palletsprojects.com/en/8.1.x/) - version 8.1.3 <br> 
 
 We reccomend GPU support if you are training Phynteny. This requires CUDA and cuDNN:
-* CUDA toolkit- version 11.2 
-* cuDNN - version 8.1.1 
+* [CUDA toolkit](https://developer.nvidia.com/cuda-toolkit) - version 11.2 
+* [cuDNN](https://developer.nvidia.com/cudnn) - version 8.1.1 
 
 ## Installation 
 
@@ -34,7 +35,7 @@ pip install .
 
 Phynteny takes a genbank file containing PHROG annotations as input. If you phage is not yet in this format, [pharokka](https://github.com/gbouras13/pharokka) can take your phage (in fasta format) to a genbank file with PHROG annotations.  Phynteny will then return a genbank files and a table containing the details of the predictions made using phynteny. Each prediction is accompanied by a 'phyteny score' which ranges between 1-10 and a recalibrated confidence score. 
 
-**Reccomended:**  
+**Reccomended**  
 ```
 phynteny test_phage.gbk  -o test_phage_phynteny
 ```
