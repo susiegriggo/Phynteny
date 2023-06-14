@@ -4,6 +4,7 @@ Evaluate all folds of a model and compute the phynteny score
 
 # imports
 from phynteny_utils import statistics
+from sklearn.metrics import classification_report
 import numpy as np 
 import glob
 import pickle5
@@ -26,14 +27,14 @@ def main(base, x, y, out):
     category_names = pickle5.load(open(category_path, 'rb'))
 
     #import the confidence dict
-    confidence_path = pkg_resources.resource_filename("phynteny_utils", "phrog_annotation_info/confidence_dict.pkl")
+    confidence_path = pkg_resources.resource_filename("phynteny_utils", "phrog_annotation_info/confidence_kde.pkl")
     confidence_dict = pickle5.load(open(confidence_path, 'rb'))
 
     # fetch the testing data
     test_X = pickle5.load(open(x, 'rb'))
-    test_X = list(test_X.values())[:100]
+    test_X = list(test_X.values())
     test_y = pickle5.load(open(y, 'rb'))
-    test_y = list(test_y.values())[:100]
+    test_y = list(test_y.values())
 
     # fetch the models
     files = glob.glob(base + '/*')
@@ -55,8 +56,8 @@ def main(base, x, y, out):
 
     # compute the classification report
     print('Generating metrics')
-    # updated to use confidence scores instead
-    report = statistics.classification_report(known_categories, [np.argmax(i) for i in confidence_out], output_dict=True)
+    # note that this does not use confidence 
+    report = classification_report(known_categories, [np.argmax(i) for i in scores], output_dict=True)
     with open(out + 'report.pkl', "wb") as f:
         pickle5.dump(report, f)
 
