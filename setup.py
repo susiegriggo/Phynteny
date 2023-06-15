@@ -2,9 +2,44 @@
 
 import setuptools
 import glob
+import os 
+
+def is_mac(): 
+    version = os.uname().version
+    sysname = os.uname().sysname
+
+    return  sysname == 'Darwin' and 'ARM64' in version
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
+
+
+
+if is_mac(): 
+    install_requires = [
+        "biopython>=1.79",
+        "pickle5",
+        "scikit-learn",
+        'numpy==1.21',
+        "pandas",
+        "click",
+        "joblib",
+        "tensorflow-macos"
+    ]
+
+else: 
+
+    install_requires = [
+        "biopython>=1.79",
+        "pickle5",
+        "scikit-learn",
+        'numpy==1.21',
+        "pandas",
+        "click",
+        "joblib",
+        "tensorflow==2.9.0"
+    ]
+
 
 packages = setuptools.find_packages()
 print(packages) 
@@ -37,17 +72,7 @@ setuptools.setup(
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         "Operating System :: OS Independent",
     ],
-    install_requires=[  # TODO
-        "biopython>=1.79",
-        "pickle5",
-        "scikit-learn",
-        'numpy==1.21',
-        "pandas",
-        "click", 
-        "joblib",
-        "tensorflow==2.9.0"
-    ],
+    install_requires= install_requires,
     python_requires=">=3.7",
 )
-
-#may need to add nvidia-tensorrt==7.2.3.4 
+ 
