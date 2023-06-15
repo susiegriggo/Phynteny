@@ -75,7 +75,7 @@ def main(infile, out, model, confidence_path):
     found = predictor.generate_table(out + '.tsv', phynteny_dict, categories, phrog_integer)
 
     print('\nDone :)')
-    print('Phynteny found ' + str(found) + ' genes with 90% confidence')
+    print('Phynteny was able to add annotations for ' + str(found) + ' genes with a confidence of at least 90%')
 
 
 if __name__ == "__main__":
