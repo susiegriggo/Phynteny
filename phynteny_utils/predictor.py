@@ -32,6 +32,7 @@ def get_dict(dict_path):
 
     return dictionary
 
+
 def get_models(models):
     """
     Load in genbank models
@@ -41,6 +42,7 @@ def get_models(models):
     """
     files = glob.glob(models + "/*")
     return [tf.keras.models.load_model(m) for m in files if "h5" in m]
+
 
 def run_phynteny(outfile, gene_predictor, gb_dict, categories):
     """
@@ -57,12 +59,10 @@ def run_phynteny(outfile, gene_predictor, gb_dict, categories):
     keys = list(gb_dict.keys())
 
     # Run Phynteny
-    with open(outfile, "wt") if outfile != '.gbk' else sys.stdout as handle:
-
+    with open(outfile, "wt") if outfile != ".gbk" else sys.stdout as handle:
         for key in keys:
-
             # print the phage
-            print('Annotating the phage: ' + key, flush=True)
+            print("Annotating the phage: " + key, flush=True)
 
             # get current phage
             phages = {key: handle_genbank.extract_features(gb_dict.get(key))}
@@ -73,7 +73,12 @@ def run_phynteny(outfile, gene_predictor, gb_dict, categories):
             ]
 
             # make predictions
-            unk_idx, predictions, scores, confidence = gene_predictor.predict_annotations(phages)
+            (
+                unk_idx,
+                predictions,
+                scores,
+                confidence,
+            ) = gene_predictor.predict_annotations(phages)
 
             # update with these annotations
             cds = [i for i in gb_dict.get(key).features if i.type == "CDS"]
@@ -89,6 +94,7 @@ def run_phynteny(outfile, gene_predictor, gb_dict, categories):
 
     return gb_dict
 
+
 def generate_table(outfile, gb_dict, categories, phrog_integer):
     """
     Generate table summary of the annotations made
@@ -101,20 +107,22 @@ def generate_table(outfile, gb_dict, categories, phrog_integer):
     found = 0
 
     # convert annotations made to a text file
-    with click.open_file(outfile, "wt") if outfile != '.tsv' else sys.stdout as f:
+    with click.open_file(outfile, "wt") if outfile != ".tsv" else sys.stdout as f:
         f.write(
-            "ID\tstart\tend\tstrand\tphrog_id\tphrog_category\tphynteny_category\tphynteny_score\tconfidence\tphage\n")
+            "ID\tstart\tend\tstrand\tphrog_id\tphrog_category\tphynteny_category\tphynteny_score\tconfidence\tphage\n"
+        )
 
         for k in keys:
-
             # print(k, flush=True)
-            cds = [f for f in gb_dict.get(k).features if f.type == 'CDS']
+            cds = [f for f in gb_dict.get(k).features if f.type == "CDS"]
 
             # extract the features for the cds
             start = [c.location.start for c in cds]
             end = [c.location.end for c in cds]
             strand = [c.strand for c in cds]
-            ID = [c.qualifiers.get('ID')[0] if 'ID' in c.qualifiers else '' for  c in cds]
+            ID = [
+                c.qualifiers.get("ID")[0] if "ID" in c.qualifiers else "" for c in cds
+            ]
 
             # lists to iterate through
             phrog = []
@@ -124,19 +132,18 @@ def generate_table(outfile, gb_dict, categories, phrog_integer):
 
             # extract details for genes
             for c in cds:
-
-                if 'phrog' in c.qualifiers.keys():
-                    phrog.append(c.qualifiers.get('phrog')[0])
+                if "phrog" in c.qualifiers.keys():
+                    phrog.append(c.qualifiers.get("phrog")[0])
                 else:
-                    phrog.append('No_PHROG')
+                    phrog.append("No_PHROG")
 
-                if 'phynteny' in c.qualifiers.keys():
-                    phynteny_category.append(c.qualifiers.get('phynteny'))
-                    phynteny_score.append(c.qualifiers.get('phynteny_score'))
-                    phynteny_confidence.append(c.qualifiers.get('phynteny_confidence'))
+                if "phynteny" in c.qualifiers.keys():
+                    phynteny_category.append(c.qualifiers.get("phynteny"))
+                    phynteny_score.append(c.qualifiers.get("phynteny_score"))
+                    phynteny_confidence.append(c.qualifiers.get("phynteny_confidence"))
 
                     # update the number of genes found
-                    if float(c.qualifiers.get('phynteny_confidence')) > 0.9:
+                    if float(c.qualifiers.get("phynteny_confidence")) > 0.9:
                         found += 1
 
                 else:
@@ -144,16 +151,20 @@ def generate_table(outfile, gb_dict, categories, phrog_integer):
                     phynteny_score.append(np.nan)
                     phynteny_confidence.append(np.nan)
 
-            phrog = [int(p) if p != 'No_PHROG' else p for p in phrog] 
-            known_category = [categories.get(phrog_integer.get(p)) for p in phrog]  
-            known_category = ['unknown function' if c == None else c for c in known_category]
+            phrog = [int(p) if p != "No_PHROG" else p for p in phrog]
+            known_category = [categories.get(phrog_integer.get(p)) for p in phrog]
+            known_category = [
+                "unknown function" if c == None else c for c in known_category
+            ]
 
             # write to table
             for i in range(len(cds)):
                 f.write(
-                    f"{ID[i]}\t{start[i]}\t{end[i]}\t{strand[i]}\t{phrog[i]}\t{known_category[i]}\t{phynteny_category[i]}\t{phynteny_score[i]}\t{phynteny_confidence[i]}\t{k}\n")
+                    f"{ID[i]}\t{start[i]}\t{end[i]}\t{strand[i]}\t{phrog[i]}\t{known_category[i]}\t{phynteny_category[i]}\t{phynteny_score[i]}\t{phynteny_confidence[i]}\t{k}\n"
+                )
 
     return found
+
 
 class Predictor:
     """
@@ -231,12 +242,8 @@ class Predictor:
 
             scores = [yhat[i] for i in range(len(unk_idx))]
 
-
             predictions, confidence = statistics.compute_confidence(
                 scores, self.confidence_dict, self.category_names
             )
 
-
         return unk_idx, predictions, scores, confidence
-
-

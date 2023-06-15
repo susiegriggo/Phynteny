@@ -2,51 +2,63 @@
 
 import setuptools
 import glob
-import os 
+import os
 
-def is_mac(): 
+
+def is_mac():
     version = os.uname().version
     sysname = os.uname().sysname
 
-    return  sysname == 'Darwin' and 'ARM64' in version
+    return sysname == "Darwin" and "ARM64" in version
+
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 
-
-if is_mac(): 
+if is_mac():
     install_requires = [
         "biopython>=1.79",
         "pickle5",
         "scikit-learn",
-        'numpy==1.21',
+        "numpy==1.21",
         "pandas",
         "click",
         "joblib",
-        "tensorflow-macos"
+        "tensorflow-macos",
     ]
 
-else: 
-
+else:
     install_requires = [
         "biopython>=1.79",
         "pickle5",
         "scikit-learn",
-        'numpy==1.21',
+        "numpy==1.21",
         "pandas",
         "click",
         "joblib",
-        "tensorflow==2.9.0"
+        "tensorflow==2.9.0",
     ]
 
 
 packages = setuptools.find_packages()
-print(packages) 
+print(packages)
 package_data = {"phynteny_utils": ["phynteny_utils/*"]}
 
-model_files = glob.glob('phynteny_utils/model/*')
-data_files = [(".", ["LICENSE", "README.md"]), ('data', ['phynteny_utils/phrog_annotation_info/integer_category.pkl', 'phynteny_utils/phrog_annotation_info/phrog_annot_v4.tsv', 'phynteny_utils/phrog_annotation_info/phrog_integer.pkl',  'phynteny_utils/phrog_annotation_info/confidence_kde.pkl']  + model_files)]
+model_files = glob.glob("phynteny_utils/model/*")
+data_files = [
+    (".", ["LICENSE", "README.md"]),
+    (
+        "data",
+        [
+            "phynteny_utils/phrog_annotation_info/integer_category.pkl",
+            "phynteny_utils/phrog_annotation_info/phrog_annot_v4.tsv",
+            "phynteny_utils/phrog_annotation_info/phrog_integer.pkl",
+            "phynteny_utils/phrog_annotation_info/confidence_kde.pkl",
+        ]
+        + model_files,
+    ),
+]
 
 setuptools.setup(
     name="Phynteny",
@@ -72,7 +84,6 @@ setuptools.setup(
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         "Operating System :: OS Independent",
     ],
-    install_requires= install_requires,
+    install_requires=install_requires,
     python_requires=">=3.7",
 )
- 

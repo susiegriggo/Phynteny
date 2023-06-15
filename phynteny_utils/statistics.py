@@ -271,11 +271,11 @@ def class_scores(tt, scores, is_real, prot_class, df):
     fscore = (2 * TP) / (2 * TP + FP + FN)
     accuracy = (TP + TN) / (TP + TN + FP + FN)
     data_row = [prot_class, precision, recall, fscore, accuracy, tt, support]
-    
+
     new_row = pd.DataFrame([data_row], columns=df.columns)
-    df = pd.merge(df, new_row, how='outer')
-    
-    #df = df.append(pd.Series(data_row, index=df.columns), sort=False, ignore_index=True)
+    df = pd.merge(df, new_row, how="outer")
+
+    # df = df.append(pd.Series(data_row, index=df.columns), sort=False, ignore_index=True)
 
     return df
 
@@ -326,6 +326,7 @@ def threshold_metrics(scores, known_categories, category_names):
 
     return df_test_score
 
+
 def confidence_metrics(scores, confidence_out, known_categories, category_names):
     """
     Calculate various metrics at different Phynteny scores
@@ -372,6 +373,7 @@ def confidence_metrics(scores, confidence_out, known_categories, category_names)
     df_test_score["category"] = [category_names.get(i) for i in df_test_score["class"]]
 
     return df_test_score
+
 
 def count_critical_points(arr):
     return np.sum(np.diff(np.sign(np.diff(arr))) != 0)
