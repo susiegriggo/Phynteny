@@ -28,7 +28,7 @@ setuptools.setup(
     package_data=package_data,
     data_files=data_files,
     include_package_data=True,
-    scripts=["phynteny", "scripts/generate_training_data.py","scripts/train_crossvalidation.py" ],
+    scripts=["phynteny"],
     classifiers=[
         "Development Status :: 1 - Planning",
         "Programming Language :: Python :: 3",
