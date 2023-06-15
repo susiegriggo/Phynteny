@@ -38,7 +38,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[  # TODO
-        "biopython",
+        "biopython>=1.79",
         "pickle5",
         "scikit-learn",
         'numpy==1.21',
