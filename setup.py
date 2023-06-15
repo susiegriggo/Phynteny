@@ -20,7 +20,7 @@ if is_mac():
         "biopython>=1.79",
         "pickle5",
         "scikit-learn",
-        'numpy',
+        'numpy==1.24',
         "pandas",
         "click",
         "joblib",
