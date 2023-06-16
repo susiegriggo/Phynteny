@@ -6,8 +6,9 @@
 
 ## Phynteny: Synteny-based annotation of viral genes 
 
-Phynteny is still a work in progress and the LSTM model has not yet been optimised. Use with caution! 
+Approximatley 65% of all phage genes cannot be a attributed a known function. Phynteny uses a Long-Short Term Memory model trained on phage synteny (the conserved gene order across phages) to predict the function of unknown phage genes. 
 
+Phynteny is still a work in progress and the LSTM model has not yet been optimised. Use with caution! 
 
 ## Dependencies
 Phynteny installation requires Python 3.7 or above. You will need the following python dependencies to run Phynteny and it's related support scripts. The latest tested versions of the dependencies are: 
@@ -81,6 +82,8 @@ Coming soon: Notebooks demonstrating the performance of the model
 If you break Phynteny or would like to make any suggestions please open an issue or email me at susie.grigson@flinders.edu.au 
 
 ## Citation 
-If you use pharokka to annotate your phage before using Phynteny please site it as well! <br> 
+A preprint is currently in preparation which describes the methods used by Phynteny and its performance. For now please cite this GitHub repository (https://github.com/susiegriggo/Phynteny/tree/no_unknowns). <br> 
 
+
+If you use pharokka to annotate your phage before using Phynteny please site it as well! <br> 
 George Bouras, Roshan Nepal, Ghais Houtak, Alkis James Psaltis, Peter-John Wormald, Sarah Vreugde, Pharokka: a fast scalable bacteriophage annotation tool, Bioinformatics, Volume 39, Issue 1, January 2023, btac776, https://doi.org/10.1093/bioinformatics/btac776
