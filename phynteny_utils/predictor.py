@@ -11,7 +11,7 @@ from phynteny_utils import format_data
 import numpy as np
 import glob
 import sys
-from logaru import logger
+from loguru import logger
 from phynteny_utils import statistics
 from phynteny_utils import handle_genbank
 from Bio import SeqIO
@@ -47,7 +47,7 @@ def get_models(models):
         logger.critical('Models directory is empty')
     if len(files) == 1:
         logger.warning('Only one model was found. Use an ensemble of multiple models for best results.')
-    if len([m if 'h5' not in m for m in files]):
+    if len([m for m in files if 'h5' not in m]):
         logger.warning('there are files in your models directory which are not tensorflow models')
 
     return [tf.keras.models.load_model(m) for m in files if "h5" in m]
@@ -90,14 +90,17 @@ def run_phynteny(outfile, gene_predictor, gb_dict, categories):
                 confidence,
             ) = gene_predictor.predict_annotations(phages)
 
-            # update with these annotations
-            cds = [i for i in gb_dict.get(key).features if i.type == "CDS"]
 
-            # return everything back
-            for i in range(len(unk_idx)):
-                cds[unk_idx[i]].qualifiers["phynteny"] = categories.get(predictions[i])
-                cds[unk_idx[i]].qualifiers["phynteny_score"] = np.max(scores[i])
-                cds[unk_idx[i]].qualifiers["phynteny_confidence"] = confidence[i]
+            if len(predictions) > 0: 
+
+                # update with these annotations
+                cds = [i for i in gb_dict.get(key).features if i.type == "CDS"]
+
+                # return everything back
+                for i in range(len(unk_idx)):
+                    cds[unk_idx[i]].qualifiers["phynteny"] = categories.get(predictions[i])
+                    cds[unk_idx[i]].qualifiers["phynteny_score"] = np.max(scores[i])
+                    cds[unk_idx[i]].qualifiers["phynteny_confidence"] = confidence[i]
 
             # write to genbank file
             SeqIO.write(gb_dict.get(key), handle, "genbank")

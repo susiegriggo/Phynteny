@@ -52,8 +52,6 @@ def get_dict(dict_path):
     handle.close()
     return dictionary
 
-def get_genbank():
-
 def encode_strand(strand):
     """
     One hot encode the direction of each gene

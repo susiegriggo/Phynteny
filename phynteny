@@ -47,6 +47,7 @@ __status__ = "development"
     ),
 )
 @click.version_option(version=__version__)
+
 def main(infile, out, force, model, confidence_path):
     """
     Phynteny: synteny-based annotation of phage genes
@@ -103,7 +104,6 @@ def main(infile, out, force, model, confidence_path):
         + str(found)
         + " genes with a confidence of at least 90%"
     )
-
 
 if __name__ == "__main__":
     main()
