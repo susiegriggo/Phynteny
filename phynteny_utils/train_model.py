@@ -70,14 +70,18 @@ def get_initializer(initializer_function):
     :return: kernel_initializer
     """
 
-    if initializer_function == 'zeros':
+    if initializer_function == "zeros":
         kernel_initializer = initializers.Zeros()
-    elif initializer_function == 'random_normal':
+    elif initializer_function == "random_normal":
         kernel_initializer = initializers.RandomNormal(stddev=0.01, seed=42)
-    elif initializer_function == 'random_uniform':
-        kernel_initializer = initializers.RandomUniform(minval=-0.05, maxval=0.05, seed=42)
-    elif initializer_function == 'truncated_normal':
-        kernel_initializer = initializers.TruncatedNormal(mean=0.0, stddev=0.05, seed=42)
+    elif initializer_function == "random_uniform":
+        kernel_initializer = initializers.RandomUniform(
+            minval=-0.05, maxval=0.05, seed=42
+        )
+    elif initializer_function == "truncated_normal":
+        kernel_initializer = initializers.TruncatedNormal(
+            mean=0.0, stddev=0.05, seed=42
+        )
 
     else:
         raise ValueError(
@@ -89,23 +93,23 @@ def get_initializer(initializer_function):
 
 class Model:
     def __init__(
-            self,
-            phrog_path=pkg_resources.resource_filename(
-                "phynteny_utils", "phrog_annotation_info/phrog_integer.pkl"
-            ),
-            max_length=120,
-            layers=1,
-            neurons=100,
-            batch_size=32,
-            dropout=0.1,
-            activation="tanh",
-            optimizer_function="adam",
-            learning_rate=0.0001,
-            patience=5,
-            min_delta=0.0001,
-            l1_regularizer=0,
-            l2_regularizer=0,
-            kernel_initializer='zeros'
+        self,
+        phrog_path=pkg_resources.resource_filename(
+            "phynteny_utils", "phrog_annotation_info/phrog_integer.pkl"
+        ),
+        max_length=120,
+        layers=1,
+        neurons=100,
+        batch_size=32,
+        dropout=0.1,
+        activation="tanh",
+        optimizer_function="adam",
+        learning_rate=0.0001,
+        patience=5,
+        min_delta=0.0001,
+        l1_regularizer=0,
+        l2_regularizer=0,
+        kernel_initializer="zeros",
     ):
         """
         :param phrog_categories_path: location of the dictionary describing the phrog_categories :param
@@ -216,21 +220,20 @@ class Model:
         :return: model ready to be trained
         """
 
-        print('building model')
+        print("building model")
         # define the model
         model = Sequential()
 
         # get the kernel initializer
         kernel_initializer = get_initializer(self.kernel_intializer)
 
-        print('Number of layers: ' + str(self.layers))
+        print("Number of layers: " + str(self.layers))
 
         # loop to add layers to the model
         for layer in range(self.layers):
-
             # add the input layer
             if layer < self.layers - 1:
-                print('adding a layer')
+                print("adding a layer")
                 model.add(
                     Bidirectional(
                         LSTM(
@@ -245,12 +248,10 @@ class Model:
                     )
                 )
 
-
             # add the final hidden layer
             else:
+                print("adding the last layer")
 
-                print('adding the last layer')
-                
                 model.add(
                     Bidirectional(
                         LSTM(
@@ -268,9 +269,7 @@ class Model:
         model.add(Dense(self.num_functions, activation="softmax"))
 
         # get the optimization function
-        optimizer = get_optimizer(
-            self.optimizer_function, self.learning_rate
-        )
+        optimizer = get_optimizer(self.optimizer_function, self.learning_rate)
 
         model.compile(
             loss="categorical_crossentropy", metrics=["accuracy"], optimizer=optimizer
@@ -280,15 +279,15 @@ class Model:
         return model
 
     def train_model(
-            self,
-            X_1,
-            y_1,
-            X_val,
-            y_val,
-            model_out="model",
-            history_out="history",
-            epochs=140,
-            save=True,
+        self,
+        X_1,
+        y_1,
+        X_val,
+        y_val,
+        model_out="model",
+        history_out="history",
+        epochs=140,
+        save=True,
     ):
         """
         Function to train the LSTM model and save the trained model
@@ -325,12 +324,12 @@ class Model:
             pickle5.dump(history.history, handle, protocol=pickle5.HIGHEST_PROTOCOL)
 
     def train_crossValidation(
-            self,
-            model_out="model",
-            history_out="history",
-            n_splits=10,
-            epochs=140,
-            save=True,
+        self,
+        model_out="model",
+        history_out="history",
+        n_splits=10,
+        epochs=140,
+        save=True,
     ):
         """
         Perform stratified cross-validation
@@ -342,10 +341,10 @@ class Model:
         :param epochs: number of epochs to train for
         """
 
-        # get the masked category in each instance 
+        # get the masked category in each instance
         masked_cat = [np.where(self.y[i] == 1)[0][0] for i in range(len(self.y))]
 
-        # split into kfolds which are stratified 
+        # split into kfolds which are stratified
         skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
 
         # count the number of folds
@@ -372,8 +371,8 @@ class Model:
                 y_train,
                 X_val,
                 y_val,
-                model_out=model_out + ".rep_" + str(counter) + '.',
-                history_out=history_out + ".rep_" + str(counter) + '.',
+                model_out=model_out + ".rep_" + str(counter) + ".",
+                history_out=history_out + ".rep_" + str(counter) + ".",
                 epochs=epochs,
                 save=save,
             )
@@ -465,14 +464,14 @@ def check_parameters(hyperparameters, num_trials):
 
 
 def random_search(
-        data_path,
-        hyperparameters,
-        num_trials,
-        model_out="model",
-        history_out="history",
-        k_folds=10,
-        epochs=140,
-        save=False,
+    data_path,
+    hyperparameters,
+    num_trials,
+    model_out="model",
+    history_out="history",
+    k_folds=10,
+    epochs=140,
+    save=False,
 ):
     """
     Method for random parameter search

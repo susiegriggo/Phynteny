@@ -5,10 +5,35 @@ Functions to prepare data for training with the LSTM viral gene organisation mod
 # imports
 import numpy as np
 import random
+import os
+import sys 
+import shutil 
 import pickle5
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
-from phynteny_utils import statistics 
+from phynteny_utils import statistics
+
+def instantiate_dir(output_dir, force): 
+    """
+    Generate output directory releative to whether force has been specififed 
+    """ 
+
+    # remove the existing outdir on force
+    if force == True: 
+        if os.path.isdir(output_dir) == True: 
+            shutil.rmtree(output_dir)
+            
+        else: 
+            print("\n--force was specficied even though the output directory does not exist \n")
+
+    # make directory if force is not specified 
+    else: 
+        if os.path.isdir(output_dir) == True: 
+            sys.exit("\nOutput directory already exists and force was not specified. Please specify -f or --force to overwrite the output directory. \n")
+
+    # instantiate the output directory 
+    os.mkdir(output_dir)
+
 
 def get_dict(dict_path):
     """
@@ -149,7 +174,7 @@ def generate_example(sequence, num_functions, max_length, idx):
     # replace the function encoding for the masked sequence
     X[idx] = np.zeros(num_functions)
 
-    #return y just as this masked function
+    # return y just as this masked function
     y = y[idx]
 
     # reshape the matrices
@@ -157,6 +182,7 @@ def generate_example(sequence, num_functions, max_length, idx):
     y = y.reshape((1, num_functions))
 
     return X, y
+
 
 def generate_prediction(sequence, num_functions, max_length, idx):
     """
@@ -178,6 +204,7 @@ def generate_prediction(sequence, num_functions, max_length, idx):
     X[idx, 0:num_functions] = np.zeros(num_functions)
 
     return X.reshape((1, max_length, num_functions))
+
 
 def generate_dataset(data, num_functions, max_length):
     """
@@ -212,9 +239,7 @@ def generate_dataset(data, num_functions, max_length):
             idx = random.randint(1, len(encoding) - 1)
 
         # generate example
-        this_X, this_y = generate_example(
-            encoding, num_functions, max_length, idx
-        )
+        this_X, this_y = generate_example(encoding, num_functions, max_length, idx)
 
         # store the data
         X.append(this_X)
@@ -225,6 +250,7 @@ def generate_dataset(data, num_functions, max_length):
     y = np.array(y).reshape(len(keys), num_functions)
 
     return X, y
+
 
 def test_train(data, path, num_functions, max_genes=120, test_size=10):
     """
@@ -241,17 +267,17 @@ def test_train(data, path, num_functions, max_genes=120, test_size=10):
     keys = list(data.keys())
 
     # encode the data
-    X, y = generate_dataset(data,num_functions, max_genes)
+    X, y = generate_dataset(data, num_functions, max_genes)
     X_dict = dict(zip(keys, X))
     y_dict = dict(zip(keys, y))
 
     # generate a list describing which categories get masked
-    #categories = [
+    # categories = [
     #    np.where(y[i, np.where(~X[i, :, 0:num_functions].any(axis=1))[0][0]] == 1)[0][0]
     #    for i in range(len(X))
-    #]
-    #masked = [statistics.get_masked(X[i], num_functions) for i in range(len(X))] 
-    categories = [np.where(y[i] == 1)[0][0]  for i in range(len(X))] 
+    # ]
+    # masked = [statistics.get_masked(X[i], num_functions) for i in range(len(X))]
+    categories = [np.where(y[i] == 1)[0][0] for i in range(len(X))]
 
     train_keys, test_keys, train_cat, test_cat = train_test_split(
         [i for i in range(len(categories))],

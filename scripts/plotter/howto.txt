@@ -1,0 +1,2 @@
+# example of how to run the pharokka plotter 
+python pharokka_plotter.py -i ~/scratch/phynteny_data/testing_data/ibd/fasta/phage_comp_227_cycle_1.fa -n plot_test --gff ~/scratch/phynteny_data/testing_data/ibd/pharokka/phage_comp_227_cycle_1.pharokka.out/pharokka.gff --genbank phage_comp_277_cycle_1.phynteny.gbk  
