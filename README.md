@@ -10,6 +10,8 @@ Approximatley 65% of all bacteriophage (phage) genes cannot be attributed a know
 
 Phynteny is still a work in progress and the LSTM model has not yet been optimised. Use with caution! 
 
+**NOTE** This version of Phynteny will only annotate phages with 120 genes or less due to the architecture of the LSTM. We aim to adjust this in future versions. 
+
 
 ## Dependencies
 Phynteny installation requires Python 3.7 or above. You will need the following python dependencies to run Phynteny and it's related support scripts. The latest tested versions of the dependencies are: 
