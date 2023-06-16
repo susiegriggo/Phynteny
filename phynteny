@@ -7,8 +7,8 @@ Phynteny: synteny-based annotation of phage genes
 import sys
 import click
 import pickle
-import loguru
-from phynteny_utils import format_data 
+from loguru import logger 
+from phynteny_utils import format_data
 from phynteny_utils import handle_genbank
 from phynteny_utils import predictor
 import pkg_resources
@@ -27,67 +27,80 @@ __status__ = "development"
     "-o",
     "--out",
     type=click.STRING,
-    default='',
+    default="",
     help="output directory",
 )
-@click.option(
-    "-f", 
-    "--force", 
-    is_flag=True, 
-    help="Overwrite output directory"
-)
+@click.option("-f", "--force", is_flag=True, help="Overwrite output directory")
 @click.option(
     "-m",
     "--model",
     type=click.Path(exists=True),
     help="Path to custom LSTM models",
-    default=pkg_resources.resource_filename('phynteny_utils', 'model'),
+    default=pkg_resources.resource_filename("phynteny_utils", "model"),
 )
 @click.option(
     "-c",
     "--confidence_path",
     type=click.Path(exists=True),
     help="Dictionary of kernel desnity estimators to use for predicting confidence",
-    default=pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/confidence_kde.pkl')
+    default=pkg_resources.resource_filename(
+        "phynteny_utils", "phrog_annotation_info/confidence_kde.pkl"
+    ),
 )
 @click.version_option(version=__version__)
-
-
 def main(infile, out, force, model, confidence_path):
     """
     Phynteny: synteny-based annotation of phage genes
     """
 
+    # generate the output directory
+    format_data.instantiate_dir(out, force)
+
+    # generate the logging object
+    logger.add(out + '/phynteny.log', level="DEBUG")
+
     # get the absolute paths to phrog annotation files, model and confidence_kde
-    phrog_categories = pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/phrog_integer.pkl')
-    category_names = pkg_resources.resource_filename('phynteny_utils', 'phrog_annotation_info/integer_category.pkl')
-    categories = pickle.load(open(category_names, 'rb'))
-    phrog_integer = pickle.load(open(phrog_categories, 'rb'))
+    phrog_categories = pkg_resources.resource_filename(
+        "phynteny_utils", "phrog_annotation_info/phrog_integer.pkl"
+    )
+    logger.info(f"PHROG integer information located at: {phrog_categories}")
+    category_names = pkg_resources.resource_filename(
+        "phynteny_utils", "phrog_annotation_info/integer_category.pkl"
+    )
+    logger.info(f"PHROG category information located at: {category_names}")
+    categories = pickle.load(open(category_names, "rb"))
+    phrog_integer = pickle.load(open(phrog_categories, "rb"))
 
     # get entries in the genbank file
-    print('Reading genbank file!')
+    print("Reading genbank file!")
     gb_dict = handle_genbank.get_genbank(infile)
     if not gb_dict:
         click.echo("Error: no sequences found in genbank file")
         sys.exit()
-    
-    # generate the output directory 
-    format_data.instantiate_dir(out, force)
 
-    # TODO create a logging object 
     # create predictor object
-    gene_predictor = predictor.Predictor(model, phrog_categories, confidence_path, category_names)
+    gene_predictor = predictor.Predictor(
+        model, phrog_categories, confidence_path, category_names
+    )
 
     # generate predictions
-    print('Predicting...')
-    phynteny_dict = predictor.run_phynteny(out + '/phynteny.gbk', gene_predictor, gb_dict, categories)
+    print("Predicting...")
+    phynteny_dict = predictor.run_phynteny(
+        out + "/phynteny.gbk", gene_predictor, gb_dict, categories
+    )
 
     # output to a table
-    print('Generating table...')
-    found = predictor.generate_table(out + '/phynteny.tsv', phynteny_dict, categories, phrog_integer)
+    print("Generating table...")
+    found = predictor.generate_table(
+        out + "/phynteny.tsv", phynteny_dict, categories, phrog_integer
+    )
 
-    print('\nDone :)')
-    print('Phynteny was able to add annotations for ' + str(found) + ' genes with a confidence of at least 90%')
+    print("\nDone :)")
+    print(
+        "Phynteny was able to add annotations for "
+        + str(found)
+        + " genes with a confidence of at least 90%"
+    )
 
 
 if __name__ == "__main__":
