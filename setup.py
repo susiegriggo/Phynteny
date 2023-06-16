@@ -21,10 +21,11 @@ if is_mac():
         "biopython>=1.79",
         "pickle5",
         "scikit-learn",
-        "numpy==1.21",
+        'numpy==1.24',
         "pandas",
         "click",
         "joblib",
+        "loguru",
         "tensorflow-macos",
     ]
 
@@ -37,6 +38,7 @@ else:
         "pandas",
         "click",
         "joblib",
+        "loguru",
         "tensorflow==2.9.0",
     ]
 

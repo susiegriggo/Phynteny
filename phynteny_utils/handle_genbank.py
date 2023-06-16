@@ -245,7 +245,7 @@ def write_genbank(gb_dict, filename):
         handle.close()
 
 
-def get_data(input_data, gene_categories, phrog_integer, maximum_genes):
+def get_data(input_data, gene_categories, phrog_integer, maximum_genes=False):
     """
     Loop to fetch training and test data
 
@@ -283,16 +283,27 @@ def get_data(input_data, gene_categories, phrog_integer, maximum_genes):
                 if 0 in categories_present:
                     categories_present.remove(0)
 
-                # if above the minimum number of categories are included
-                if (
-                    len(phage_dict.get("phrogs")) <= maximum_genes
-                    and len(categories_present) >= gene_categories
-                ):
-                    # update the passing candidature
-                    prophage_pass += 1
+                if maximum_genes == False: 
+                    if len(categories_present) >= gene_categories: 
 
-                    # update dictionary with this entry
-                    g = re.split(",|\.", re.split("/", genbank.strip())[-1])[0]
-                    training_data[g + "_" + key] = phage_dict
+                        # update the passing candidature 
+                        prophage_pass += 1 
+                        
+                        # update dictionary with this entry
+                        g = re.split(",|\.", re.split("/", genbank.strip())[-1])[0]
+                        training_data[g + "_" + key] = phage_dict 
+
+                else: 
+                    # if above the minimum number of categories are included
+                    if (
+                        len(phage_dict.get("phrogs")) <= maximum_genes
+                        and len(categories_present) >= gene_categories
+                    ):
+                        # update the passing candidature
+                        prophage_pass += 1
+
+                        # update dictionary with this entry
+                        g = re.split(",|\.", re.split("/", genbank.strip())[-1])[0]
+                        training_data[g + "_" + key] = phage_dict
 
     return training_data

@@ -7,6 +7,8 @@ Phynteny: synteny-based annotation of phage genes
 import sys
 import click
 import pickle
+import loguru
+from phynteny_utils import format_data 
 from phynteny_utils import handle_genbank
 from phynteny_utils import predictor
 import pkg_resources
@@ -26,7 +28,13 @@ __status__ = "development"
     "--out",
     type=click.STRING,
     default='',
-    help="prefix for output",
+    help="output directory",
+)
+@click.option(
+    "-f", 
+    "--force", 
+    is_flag=True, 
+    help="Overwrite output directory"
 )
 @click.option(
     "-m",
@@ -45,7 +53,7 @@ __status__ = "development"
 @click.version_option(version=__version__)
 
 
-def main(infile, out, model, confidence_path):
+def main(infile, out, force, model, confidence_path):
     """
     Phynteny: synteny-based annotation of phage genes
     """
@@ -62,17 +70,21 @@ def main(infile, out, model, confidence_path):
     if not gb_dict:
         click.echo("Error: no sequences found in genbank file")
         sys.exit()
-    print(model) 
+    
+    # generate the output directory 
+    format_data.instantiate_dir(out, force)
+
+    # TODO create a logging object 
     # create predictor object
     gene_predictor = predictor.Predictor(model, phrog_categories, confidence_path, category_names)
 
     # generate predictions
     print('Predicting...')
-    phynteny_dict = predictor.run_phynteny(out + '.gbk', gene_predictor, gb_dict, categories)
+    phynteny_dict = predictor.run_phynteny(out + '/phynteny.gbk', gene_predictor, gb_dict, categories)
 
     # output to a table
     print('Generating table...')
-    found = predictor.generate_table(out + '.tsv', phynteny_dict, categories, phrog_integer)
+    found = predictor.generate_table(out + '/phynteny.tsv', phynteny_dict, categories, phrog_integer)
 
     print('\nDone :)')
     print('Phynteny was able to add annotations for ' + str(found) + ' genes with a confidence of at least 90%')

@@ -14,8 +14,8 @@ Phynteny installation requires Python 3.7 or above. You will need the following 
 * [python](https://www.python.org/) - version 3.9.0 
 * [sklearn](https://scikit-learn.org/stable/) - version 1.2.2 
 * [biopython](https://biopython.org/) - version 1.81
-* [numpy](https://numpy.org/) - version 1.21.0
-* [tensorflow](https://www.tensorflow.org/) - version 2.9.0
+* [numpy](https://numpy.org/) - version 1.21.0 (Windows, Linux, Apple Intel), version 1.24.0 (Apple M1/M2)
+* [tensorflow](https://www.tensorflow.org/) - version 2.9.0 (Windows, Linux, Apple Intel), tensorflow-macos version 2.11 (Apple M1/M2)
 * [pandas](https://pandas.pydata.org/) - version 2.0.2
 * [click](https://click.palletsprojects.com/en/8.1.x/) - version 8.1.3 <br> 
 
@@ -37,7 +37,7 @@ Phynteny takes a genbank file containing PHROG annotations as input. If you phag
 
 **Reccomended**  
 ```
-phynteny test_phage.gbk  -o test_phage_phynteny
+phynteny test_phage.gbk  -o test_phynteny
 ```
 
 **Custom** 

@@ -5,10 +5,34 @@ Functions to prepare data for training with the LSTM viral gene organisation mod
 # imports
 import numpy as np
 import random
+import os
+import sys 
+import shutil 
 import pickle5
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
 from phynteny_utils import statistics
+
+def instantiate_dir(output_dir, force): 
+    """
+    Generate output directory releative to whether force has been specififed 
+    """ 
+
+    # remove the existing outdir on force
+    if force == True: 
+        if os.path.isdir(output_dir) == True: 
+            shutil.rmtree(output_dir)
+            
+        else: 
+            print("\n--force was specficied even though the output directory does not exist \n")
+
+    # make directory if force is not specified 
+    else: 
+        if os.path.isdir(output_dir) == True: 
+            sys.exit("\nOutput directory already exists and force was not specified. Please specify -f or --force to overwrite the output directory. \n")
+
+    # instantiate the output directory 
+    os.mkdir(output_dir)
 
 
 def get_dict(dict_path):
