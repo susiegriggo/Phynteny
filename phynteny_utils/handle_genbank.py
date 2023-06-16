@@ -5,6 +5,7 @@ Module for manipulating genbank files
 import pandas as pd
 from pandas.errors import EmptyDataError
 import re
+from loguru import logger
 from Bio import SeqIO
 import gzip
 import random
@@ -44,7 +45,7 @@ def get_genbank(genbank):
                 gb_dict = SeqIO.to_dict(SeqIO.parse(handle, "gb"))
             handle.close()
         except ValueError:
-            print("ERROR: " + genbank.strip() + " is not a genbank file!")
+            logger.error(genbank.strip() + " is not a genbank file!")
             raise
 
     else:
@@ -53,7 +54,7 @@ def get_genbank(genbank):
                 gb_dict = SeqIO.to_dict(SeqIO.parse(handle, "gb"))
             handle.close()
         except ValueError:
-            print("ERROR: " + genbank.strip() + " is not a genbank file!")
+            logger.error(genbank.strip() + " is not a genbank file!")
             raise
 
     return gb_dict

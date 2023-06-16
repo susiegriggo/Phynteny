@@ -11,6 +11,7 @@ from phynteny_utils import format_data
 import numpy as np
 import glob
 import sys
+from logaru import logger
 from phynteny_utils import statistics
 from phynteny_utils import handle_genbank
 from Bio import SeqIO
@@ -37,12 +38,19 @@ def get_models(models):
     """
     Load in genbank models
 
-    :param models: path of directory where model obejcts are located
+    :param models: path of directory where model obejects are located
     :return: list of models to iterate over
     """
     files = glob.glob(models + "/*")
-    return [tf.keras.models.load_model(m) for m in files if "h5" in m]
 
+    if len(files) == 0:
+        logger.critical('Models directory is empty')
+    if len(files) == 1:
+        logger.warning('Only one model was found. Use an ensemble of multiple models for best results.')
+    if len([m if 'h5' not in m for m in files]):
+        logger.warning('there are files in your models directory which are not tensorflow models')
+
+    return [tf.keras.models.load_model(m) for m in files if "h5" in m]
 
 def run_phynteny(outfile, gene_predictor, gb_dict, categories):
     """
@@ -60,7 +68,9 @@ def run_phynteny(outfile, gene_predictor, gb_dict, categories):
 
     # Run Phynteny
     with open(outfile, "wt") if outfile != ".gbk" else sys.stdout as handle:
+
         for key in keys:
+
             # print the phage
             print("Annotating the phage: " + key, flush=True)
 
@@ -196,6 +206,9 @@ class Predictor:
             for q in list(phage_dict.keys())
         ]
 
+        if len(encodings[0]) == 0:
+            logger.info(f'your phage {list(phage_dict.keys())[0]}  has zero genes!')
+
         unk_idx = [i for i, x in enumerate(encodings[0]) if x == 0]
 
         if len(unk_idx) == 0:
@@ -205,7 +218,6 @@ class Predictor:
                 + " is already completely annotated!"
             )
 
-            phynteny = [self.category_names.get(e) for e in encodings[0]]
             predictions = []
             scores = []
             confidence = []
@@ -217,7 +229,6 @@ class Predictor:
                 + " has more genes than the maximum of 120!"
             )
 
-            phynteny = [self.category_names.get(e) for e in encodings[0]]
             predictions = []
             scores = []
             confidence = []

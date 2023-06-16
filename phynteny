@@ -6,8 +6,7 @@ Phynteny: synteny-based annotation of phage genes
 
 import sys
 import click
-import pickle
-from loguru import logger 
+from loguru import logger
 from phynteny_utils import format_data
 from phynteny_utils import handle_genbank
 from phynteny_utils import predictor
@@ -68,14 +67,16 @@ def main(infile, out, force, model, confidence_path):
         "phynteny_utils", "phrog_annotation_info/integer_category.pkl"
     )
     logger.info(f"PHROG category information located at: {category_names}")
-    categories = pickle.load(open(category_names, "rb"))
-    phrog_integer = pickle.load(open(phrog_categories, "rb"))
+
+    categories = format_data.get_dict(category_names)
+    phrog_integer = format_data.get_dict(phrog_categories)
 
     # get entries in the genbank file
     print("Reading genbank file!")
     gb_dict = handle_genbank.get_genbank(infile)
     if not gb_dict:
         click.echo("Error: no sequences found in genbank file")
+        logger.critcal('No sequences found in genbank file. Nothing to annotate')
         sys.exit()
 
     # create predictor object
@@ -85,6 +86,7 @@ def main(infile, out, force, model, confidence_path):
 
     # generate predictions
     print("Predicting...")
+    logger.info(f"Confidence object located at {confidence_path}")
     phynteny_dict = predictor.run_phynteny(
         out + "/phynteny.gbk", gene_predictor, gb_dict, categories
     )

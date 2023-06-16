@@ -9,9 +9,9 @@ import os
 import sys 
 import shutil 
 import pickle5
+from loguru import logger
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
-from phynteny_utils import statistics
 
 def instantiate_dir(output_dir, force): 
     """
@@ -38,14 +38,21 @@ def instantiate_dir(output_dir, force):
 def get_dict(dict_path):
     """
     Helper function to import dictionaries
+
+    :param dict_path: path to the desired dictionary
+    :return: loaded dictionary
     """
 
     with open(dict_path, "rb") as handle:
         dictionary = pickle5.load(handle)
+        if any(dictionary):
+            logger.info(f'dictionary loaded from {dict_path}')
+        else:
+            logger.crtical(f'dictionary could not be loaded from {dict_path}. Is it empty?')
     handle.close()
-
     return dictionary
 
+def get_genbank():
 
 def encode_strand(strand):
     """
