@@ -21,6 +21,7 @@ Phynteny installation requires Python 3.7 or above. You will need the following 
 * [numpy](https://numpy.org/) - version 1.21.0 (Windows, Linux, Apple Intel), version 1.24.0 (Apple M1/M2)
 * [tensorflow](https://www.tensorflow.org/) - version 2.9.0 (Windows, Linux, Apple Intel), tensorflow-macos version 2.11 (Apple M1/M2)
 * [pandas](https://pandas.pydata.org/) - version 2.0.2
+* [loguru(https://loguru.readthedocs.io/en/stable/) - version 0.7.0]
 * [click](https://click.palletsprojects.com/en/8.1.x/) - version 8.1.3 <br> 
 
 We reccomend GPU support if you are training Phynteny. This requires CUDA and cuDNN:
