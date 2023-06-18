@@ -21,6 +21,7 @@ Phynteny installation requires Python 3.7 or above. You will need the following 
 * [numpy](https://numpy.org/) - version 1.21.0 (Windows, Linux, Apple Intel), version 1.24.0 (Apple M1/M2)
 * [tensorflow](https://www.tensorflow.org/) - version 2.9.0 (Windows, Linux, Apple Intel), tensorflow-macos version 2.11 (Apple M1/M2)
 * [pandas](https://pandas.pydata.org/) - version 2.0.2
+* [loguru](https://loguru.readthedocs.io/en/stable/) - version 0.7.0
 * [click](https://click.palletsprojects.com/en/8.1.x/) - version 8.1.3 <br> 
 
 We reccomend GPU support if you are training Phynteny. This requires CUDA and cuDNN:
@@ -30,7 +31,7 @@ We reccomend GPU support if you are training Phynteny. This requires CUDA and cu
 ## Installation 
 
 ```
-git clone https://github.com/susiegriggo/Phynteny
+git clone https://github.com/susiegriggo/Phynteny.git --branch no_unknowns --depth 1 
 cd Phynteny 
 pip install . 
 ```
@@ -41,7 +42,7 @@ Phynteny takes a genbank file containing PHROG annotations as input. If you phag
 
 **Reccomended**  
 ```
-phynteny test_phage.gbk  -o test_phynteny
+phynteny test_data/test_phage.gbk  -o test_phynteny
 ```
 
 **Custom** 
