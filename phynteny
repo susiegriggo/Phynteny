@@ -6,6 +6,8 @@ Phynteny: synteny-based annotation of phage genes
 
 import sys
 import click
+import time 
+import datetime 
 from loguru import logger
 from phynteny_utils import format_data
 from phynteny_utils import handle_genbank
@@ -53,11 +55,15 @@ def main(infile, out, force, model, confidence_path):
     Phynteny: synteny-based annotation of phage genes
     """
 
+    # get the start time 
+    start_time = time.time()
+
     # generate the output directory
     format_data.instantiate_dir(out, force)
 
     # generate the logging object
     logger.add(out + '/phynteny.log', level="DEBUG")
+    logger.info('Starting Phynteny')
 
     # get the absolute paths to phrog annotation files, model and confidence_kde
     phrog_categories = pkg_resources.resource_filename(
@@ -68,12 +74,11 @@ def main(infile, out, force, model, confidence_path):
         "phynteny_utils", "phrog_annotation_info/integer_category.pkl"
     )
     logger.info(f"PHROG category information located at: {category_names}")
-
     categories = format_data.get_dict(category_names)
     phrog_integer = format_data.get_dict(phrog_categories)
 
     # get entries in the genbank file
-    print("Reading genbank file!")
+    logger.info("Reading genbank file!")
     gb_dict = handle_genbank.get_genbank(infile)
     if not gb_dict:
         click.echo("Error: no sequences found in genbank file")
@@ -86,24 +91,31 @@ def main(infile, out, force, model, confidence_path):
     )
 
     # generate predictions
-    print("Predicting...")
     logger.info(f"Confidence object located at {confidence_path}")
+    genbank_file = out + "/phynteny.gbk"
     phynteny_dict = predictor.run_phynteny(
-        out + "/phynteny.gbk", gene_predictor, gb_dict, categories
+        genbank_file, gene_predictor, gb_dict, categories
     )
+    logger.info(f"Finished predicting. Genbank file located at {genbank_file}")
 
     # output to a table
-    print("Generating table...")
+    logger.info("Generating table...")
+    table_file = out + "/phynteny.tsv"
     found = predictor.generate_table(
-        out + "/phynteny.tsv", phynteny_dict, categories, phrog_integer
+        table_file, phynteny_dict, categories, phrog_integer
     )
-
-    print("\nDone :)")
-    print(
+    logger.info(f"Generated table. Table located at {table_file}")
+    logger.info("\nDone :)")
+    logger.info(
         "Phynteny was able to add annotations for "
         + str(found)
         + " genes with a confidence of at least 90%"
     )
+    logger.info("Done :)")
+
+    # show the time elapsed 
+    elapsed_time = round(time.time() - start_time, 2)
+    logger.info(f'Elpased time: {elapsed_time} seconds')
 
 if __name__ == "__main__":
     main()

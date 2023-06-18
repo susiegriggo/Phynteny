@@ -44,13 +44,18 @@ def get_models(models):
     files = glob.glob(models + "/*")
 
     if len(files) == 0:
-        logger.critical('Models directory is empty')
+        logger.critical("Models directory is empty")
     if len(files) == 1:
-        logger.warning('Only one model was found. Use an ensemble of multiple models for best results.')
-    if len([m for m in files if 'h5' not in m]):
-        logger.warning('there are files in your models directory which are not tensorflow models')
+        logger.warning(
+            "Only one model was found. Use an ensemble of multiple models for best results."
+        )
+    if len([m for m in files if "h5" not in m]):
+        logger.warning(
+            "there are files in your models directory which are not tensorflow models"
+        )
 
     return [tf.keras.models.load_model(m) for m in files if "h5" in m]
+
 
 def run_phynteny(outfile, gene_predictor, gb_dict, categories):
     """
@@ -68,9 +73,7 @@ def run_phynteny(outfile, gene_predictor, gb_dict, categories):
 
     # Run Phynteny
     with open(outfile, "wt") if outfile != ".gbk" else sys.stdout as handle:
-
         for key in keys:
-
             # print the phage
             print("Annotating the phage: " + key, flush=True)
 
@@ -90,21 +93,22 @@ def run_phynteny(outfile, gene_predictor, gb_dict, categories):
                 confidence,
             ) = gene_predictor.predict_annotations(phages)
 
-
-            if len(predictions) > 0: 
-
+            if len(predictions) > 0:
                 # update with these annotations
                 cds = [i for i in gb_dict.get(key).features if i.type == "CDS"]
 
                 # return everything back
                 for i in range(len(unk_idx)):
-                    cds[unk_idx[i]].qualifiers["phynteny"] = categories.get(predictions[i])
-                    cds[unk_idx[i]].qualifiers["phynteny_score"] = np.max(scores[i])
+                    cds[unk_idx[i]].qualifiers["phynteny"] = categories.get(
+                        predictions[i]
+                    )
+                    round_score = str(np.max(scores[i]))
+                    cds[unk_idx[i]].qualifiers["phynteny_score"] = round_score
                     cds[unk_idx[i]].qualifiers["phynteny_confidence"] = confidence[i]
 
             # write to genbank file
             SeqIO.write(gb_dict.get(key), handle, "genbank")
-
+            logger.info(f"Annotated the phage {key}")
     return gb_dict
 
 
@@ -210,15 +214,13 @@ class Predictor:
         ]
 
         if len(encodings[0]) == 0:
-            logger.info(f'your phage {list(phage_dict.keys())[0]}  has zero genes!')
+            logger.info(f"your phage {list(phage_dict.keys())[0]}  has zero genes!")
 
         unk_idx = [i for i, x in enumerate(encodings[0]) if x == 0]
 
         if len(unk_idx) == 0:
-            print(
-                "Your phage "
-                + str(list(phage_dict.keys())[0])
-                + " is already completely annotated!"
+            logger.info(
+                f"Phage {str(list(phage_dict.keys())[0])} is already completely annotated!"
             )
 
             predictions = []
@@ -226,10 +228,8 @@ class Predictor:
             confidence = []
 
         elif len(encodings[0]) > 120:
-            print(
-                "Your phage "
-                + str(list(phage_dict.keys())[0])
-                + " has more genes than the maximum of 120!"
+            logger.info(
+                f"Your phage + {str(list(phage_dict.keys())[0])} has more genes than the maximum of 120!"
             )
 
             predictions = []
@@ -260,4 +260,8 @@ class Predictor:
                 scores, self.confidence_dict, self.category_names
             )
 
-        return unk_idx, predictions, scores, confidence
+        # round the scores
+        scores_round = np.round(scores, decimals=3)
+        confidence_round = np.round(confidence, decimals=4)
+
+        return unk_idx, predictions, scores_round, confidence_round
