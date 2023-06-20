@@ -1,10 +1,9 @@
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![FAME Lab](https://img.shields.io/badge/Bioinformatics-EdwardsLab-03A9F4)](https://fame.flinders.edu.au/)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/susiegriggo/Phynteny/no_unknowns/phynteny_logo.png" width="600" title="phynteny logo" alt="phynteny logo">
+</p>
 
-
-# Phynteny
-
-## Phynteny: Synteny-based annotation of bacteriophage genes 
+Phynteny: Synteny-based annotation of bacteriophage genes 
+=============== 
 
 Approximatley 65% of all bacteriophage (phage) genes cannot be attributed a known biological function. Phynteny uses a long-short term memory model trained on phage synteny (the conserved gene order across phages) to assign hypothetical phage proteins to a [PHROG](https://phrogs.lmge.uca.fr/) category. 
 
