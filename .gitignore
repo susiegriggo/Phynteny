@@ -152,6 +152,10 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+# Mac OS
+*.DS_Store
+./**/.DS_Store
+
 # Python egg
 Phynteny.egg-info
 
