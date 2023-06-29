@@ -194,7 +194,6 @@ def derep_trainingdata(training_data):
 
     return dict(zip(dedup_keys, [training_data.get(d) for d in dedup_keys]))
 
-
 def add_predictions(gb_dict, predictions):
     """
     Add predictions to the genbank dictionary
