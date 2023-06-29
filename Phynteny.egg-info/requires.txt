@@ -1,7 +1,0 @@
-biopython
-pickle5
-scikit-learn
-numpy==1.21
-pandas
-click
-joblib
