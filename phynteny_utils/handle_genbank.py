@@ -184,13 +184,13 @@ def derep_trainingdata(training_data):
 
     # write a function to remove duplicates in the training data
     training_str = ["".join([str(j) for j in i]) for i in training_encodings]
-    training_sense = ["".join(training_data.get(p).get("sense")) for p in training_keys]
-    training_hash = [
-        training_sense[i] + training_str[i] for i in range(len(training_keys))
-    ]
+    #training_sense = ["".join(training_data.get(p).get("sense")) for p in training_keys]
+    #training_hash = [
+    #    training_sense[i] + training_str[i] for i in range(len(training_keys))
+    #]
 
     # get the dereplicated keys
-    dedup_keys = list(dict(zip(training_hash, training_keys)).values())
+    dedup_keys = list(dict(zip(training_str, training_keys)).values())
 
     return dict(zip(dedup_keys, [training_data.get(d) for d in dedup_keys]))
 
