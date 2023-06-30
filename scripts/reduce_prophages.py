@@ -53,7 +53,7 @@ def main(input_data, gene_categories,  prefix):
     # takes a text file where each line is the file path to genbank files of phages to train a model
     print("getting input", flush=True)
     data = handle_genbank.get_data(
-        input_data, gene_categories, phrog_integer)  # dictionary to store all of the training data
+        input_data, gene_categories, phrog_integer, False)  # dictionary to store all of the training data
 
     # save the training data dictionary
     print("Done Processing!")
@@ -65,7 +65,7 @@ def main(input_data, gene_categories,  prefix):
     handle.close()
 
     # save the keys pf the dictionary to a text file 
-    filtered_prophages = list(dict(keys()))
+    filtered_prophages = list(dict(data.keys()))
     with open(prefix + '_all_data_headers.txt', 'w') as file: 
         for item in filtered_prophages: 
             file.write(item + '\n')

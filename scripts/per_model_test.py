@@ -28,7 +28,8 @@ import pkg_resources
 )
 @click.option("--out", "-o", type=click.Path(), help="output file path")
 def main(base, x, y, out):
-    print("Getting data...")
+
+    print("Getting utils...", flush = True)
 
     # fetch the different PHROG categories
     category_path = pkg_resources.resource_filename(
@@ -43,20 +44,23 @@ def main(base, x, y, out):
     confidence_dict = pickle5.load(open(confidence_path, "rb"))
 
     # fetch the testing data
+    print('reading in data', flush = True)
     test_X = pickle5.load(open(x, "rb"))
     test_X = list(test_X.values())
     test_y = pickle5.load(open(y, "rb"))
     test_y = list(test_y.values())
 
     # fetch the models
+    print('getting the models',flush = True)
     files = glob.glob(base + "/*")
     models = [tf.keras.models.load_model(f) for f in files]
 
     # compute the phynteny scores
-    print("Computing Phynteny Scores")
+    print("Computing Phynteny Scores", flush = True)
     scores = statistics.phynteny_score(test_X, len(category_names), models)
 
     # compute the confidence scores using the computed kernel densities
+    print('Computing confidence', flush = True)
     known_categories = statistics.known_category(test_X, test_y, len(category_names))
     predictions_out, confidence_out = statistics.compute_confidence(
         scores, confidence_dict, category_names
@@ -65,6 +69,7 @@ def main(base, x, y, out):
         {'true_category': known_categories, 'predicted_category': predictions_out,
          'phynteny_score': [np.max(i) for i in scores], 'confidence': confidence_out})
 
+    print('Saving the predictions to a file', flush = True)
     predictions_df.to_csv(out + "_predictions.tsv", sep='\t')
 
     # Build the ROC curve based on the Phynteny scores
