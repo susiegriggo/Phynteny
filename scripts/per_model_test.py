@@ -57,44 +57,50 @@ def main(base, x, y, out):
     scores = statistics.phynteny_score(test_X, len(category_names), models)
 
     # compute the confidence scores using the computed kernel densities
+    known_categories = statistics.known_category(test_X, test_y, len(category_names))
     predictions_out, confidence_out = statistics.compute_confidence(
         scores, confidence_dict, category_names
     )
+    predictions_df = pd.DataFrame(
+        {'true_category': known_categories, 'predicted_category': predictions_out,
+         'phynteny_score': [np.max(i) for i in scores], 'confidence': confidence_out})
+
+    predictions_df.to_csv(out + "_predictions.tsv", sep='\t')
 
     # Build the ROC curve based on the Phynteny scores
     # Would this be any different based on the transformed confidence (probs not)
-    known_categories = statistics.known_category(test_X, test_y, len(category_names))
-    print("Building ROC curve")
-    ROC_df = statistics.build_roc(scores, known_categories, category_names)
-    ROC_df.to_csv(out + "ROC.tsv", sep="\t")
+    #known_categories = statistics.known_category(test_X, test_y, len(category_names))
+    #print("Building ROC curve")
+    #ROC_df = statistics.build_roc(scores, known_categories, category_names)
+    #ROC_df.to_csv(out + "ROC.tsv", sep="\t")
 
     # compute the classification report
-    print("Generating metrics")
+    #print("Generating metrics")
     # note that this does not use confidence
-    report = classification_report(
-        known_categories, [np.argmax(i) for i in scores], output_dict=True
-    )
-    with open(out + "report.pkl", "wb") as f:
-        pickle5.dump(report, f)
+    #report = classification_report(
+    #    known_categories, [np.argmax(i) for i in scores], output_dict=True
+    #)
+    #with open(out + "report.pkl", "wb") as f:
+    #    pickle5.dump(report, f)
 
     # calculate the AUC for each category
-    print("Calculating AUC")
-    auc = statistics.per_category_auc(scores, known_categories, category_names)
-    with open(out + "AUC.pkl", "wb") as f:
-        pickle5.dump(auc, f)
+    #print("Calculating AUC")
+    #auc = statistics.per_category_auc(scores, known_categories, category_names)
+    #with open(out + "AUC.pkl", "wb") as f:
+    #    pickle5.dump(auc, f)
 
     # get the thresholds
-    print("Generating thresholds")
-    phynteny_df = statistics.threshold_metrics(scores, known_categories, category_names)
-    phynteny_df.to_csv(out + "phynteny_score_metrics.tsv", sep="\t")
+    #print("Generating thresholds")
+    #phynteny_df = statistics.threshold_metrics(scores, known_categories, category_names)
+    #phynteny_df.to_csv(out + "phynteny_score_metrics.tsv", sep="\t")
 
     # repeat on the confidence scores
     # get the thresholds
-    print("Comparing confidence")
-    phynteny_df = statistics.confidence_metrics(
-        scores, confidence_out, known_categories, category_names
-    )
-    phynteny_df.to_csv(out + "confidence_metrics.tsv", sep="\t")
+    #print("Comparing confidence")
+    #phynteny_df = statistics.confidence_metrics(
+    #    scores, confidence_out, known_categories, category_names
+    #)
+    #phynteny_df.to_csv(out + "confidence_metrics.tsv", sep="\t")
 
     print("FINISHED")
 
