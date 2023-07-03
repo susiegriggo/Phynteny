@@ -126,7 +126,7 @@ def generate_table(outfile, gb_dict, categories, phrog_integer):
     # convert annotations made to a text file
     with click.open_file(outfile, "wt") if outfile != ".tsv" else sys.stdout as f:
         f.write(
-            "ID\tstart\tend\tstrand\tphrog_id\tphrog_category\tphynteny_category\tphynteny_score\tconfidence\tphage\n"
+            "ID\tstart\tend\tstrand\tphrog_id\tphrog_category\tphynteny_category\tphynteny_score\tconfidence\ttranslation\tphage\n"
         )
 
         for k in keys:
@@ -136,6 +136,7 @@ def generate_table(outfile, gb_dict, categories, phrog_integer):
             # extract the features for the cds
             start = [c.location.start for c in cds]
             end = [c.location.end for c in cds]
+            translation = [c.location.translation for c in cds]
             strand = [c.strand for c in cds]
             ID = [
                 c.qualifiers.get("ID")[0] if "ID" in c.qualifiers else "" for c in cds
@@ -177,7 +178,7 @@ def generate_table(outfile, gb_dict, categories, phrog_integer):
             # write to table
             for i in range(len(cds)):
                 f.write(
-                    f"{ID[i]}\t{start[i]}\t{end[i]}\t{strand[i]}\t{phrog[i]}\t{known_category[i]}\t{phynteny_category[i]}\t{phynteny_score[i]}\t{phynteny_confidence[i]}\t{k}\n"
+                    f"{ID[i]}\t{start[i]}\t{end[i]}\t{strand[i]}\t{phrog[i]}\t{known_category[i]}\t{phynteny_category[i]}\t{phynteny_score[i]}\t{phynteny_confidence[i]}\t{translation[i]}\t{k}\n"
                 )
 
     return found
