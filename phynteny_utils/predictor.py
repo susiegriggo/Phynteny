@@ -136,7 +136,7 @@ def generate_table(outfile, gb_dict, categories, phrog_integer):
             # extract the features for the cds
             start = [c.location.start for c in cds]
             end = [c.location.end for c in cds]
-            translation = [c.location.translation for c in cds]
+            translation = [c.qualifiers.get('translation')[0] for c in cds]
             strand = [c.strand for c in cds]
             ID = [
                 c.qualifiers.get("ID")[0] if "ID" in c.qualifiers else "" for c in cds
