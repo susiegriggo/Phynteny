@@ -1,5 +1,8 @@
 [![Edwards Lab](https://img.shields.io/badge/Bioinformatics-EdwardsLab-03A9F4)](https://edwards.sdsu.edu/research)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![DOI](https://zenodo.org/badge/548652990.svg)](https://zenodo.org/badge/latestdoi/548652990)
+![GitHub language count](https://img.shields.io/github/languages/count/susiegriggo/Phynteny) 
+
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/susiegriggo/Phynteny/no_unknowns/phynteny_logo.png" width="600" title="phynteny logo" alt="phynteny logo">
@@ -67,7 +70,15 @@ Coming soon: Notebooks demonstrating the performance of the model
 ## Bugs and Suggestions 
 If you break Phynteny or would like to make any suggestions please open an issue or email me at susie.grigson@flinders.edu.au 
 
-## Citation 
-If you use pharokka to annotate your phage before using Phynteny please site it as well! <br> 
+## Wow! How can I cite this amazing piece of work 
 
-George Bouras, Roshan Nepal, Ghais Houtak, Alkis James Psaltis, Peter-John Wormald, Sarah Vreugde, Pharokka: a fast scalable bacteriophage annotation tool, Bioinformatics, Volume 39, Issue 1, January 2023, btac776, https://doi.org/10.1093/bioinformatics/btac776
+The Phynteny manuscript is currently in preparation. In the meantime, please cite Phynteny as: 
+```
+Grigson, S.R.,  Mallawaarachchi, V., Roach, M.R., Papudeshi, B., Bouras, G., Decewicz, P., Dinsdale, E.A. & Edwards, R.A. (2023). Phynteny: Synteny-based annotation of phage genomes. DOI: 10.5281/zenodo.8128917
+```
+
+If you use pharokka to annotate your phage before using Phynteny please cite it as well: 
+```
+Bouras, G., Nepal, R., Houtak, G., Psaltis, A. J., Wormald, P. J., & Vreugde, S. (2023). Pharokka: a fast scalable bacteriophage annotation tool. Bioinformatics, 39(1), btac776.
+```
+
