@@ -11,7 +11,7 @@
 Phynteny: Synteny-based annotation of bacteriophage genes 
 =============== 
 
-Approximatley 65% of all bacteriophage (phage) genes cannot be attributed a known biological function. Phynteny uses a long-short term memory model trained on phage synteny (the conserved gene order across phages) to assign hypothetical phage proteins to a [PHROG](https://phrogs.lmge.uca.fr/) category. 
+Approximately 65% of all bacteriophage (phage) genes cannot be attributed a known biological function. Phynteny uses a long-short term memory model trained on phage synteny (the conserved gene order across phages) to assign hypothetical phage proteins to a [PHROG](https://phrogs.lmge.uca.fr/) category. 
 
 Phynteny is still a work in progress and the LSTM model has not yet been optimised. Use with caution! 
 
@@ -19,8 +19,8 @@ Phynteny is still a work in progress and the LSTM model has not yet been optimis
 
 
 ## Dependencies
-Phynteny installation requires Python 3.7 or above. You will need the following python dependencies to run Phynteny and it's related support scripts. The latest tested versions of the dependencies are: 
-* [python](https://www.python.org/) - version 3.9.0 
+Phynteny installation requires Python 3.10 or above. You will need the following python dependencies to run Phynteny and its related support scripts. The latest tested versions of the dependencies are: 
+* [python](https://www.python.org/) - version 3.11.0 
 * [sklearn](https://scikit-learn.org/stable/) - version 1.2.2 
 * [biopython](https://biopython.org/) - version 1.81
 * [numpy](https://numpy.org/) - version 1.21.0 (Windows, Linux, Apple Intel), version 1.24.0 (Apple M1/M2)
@@ -29,7 +29,7 @@ Phynteny installation requires Python 3.7 or above. You will need the following 
 * [loguru](https://loguru.readthedocs.io/en/stable/) - version 0.7.0
 * [click](https://click.palletsprojects.com/en/8.1.x/) - version 8.1.3 <br> 
 
-We reccomend GPU support if you are training Phynteny. This requires CUDA and cuDNN:
+We recommend GPU support if you are training Phynteny. This requires CUDA and cuDNN:
 * [CUDA toolkit](https://developer.nvidia.com/cuda-toolkit) - version 11.2 
 * [cuDNN](https://developer.nvidia.com/cudnn) - version 8.1.1 
 
@@ -68,13 +68,14 @@ If you would like to generate your own Phynteny model using your own dataset ins
 Coming soon: Notebooks demonstrating the performance of the model 
 
 ## Bugs and Suggestions 
+
 If you break Phynteny or would like to make any suggestions please open an issue or email me at susie.grigson@flinders.edu.au 
 
-## Wow! How can I cite this amazing piece of work 
+## Wow! How can I cite this amazing piece of work? 
 
 The Phynteny manuscript is currently in preparation. In the meantime, please cite Phynteny as: 
 ```
-Grigson, S.R.,  Mallawaarachchi, V., Roach, M.R., Papudeshi, B., Bouras, G., Decewicz, P., Dinsdale, E.A. & Edwards, R.A. (2023). Phynteny: Synteny-based annotation of phage genomes. DOI: 10.5281/zenodo.8128917
+Grigson, S. R.,  Mallawaarachchi, V., Roach, M. R., Papudeshi, B., Bouras, G., Decewicz, P., Dinsdale, E. A. & Edwards, R. A. (2023). Phynteny: Synteny-based annotation of phage genomes. DOI: 10.5281/zenodo.8128917
 ```
 
 If you use pharokka to annotate your phage before using Phynteny please cite it as well: 
