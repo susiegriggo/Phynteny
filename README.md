@@ -61,7 +61,7 @@ Details of how to train the phynteny models and generate confidence estimates is
 
 ## Train Phynteny 
 
-If you would like to generate your own Phynteny model using your own dataset instructions and training scripts have been provided [here](https://github.com/susiegriggo/Phynteny/tree/no_unknowns/train_phynteny).
+Phynteny has already been trained for you on a dataset containing over 1 million prophages! If you feel inclined to generate your own Phynteny model using your own dataset, instructions and training scripts are provided [here](https://github.com/susiegriggo/Phynteny/tree/no_unknowns/train_phynteny).
 
 ## Performance 
 
