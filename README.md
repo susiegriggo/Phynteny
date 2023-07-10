@@ -30,7 +30,7 @@ We reccomend GPU support if you are training Phynteny. This requires CUDA and cu
 ## Installation 
 
 ```
-git clone https://github.com/susiegriggo/Phynteny.git --branch no_unknowns --depth 1 
+git clone https://github.com/susiegriggo/Phynteny.git --branch main --depth 1 
 cd Phynteny 
 pip install . 
 ```
