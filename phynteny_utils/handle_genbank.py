@@ -5,10 +5,11 @@ Module for manipulating genbank files
 import pandas as pd
 from pandas.errors import EmptyDataError
 import re
+from loguru import logger
 from Bio import SeqIO
 import gzip
 import random
-import binascii 
+import binascii
 
 
 def get_mmseqs(phrog_file):
@@ -37,14 +38,14 @@ def get_genbank(genbank):
     return: genbank file as a dictionary
     """
 
-    #if genbank.strip()[-3:] == ".gz":
-    if is_gzip_file(genbank.strip()): 
+    # if genbank.strip()[-3:] == ".gz":
+    if is_gzip_file(genbank.strip()):
         try:
             with gzip.open(genbank.strip(), "rt") as handle:
                 gb_dict = SeqIO.to_dict(SeqIO.parse(handle, "gb"))
             handle.close()
         except ValueError:
-            print("ERROR: " + genbank.strip() + " is not a genbank file!")
+            logger.error(genbank.strip() + " is not a genbank file!")
             raise
 
     else:
@@ -53,7 +54,7 @@ def get_genbank(genbank):
                 gb_dict = SeqIO.to_dict(SeqIO.parse(handle, "gb"))
             handle.close()
         except ValueError:
-            print("ERROR: " + genbank.strip() + " is not a genbank file!")
+            logger.error(genbank.strip() + " is not a genbank file!")
             raise
 
     return gb_dict
@@ -183,16 +184,15 @@ def derep_trainingdata(training_data):
 
     # write a function to remove duplicates in the training data
     training_str = ["".join([str(j) for j in i]) for i in training_encodings]
-    training_sense = ["".join(training_data.get(p).get("sense")) for p in training_keys]
-    training_hash = [
-        training_sense[i] + training_str[i] for i in range(len(training_keys))
-    ]
+    #training_sense = ["".join(training_data.get(p).get("sense")) for p in training_keys]
+    #training_hash = [
+    #    training_sense[i] + training_str[i] for i in range(len(training_keys))
+    #]
 
     # get the dereplicated keys
-    dedup_keys = list(dict(zip(training_hash, training_keys)).values())
+    dedup_keys = list(dict(zip(training_str, training_keys)).values())
 
     return dict(zip(dedup_keys, [training_data.get(d) for d in dedup_keys]))
-
 
 def add_predictions(gb_dict, predictions):
     """
@@ -212,7 +212,7 @@ def add_predictions(gb_dict, predictions):
 
 def is_gzip_file(f):
     """
-    Method copied from Phispy see https://github.com/linsalrob/PhiSpy/blob/master/PhiSpyModules/helper_functions.py 
+    Method copied from Phispy see https://github.com/linsalrob/PhiSpy/blob/master/PhiSpyModules/helper_functions.py
 
     This is an elegant solution to test whether a file is gzipped by reading the first two characters.
     I also use a version of this in fastq_pair if you want a C version :)
@@ -220,8 +220,9 @@ def is_gzip_file(f):
     :param f: the file to test
     :return: True if the file is gzip compressed else false
     """
-    with open(f, 'rb') as i:
-        return binascii.hexlify(i.read(2)) == b'1f8b' 
+    with open(f, "rb") as i:
+        return binascii.hexlify(i.read(2)) == b"1f8b"
+
 
 def write_genbank(gb_dict, filename):
     """
@@ -244,7 +245,7 @@ def write_genbank(gb_dict, filename):
         handle.close()
 
 
-def get_data(input_data, gene_categories, phrog_integer, maximum_genes):
+def get_data(input_data, gene_categories, phrog_integer, maximum_genes=False):
     """
     Loop to fetch training and test data
 
@@ -282,16 +283,27 @@ def get_data(input_data, gene_categories, phrog_integer, maximum_genes):
                 if 0 in categories_present:
                     categories_present.remove(0)
 
-                # if above the minimum number of categories are included
-                if (
-                    len(phage_dict.get("phrogs")) <= maximum_genes
-                    and len(categories_present) >= gene_categories
-                ):
-                    # update the passing candidature
-                    prophage_pass += 1
+                if maximum_genes == False: 
+                    if len(categories_present) >= gene_categories: 
 
-                    # update dictionary with this entry
-                    g = re.split(",|\.", re.split("/", genbank.strip())[-1])[0]
-                    training_data[g + "_" + key] = phage_dict
+                        # update the passing candidature 
+                        prophage_pass += 1 
+                        
+                        # update dictionary with this entry
+                        g = re.split(",|\.", re.split("/", genbank.strip())[-1])[0]
+                        training_data[g + "_" + key] = phage_dict 
+
+                else: 
+                    # if above the minimum number of categories are included
+                    if (
+                        len(phage_dict.get("phrogs")) <= maximum_genes
+                        and len(categories_present) >= gene_categories
+                    ):
+                        # update the passing candidature
+                        prophage_pass += 1
+
+                        # update dictionary with this entry
+                        g = re.split(",|\.", re.split("/", genbank.strip())[-1])[0]
+                        training_data[g + "_" + key] = phage_dict
 
     return training_data

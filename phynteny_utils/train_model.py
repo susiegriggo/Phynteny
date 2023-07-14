@@ -2,8 +2,6 @@
 Script to train model 
 
 Use to parameter sweep to determine optimal batch size, epochs, dropout, memory cells
-
-Think about using classes in this script -how to handle the features like max length etc
 """
 
 # imports
@@ -21,7 +19,8 @@ import numpy as np
 import random
 import pkg_resources
 import absl.logging
-import tensorflow as tf  
+import tensorflow as tf
+
 absl.logging.set_verbosity(absl.logging.ERROR)
 
 
@@ -35,31 +34,6 @@ def get_dict(dict_path):
     handle.close()
 
     return dictionary
-
-
-def feature_check(features_include):
-    """
-    Check the combination of features is possible
-
-    :param features_include: string describing the list of features
-    """
-
-    if features_include not in [
-        "all",
-        "strand",
-        "none",
-        "intergenic",
-        "gene_length",
-        "position",
-        "orientation_count",
-    ]:
-        raise Exception(
-            "Not an possible combination of features!\n"
-            "Must be one of: 'all', 'none', 'intergenic', 'gene_length', 'position', 'orientation_count', "
-            "'strand'"
-        )
-
-    return features_include
 
 
 def get_optimizer(optimizer_function, learning_rate):
@@ -87,6 +61,7 @@ def get_optimizer(optimizer_function, learning_rate):
 
     return optimizer_function
 
+
 def get_initializer(initializer_function):
     """
     Get the kernel initializer to train the LSTM
@@ -95,14 +70,18 @@ def get_initializer(initializer_function):
     :return: kernel_initializer
     """
 
-    if initializer_function == 'zeros':
+    if initializer_function == "zeros":
         kernel_initializer = initializers.Zeros()
-    elif initializer_function == 'random_normal':
+    elif initializer_function == "random_normal":
         kernel_initializer = initializers.RandomNormal(stddev=0.01, seed=42)
-    elif initializer_function == 'random_uniform':
-        kernel_initializer = initializers.RandomUniform(minval=-0.05, maxval=0.05, seed=42)
-    elif initializer_function == 'truncated_normal':
-        kernel_initializer = initializers.TruncatedNormal(mean=0.0, stddev=0.05, seed=42)
+    elif initializer_function == "random_uniform":
+        kernel_initializer = initializers.RandomUniform(
+            minval=-0.05, maxval=0.05, seed=42
+        )
+    elif initializer_function == "truncated_normal":
+        kernel_initializer = initializers.TruncatedNormal(
+            mean=0.0, stddev=0.05, seed=42
+        )
 
     else:
         raise ValueError(
@@ -111,6 +90,7 @@ def get_initializer(initializer_function):
 
     return kernel_initializer
 
+
 class Model:
     def __init__(
         self,
@@ -118,7 +98,6 @@ class Model:
             "phynteny_utils", "phrog_annotation_info/phrog_integer.pkl"
         ),
         max_length=120,
-        features_include="all",
         layers=1,
         neurons=100,
         batch_size=32,
@@ -130,12 +109,10 @@ class Model:
         min_delta=0.0001,
         l1_regularizer=0,
         l2_regularizer=0,
-        kernel_initializer='zeros'
+        kernel_initializer="zeros",
     ):
         """
         :param phrog_categories_path: location of the dictionary describing the phrog_categories :param
-        features_include: string describing a subset of features to use - one of ['all', 'strand', 'none',
-        'gene_start', 'intergenic', 'gene_length', 'position', 'orientation_count']
         :param max_length: maximum length of prophage to consider
         :param layers: number of hidden layers to use in the model
         :param neurons: number of memory cells in hidden layers
@@ -151,7 +128,6 @@ class Model:
 
         # set general information for the model
         self.phrog_categories = get_dict(phrog_path)
-        self.features_include = feature_check(features_include)
         self.num_functions = len(
             list(set(self.phrog_categories.values()))
         )  # dimension describing the number of functions
@@ -175,7 +151,6 @@ class Model:
         # placeholder variables
         self.X = []
         self.y = []
-        self.n_features = []
 
     def fit_data(self, data_path):
         """
@@ -187,18 +162,13 @@ class Model:
 
         # process the data
         self.X, self.y = format_data.generate_dataset(
-            data, self.features_include, self.num_functions, self.max_length
+            data, self.num_functions, self.max_length
         )
-        self.n_features = self.X.shape[2]
-
-        #TODO add a warning if the data exceeds the maximum length
-        #TODO make it possible to fit in data which has already been masked
 
     def parse_masked_data(self, X_path, y_path):
         """
         Parse a pre-masked dataset
         """
-
         # get the X data
         X = get_dict(X_path)
         self.X = np.array(list(X.values()))
@@ -206,35 +176,6 @@ class Model:
         # get the y data
         y = get_dict(y_path)
         self.y = np.array(list(y.values()))
-
-        # apply steps to remove features not specified
-        self.prune_features()
-
-        #update the number of known features
-        self.n_features = self.X.shape[2]
-
-    def prune_features(self):
-        """
-        Remove redundant features from a dataset
-        """
-
-        if self.features_include == 'strand':
-            self.X = self.X[:,:,:self.num_functions+2]
-
-        elif self.features_include == 'none':
-            self.X = self.X[:,:,:self.num_functions]
-
-        elif self.features_include == 'position':
-            self.X = np.delete(self.X, [10, 11, 13, 14, 15], axis=2)
-
-        elif self.features_include == 'intergenic':
-            self.X = np.delete(self.X, [10,11,12,14,15], axis=2)
-
-        elif self.features_include == 'gene_length':
-            self.X = np.delete(self.X, [10,11,12,13,15], axis=2)
-
-        elif self.features_include == 'orientation_count':
-            self.X = np.delete(self.X, [10,11,12,13,14], axis=2)
 
     def get_callbacks(self, model_out):
         """
@@ -279,57 +220,62 @@ class Model:
         :return: model ready to be trained
         """
 
+        print("building model")
         # define the model
         model = Sequential()
 
         # get the kernel initializer
         kernel_initializer = get_initializer(self.kernel_intializer)
 
-        # input layer
-        model.add(
-            Bidirectional(
-                LSTM(
-                    self.neurons,
-                    return_sequences=True,
-                    dropout=self.dropout,
-                    kernel_regularizer=self.kernel_regularizer,
-                    kernel_initializer=kernel_initializer,
-                    activation=self.activation,
-                ),
-                input_shape=(self.max_length, self.n_features),
-            )
-        )
+        print("Number of layers: " + str(self.layers))
 
-        # loop which controls the number of hidden layers
+        # loop to add layers to the model
         for layer in range(self.layers):
-            
-            model.add(
-                Bidirectional(
-                    LSTM(
-                        self.neurons,
-                        return_sequences=True,
-                        dropout=self.dropout,
-                        kernel_regularizer=self.kernel_regularizer,
-                        kernel_initializer=kernel_initializer,
-                        activation=self.activation,
+            # add the input layer
+            if layer < self.layers - 1:
+                print("adding a layer")
+                model.add(
+                    Bidirectional(
+                        LSTM(
+                            self.neurons,
+                            return_sequences=True,
+                            dropout=self.dropout,
+                            kernel_regularizer=self.kernel_regularizer,
+                            kernel_initializer=kernel_initializer,
+                            activation=self.activation,
+                        ),
+                        input_shape=(self.max_length, self.num_functions),
                     )
-                ),
-            )
+                )
+
+            # add the final hidden layer
+            else:
+                print("adding the last layer")
+
+                model.add(
+                    Bidirectional(
+                        LSTM(
+                            self.neurons,
+                            dropout=self.dropout,
+                            kernel_regularizer=self.kernel_regularizer,
+                            kernel_initializer=kernel_initializer,
+                            activation=self.activation,
+                        ),
+                        input_shape=(self.max_length, self.num_functions),
+                    )
+                )
 
         # output layer
-        model.add(TimeDistributed(Dense(self.num_functions, activation="softmax")))
+        model.add(Dense(self.num_functions, activation="softmax"))
 
-     
         # get the optimization function
-        optimizer = get_optimizer(
-            self.optimizer_function, self.learning_rate
-        )  
+        optimizer = get_optimizer(self.optimizer_function, self.learning_rate)
 
         model.compile(
             loss="categorical_crossentropy", metrics=["accuracy"], optimizer=optimizer
-        ) 
+        )
         print(model.summary(), flush=True)
-         
+
         return model
 
     def train_model(
@@ -358,7 +304,7 @@ class Model:
 
         # model with the best validation set accuracy therefore maximise
         model = self.generate_LSTM()
-         
+
         history = model.fit(
             X_1,
             y_1,
@@ -394,22 +340,11 @@ class Model:
         :param n_splits: number of k-folds to include. 1 is added to this to also generate a test set of equal size
         :param epochs: number of epochs to train for
         """
-        
-        # separate into testing and training data - testing data reserved
-        #X_1, X_test, y_1, y_test = train_test_split(
-        #    self.X, self.y, test_size=float(1 / 11), random_state=42
-        #)  # TODO move the test and train split out of this module - perhaps do this in the generate training data script
 
-        
-        # get the predicted category of the train data
-        masked_cat = [
-            np.where(
-                self.y[i, np.where(~self.X[i, :, 0 : self.num_functions].any(axis=1))[0][0]]
-                == 1
-            )[0][0]
-            for i in range(len(self.X))
-        ]
-    
+        # get the masked category in each instance
+        masked_cat = [np.where(self.y[i] == 1)[0][0] for i in range(len(self.y))]
+
+        # split into kfolds which are stratified
         skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
 
         # count the number of folds
@@ -417,14 +352,18 @@ class Model:
 
         # investigate each k-fold
         for train_index, val_index in skf.split(np.zeros(len(masked_cat)), masked_cat):
-            
             # generate stratified test and train sets
             X_train = self.X[train_index, :, :]
-            y_train = self.y[train_index, :, :]
+            y_train = self.y[train_index, :]
 
             # generate validation data for the training
             X_val = self.X[val_index, :, :]
-            y_val = self.y[val_index, :, :]
+            y_val = self.y[val_index, :]
+
+            # reshape
+            print(y_train.shape)
+            y_train = y_train.reshape((len(y_train), self.num_functions))
+            y_val = y_val.reshape((len(y_val), self.num_functions))
 
             # use the compile function here
             self.train_model(
@@ -432,12 +371,11 @@ class Model:
                 y_train,
                 X_val,
                 y_val,
-                model_out=model_out + ".rep_" + str(counter) + '.',
-                history_out=history_out + ".rep_" + str(counter) + '.',
+                model_out=model_out + ".rep_" + str(counter) + ".",
+                history_out=history_out + ".rep_" + str(counter) + ".",
                 epochs=epochs,
                 save=save,
             )
-
 
             # update counter
             counter += 1
@@ -487,7 +425,6 @@ def check_parameters(hyperparameters, num_trials):
 
     poss_parameters = [
         "max_length",
-        "features_include",
         "layers",
         "neurons",
         "batch_size",
@@ -510,7 +447,7 @@ def check_parameters(hyperparameters, num_trials):
         # Check that the parameter is allowed
         if k not in poss_parameters:
             raise ValueError(
-                " illegal parameter value. Parameters must be one of 'max_length', 'features_include', "
+                " illegal parameter value. Parameters must be one of 'max_length', "
                 "'layers', 'neurons', 'batch_size', 'dropout', 'activation', 'optimizer_function', "
                 "'learning_rate', 'patience', 'min_delta', 'l1_regularizer', 'l2_regularizer'"
             )
@@ -588,8 +525,6 @@ def random_search(
         if val_loss < best_loss:
             best_params = params
             best_loss = val_loss
-
-        # TODO compare the accuracy
 
     print(f"Best params: {best_params}")
     print(f"Best validation loss: {best_loss:.4f}")

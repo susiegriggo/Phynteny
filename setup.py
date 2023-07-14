@@ -2,16 +2,65 @@
 
 import setuptools
 import glob
+import os
+
+
+def is_mac():
+    version = os.uname().version
+    sysname = os.uname().sysname
+
+    return sysname == "Darwin" and "ARM64" in version
+
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+
+if is_mac():
+    install_requires = [
+        "biopython>=1.79",
+        "pickle5",
+        "scikit-learn==1.2.2",
+        'numpy==1.24',
+        "pandas",
+        "click",
+        "joblib",
+        "loguru",
+        "tensorflow-macos",
+    ]
+
+else:
+    install_requires = [
+        "biopython>=1.79",
+        "pickle5",
+        "scikit-learn==1.2.2",
+        "numpy==1.21",
+        "pandas",
+        "click",
+        "joblib",
+        "loguru",
+        "tensorflow==2.9.0",
+    ]
+
+
 packages = setuptools.find_packages()
-print(packages) 
+print(packages)
 package_data = {"phynteny_utils": ["phynteny_utils/*"]}
 
-model_files = glob.glob('phynteny_utils/test_model/*')
-data_files = [(".", ["LICENSE", "README.md"]), ('data', ['phynteny_utils/phrog_annotation_info/integer_category.pkl', 'phynteny_utils/phrog_annotation_info/phrog_annot_v4.tsv', 'phynteny_utils/phrog_annotation_info/phrog_integer.pkl', 'phynteny_utils/model/all_chunk_trained_LSTMbest_val_loss.h5', 'phynteny_utils/model/all_chunk_trained_LSTMbest_val_loss_thresholds.pkl'] + model_files)]
+model_files = glob.glob("phynteny_utils/model/*")
+data_files = [
+    (".", ["LICENSE", "README.md"]),
+    (
+        "data",
+        [
+            "phynteny_utils/phrog_annotation_info/integer_category.pkl",
+            "phynteny_utils/phrog_annotation_info/phrog_annot_v4.tsv",
+            "phynteny_utils/phrog_annotation_info/phrog_integer.pkl",
+            "phynteny_utils/phrog_annotation_info/confidence_kde.pkl",
+        ]
+        + model_files,
+    ),
+]
 
 setuptools.setup(
     name="Phynteny",
@@ -28,7 +77,7 @@ setuptools.setup(
     package_data=package_data,
     data_files=data_files,
     include_package_data=True,
-    scripts=["phynteny", "scripts/generate_training_data.py","scripts/train_crossvalidation.py" ],
+    scripts=["phynteny"],
     classifiers=[
         "Development Status :: 1 - Planning",
         "Programming Language :: Python :: 3",
@@ -37,16 +86,6 @@ setuptools.setup(
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         "Operating System :: OS Independent",
     ],
-    install_requires=[  # TODO
-        "biopython",
-        "pickle5",
-        "scikit-learn",
-        'numpy==1.21',
-        "pandas",
-        "click", 
-        "joblib",
-    ],
-    python_requires=">=3.7",
+    install_requires=install_requires,
+    python_requires=">=3.10",
 )
-
-#may need to add nvidia-tensorrt==7.2.3.4 

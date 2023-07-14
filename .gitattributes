@@ -1,0 +1,8 @@
+# .gitattributes
+
+# Ignore Jupyter Notebook files with bar plots
+*.ipynb linguist-vendored
+
+# Allow other file types to be recognized by Linguist
+*.py linguist-detectable=true
+*.md linguist-detectable=true
