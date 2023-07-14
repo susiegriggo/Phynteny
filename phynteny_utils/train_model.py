@@ -9,7 +9,6 @@ from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Bidirectional, TimeDistributed, Dense, LSTM
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 import tensorflow.keras.optimizers as optimizers
-from tensorflow.keras.optimizers.experimental import RMSprop
 import tensorflow.keras.initializers as initializers
 from tensorflow.keras.regularizers import L1L2
 from sklearn.model_selection import train_test_split, StratifiedKFold
@@ -49,7 +48,7 @@ def get_optimizer(optimizer_function, learning_rate):
     if optimizer_function == "adam":
         optimizer = optimizers.Adam(learning_rate=learning_rate, clipnorm=1)
     elif optimizer_function == "rmsprop":
-        optimizer = RMSprop(learning_rate=learning_rate)
+        optimizer = optimizers.RMSprop(learning_rate=learning_rate)
     elif optimizer_function == "adagrad":
         optimizer = optimizers.Adagrad(learning_rate=learning_rate)
     elif optimizer_function == "sgd":
