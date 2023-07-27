@@ -353,11 +353,10 @@ class Model:
 
         # restrict the kfolds to train if specified
         if include !=0:
-            skf = skf[include-0]
-            counter = include-0
+            counter = include-1
 
         # investigate each k-fold
-        for train_index, val_index in skf.split(np.zeros(len(masked_cat)), masked_cat):
+        for train_index, val_index in skf.split(np.zeros(len(masked_cat)), masked_cat)[include-1]:
             # generate stratified test and train sets
             X_train = self.X[train_index, :, :]
             y_train = self.y[train_index, :]
@@ -393,7 +392,6 @@ def mean_metric(history_out, n_splits):
 
     :param history_out: prefix used for the history output
     :param n_splits: number of splits used for the cross validation
-
     """
 
     # intialise lists to store data
