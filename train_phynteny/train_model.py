@@ -121,6 +121,14 @@ import pkg_resources
 #    type=click.Choice(["zeros", "random_normal", "random_uniform", "truncated_normal"]),
     help="kernel initializer",
 )
+@click.option(
+    '--include',
+    '-i',
+    default=0,
+    type=int,
+    help='Restrict kfold index',
+
+)
 
 def main(
     x_path,
@@ -142,6 +150,7 @@ def main(
     l1_regularize,
     l2_regularize,
     kernel_initializer,
+    include,
 ):
     print("STARTING")
     # create a model object
@@ -174,7 +183,7 @@ def main(
     # perform stratified k-fold validation
     print("Performing cross validation... ")
     model.train_crossValidation(
-        model_out=model_out, history_out=history_out, n_splits=k_folds, epochs=epochs
+        model_out=model_out, history_out=history_out, n_splits=k_folds, epochs=epochs, include=include
     )
 
 

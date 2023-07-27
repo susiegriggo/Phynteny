@@ -20,7 +20,7 @@ Phynteny is still a work in progress and the LSTM model has not yet been optimis
 
 ## Dependencies
 Phynteny installation requires Python 3.10 or above. You will need the following python dependencies to run Phynteny and its related support scripts. The latest tested versions of the dependencies are: 
-* [python](https://www.python.org/) - version 3.11.0 
+* [python](https://www.python.org/) - version 3.10.0 
 * [sklearn](https://scikit-learn.org/stable/) - version 1.2.2 
 * [biopython](https://biopython.org/) - version 1.81
 * [numpy](https://numpy.org/) - version 1.21.0 (Windows, Linux, Apple Intel), version 1.24.0 (Apple M1/M2)

@@ -329,6 +329,7 @@ class Model:
         n_splits=10,
         epochs=140,
         save=True,
+        include=0,
     ):
         """
         Perform stratified cross-validation
@@ -338,6 +339,7 @@ class Model:
         :param history_out: prefix of history file
         :param n_splits: number of k-folds to include. 1 is added to this to also generate a test set of equal size
         :param epochs: number of epochs to train for
+        :param include: which kfolds to use for training. Default is to loop through all of the kfolds.
         """
 
         # get the masked category in each instance
@@ -348,6 +350,11 @@ class Model:
 
         # count the number of folds
         counter = 0
+
+        # restrict the kfolds to train if specified
+        if include !=0:
+            skf = skf[include-0]
+            counter = include-0
 
         # investigate each k-fold
         for train_index, val_index in skf.split(np.zeros(len(masked_cat)), masked_cat):
