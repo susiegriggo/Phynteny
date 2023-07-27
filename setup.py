@@ -26,6 +26,7 @@ if is_mac():
         "click",
         "joblib",
         "loguru",
+        "tensorflow-cpu"
         "tensorflow-macos",
     ]
 
@@ -78,6 +79,13 @@ setuptools.setup(
     data_files=data_files,
     include_package_data=True,
     scripts=["phynteny"],
+    entry_points={
+        "console_scripts": [
+            "generate_training_data=train_phynteny.generate_training_data:main",
+            "train_model=train_phynteny.train_phyntenty:main",
+            "compute_confidence=train_phynteny.compute_confidence:main"
+        ],
+    },
     classifiers=[
         "Development Status :: 1 - Planning",
         "Programming Language :: Python :: 3",
