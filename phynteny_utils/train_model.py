@@ -355,8 +355,9 @@ class Model:
         train_index_kfold = []
         val_index_kfold = []
         for train_index, val_index in skf.split(np.zeros(len(masked_cat)), masked_cat):
+         
             train_index_kfold.append(train_index)
-            val_index_kfold.append(val_index_kfold)
+            val_index_kfold.append(val_index)
 
         # create list of kfolds to consider
         kfolds = []
@@ -367,7 +368,7 @@ class Model:
             counter = include-1
 
         for k in kfolds:
-
+            
             # generate stratified test and train sets
             X_train = self.X[train_index_kfold[k], :, :]
             y_train = self.y[train_index_kfold[k], :]
@@ -377,9 +378,10 @@ class Model:
             y_val = self.y[val_index_kfold[k], :]
 
             # reshape
-            print(y_train.shape)
-            y_train = y_train.reshape((len(y_train), self.num_functions))
-            y_val = y_val.reshape((len(y_val), self.num_functions))
+            #print('reshaping') 
+            #print(y_train.shape)
+            #y_train = y_train.reshape((len(y_train), self.num_functions))
+            #y_val = y_val.reshape((len(y_val), self.num_functions))
 
             # use the compile function here
             self.train_model(
