@@ -351,19 +351,30 @@ class Model:
         # count the number of folds
         counter = 0
 
-        # restrict the kfolds to train if specified
-        if include !=0:
+        # create a list of list which stores the required indicies
+        train_index_kfold = []
+        val_index_kfold = []
+        for train_index, val_index in skf.split(np.zeros(len(masked_cat)), masked_cat):
+            train_index_kfold.append(train_index)
+            val_index_kfold.append(val_index_kfold)
+
+        # create list of kfolds to consider
+        kfolds = []
+        if include == 0:
+            kfolds = list(range(n_splits))
+        else:
+            kfolds = [include-1]
             counter = include-1
 
-        # investigate each k-fold
-        for train_index, val_index in skf.split(np.zeros(len(masked_cat)), masked_cat)[include-1]:
+        for k in kfolds:
+
             # generate stratified test and train sets
-            X_train = self.X[train_index, :, :]
-            y_train = self.y[train_index, :]
+            X_train = self.X[train_index_kfold[k], :, :]
+            y_train = self.y[train_index_kfold[k], :]
 
             # generate validation data for the training
-            X_val = self.X[val_index, :, :]
-            y_val = self.y[val_index, :]
+            X_val = self.X[val_index_kfold[k], :, :]
+            y_val = self.y[val_index_kfold[k], :]
 
             # reshape
             print(y_train.shape)
@@ -384,7 +395,6 @@ class Model:
 
             # update counter
             counter += 1
-
 
 def mean_metric(history_out, n_splits):
     """
