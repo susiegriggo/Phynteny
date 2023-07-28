@@ -46,22 +46,13 @@ else:
 
 packages = setuptools.find_packages()
 print(packages)
-package_data = {"phynteny_utils": ["phynteny_utils/*"]}
+package_data = {
+	"phynteny_utils": ["phynteny_utils/*", "phynteny_utils/models/*", "phynteny_utils/phrog_annotation_info/*"],
+	"train_phynteny": ["train_phynteny/*"]
+}
 
 model_files = glob.glob("phynteny_utils/model/*")
-data_files = [
-    (".", ["LICENSE", "README.md"]),
-    (
-        "data",
-        [
-            "phynteny_utils/phrog_annotation_info/integer_category.pkl",
-            "phynteny_utils/phrog_annotation_info/phrog_annot_v4.tsv",
-            "phynteny_utils/phrog_annotation_info/phrog_integer.pkl",
-            "phynteny_utils/phrog_annotation_info/confidence_kde.pkl",
-        ]
-        + model_files,
-    ),
-]
+data_files = [(".", ["LICENSE", "README.md"])]
 
 setuptools.setup(
     name="Phynteny",
