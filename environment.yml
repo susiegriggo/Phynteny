@@ -1,80 +1,16 @@
-name: phynteny_install
+name: phynteny
 channels:
   - anaconda
   - defaults
 dependencies:
-  - _libgcc_mutex=0.1=main
-  - _openmp_mutex=5.1=1_gnu
-  - bzip2=1.0.8=h7b6447c_0
-  - ca-certificates=2023.01.10=h06a4308_0
-  - certifi=2022.12.7=py310h06a4308_0
-  - ld_impl_linux-64=2.38=h1181459_1
-  - libffi=3.4.2=h6a678d5_6
-  - libgcc-ng=11.2.0=h1234567_1
-  - libgomp=11.2.0=h1234567_1
-  - libstdcxx-ng=11.2.0=h1234567_1
-  - libuuid=1.41.5=h5eee18b_0
-  - ncurses=6.4=h6a678d5_0
-  - openssl=1.1.1s=h7f8727e_0
-  - pip=22.3.1=py310h06a4308_0
-  - python=3.10.9=h7a1cb2a_0
-  - readline=8.2=h5eee18b_0
-  - setuptools=65.6.3=py310h06a4308_0
-  - sqlite=3.40.1=h5082296_0
-  - tk=8.6.12=h1ccaba5_0
-  - wheel=0.37.1=pyhd3eb1b0_0
-  - xz=5.2.10=h5eee18b_1
-  - zlib=1.2.13=h5eee18b_0
   - pip:
-      - absl-py==1.4.0
-      - astunparse==1.6.3
-      - biopython==1.81
-      - cachetools==5.3.1
-      - charset-normalizer==3.1.0
-      - click==8.1.3
-      - flatbuffers==1.12
-      - gast==0.4.0
-      - google-auth==2.19.1
-      - google-auth-oauthlib==0.4.6
-      - google-pasta==0.2.0
-      - grpcio==1.54.2
-      - h5py==3.8.0
-      - idna==3.4
-      - joblib==1.2.0
-      - keras==2.9.0
-      - keras-preprocessing==1.1.2
-      - libclang==16.0.0
-      - markdown==3.4.3
-      - markupsafe==2.1.3
-      - numpy==1.21.0
-      - oauthlib==3.2.2
-      - opt-einsum==3.3.0
-      - packaging==23.1
-      - pandas==2.0.2
-      - phynteny==0
-      - pickle5==0.0.11
-      - protobuf==3.19.6
-      - pyasn1==0.5.0
-      - pyasn1-modules==0.3.0
-      - python-dateutil==2.8.2
-      - pytz==2023.3
-      - requests==2.31.0
-      - requests-oauthlib==1.3.1
-      - rsa==4.9
+      - biopython>=1.79
+      - pickle5
+      - click
+      - pandas 
+      - numpy==1.24
+      - loguru
+      - joblib
       - scikit-learn==1.2.2
-      - scipy==1.10.1
-      - six==1.16.0
-      - tensorboard==2.9.1
-      - tensorboard-data-server==0.6.1
-      - tensorboard-plugin-wit==1.8.1
       - tensorflow==2.9.0
-      - tensorflow-estimator==2.9.0
-      - tensorflow-io-gcs-filesystem==0.32.0
-      - termcolor==2.3.0
-      - threadpoolctl==3.1.0
-      - typing-extensions==4.6.3
-      - tzdata==2023.3
-      - urllib3==1.26.16
-      - werkzeug==2.3.6
-      - wrapt==1.15.0
 prefix: /home/grig0076/miniconda3/envs/phynteny_install
