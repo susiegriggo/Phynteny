@@ -2,6 +2,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![DOI](https://zenodo.org/badge/548652990.svg)](https://zenodo.org/badge/latestdoi/548652990)
 ![GitHub language count](https://img.shields.io/github/languages/count/susiegriggo/Phynteny) 
+[![CI](https://github.com/susiegriggo/Phynteny/actions/workflows/testing.yml/badge.svg)](https://github.com/susiegriggo/Phynteny/actions/workflows/testing.yml)
 
 
 <p align="center">
