@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import models
+from phynteny_utils import models
 import click
 import pkg_resources
 

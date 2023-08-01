@@ -87,7 +87,7 @@ def main(infile, out, force, models, confidence_path):
 
     # create predictor object
     gene_predictor = predictor.Predictor(
-        model, phrog_categories, confidence_path, category_names
+        models, phrog_categories, confidence_path, category_names
     )
 
     # generate predictions
