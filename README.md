@@ -20,7 +20,7 @@ Phynteny is still a work in progress and the LSTM model has not yet been optimis
 
 
 ## Dependencies
-Phynteny installation requires Python 3.10 or above. You will need the following python dependencies to run Phynteny and its related support scripts. The latest tested versions of the dependencies are: 
+Phynteny installation requires Python 3.8 or above. You will need the following python dependencies to run Phynteny and its related support scripts. The latest tested versions of the dependencies are: 
 * [python](https://www.python.org/) - version 3.10.0 
 * [sklearn](https://scikit-learn.org/stable/) - version 1.2.2 
 * [biopython](https://biopython.org/) - version 1.81
@@ -36,11 +36,25 @@ We recommend GPU support if you are training Phynteny. This requires CUDA and cu
 
 ## Installation 
 
+Currently Phynteny can be installed from this repository
 ```
 git clone https://github.com/susiegriggo/Phynteny.git --branch main --depth 1 
 cd Phynteny 
 pip install . 
 ```
+
+### Install Models 
+Once you've installed Phynteny you'll need to download the pre-trained models
+```
+install_models.py 
+```
+If you would like to specify a particular location to download the models run
+```
+install_models.py -o <path/to/database_dir>
+```
+
+If for some reason this does not work. you can download the pre-trained models from [Zenodo](https://zenodo.org/record/8198288/files/phynteny_models_v0.1.11.tar.gz) and untar in a location of your choice. 
+
 
 ## Usage 
 
@@ -72,7 +86,7 @@ Coming soon: Notebooks demonstrating the performance of the model
 
 If you break Phynteny or would like to make any suggestions please open an issue or email me at susie.grigson@flinders.edu.au 
 
-## Wow! How can I cite this amazing piece of work? 
+## Wow! How can I cite this incredible piece of work? 
 
 The Phynteny manuscript is currently in preparation. In the meantime, please cite Phynteny as: 
 ```

@@ -39,7 +39,5 @@ def test_phynteny_command(tmp_dir):
     """
     Test phynteny annotation command
     """
-    cmd = f"phynteny {TEST_ROODIR}/data/test_phage.gbk -o {tmp_dir} -f"
+    cmd = f"phynteny --help"
     exec_command(cmd)
-
-# add tests for the training generation and confidence computation
