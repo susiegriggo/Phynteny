@@ -25,7 +25,7 @@ if is_mac():
         "pandas",
         "click",
         "joblib",
-        "loguru", 
+        "loguru",
         "tensorflow-macos",
     ]
 
