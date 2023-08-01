@@ -34,10 +34,10 @@ __status__ = "development"
 @click.option("-f", "--force", is_flag=True, help="Overwrite output directory")
 @click.option(
     "-m",
-    "--model",
+    "--models",
     type=click.Path(exists=True),
-    help="Path to custom LSTM models",
-    default=pkg_resources.resource_filename("phynteny_utils", "model"),
+    help="Path to directory containing phynteny models",
+    default=pkg_resources.resource_filename("phynteny_utils", "models"),
 )
 @click.option(
     "-c",
@@ -50,7 +50,7 @@ __status__ = "development"
 )
 @click.version_option(version=__version__)
 
-def main(infile, out, force, model, confidence_path):
+def main(infile, out, force, models, confidence_path):
     """
     Phynteny: synteny-based annotation of phage genes
     """

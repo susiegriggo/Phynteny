@@ -1,8 +1,3 @@
-""" 
-Script to train model 
-
-Use to parameter sweep to determine optimal batch size, epochs, dropout, memory cells
-"""
 
 # imports
 from tensorflow.keras import Sequential
@@ -343,9 +338,11 @@ class Model:
         """
 
         # get the masked category in each instance
+        print('categories', flush = True)
         masked_cat = [np.where(self.y[i] == 1)[0][0] for i in range(len(self.y))]
 
         # split into kfolds which are stratified
+        print('skf')
         skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
 
         # count the number of folds
@@ -359,6 +356,8 @@ class Model:
             train_index_kfold.append(train_index)
             val_index_kfold.append(val_index)
 
+
+        print(val_index_kfold)
         # create list of kfolds to consider
         kfolds = []
         if include == 0:

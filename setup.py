@@ -26,7 +26,7 @@ if is_mac():
         "click",
         "joblib",
         "loguru",
-        "tensorflow-cpu"
+        "tensorflow-cpu", 
         "tensorflow-macos",
     ]
 
@@ -51,7 +51,7 @@ package_data = {
 	"train_phynteny": ["train_phynteny/*"]
 }
 
-model_files = glob.glob("phynteny_utils/model/*")
+model_files = glob.glob("phynteny_utils/models/*")
 data_files = [(".", ["LICENSE", "README.md"])]
 
 setuptools.setup(
@@ -74,7 +74,8 @@ setuptools.setup(
         "console_scripts": [
             "generate_training_data=train_phynteny.generate_training_data:main",
             "train_model=train_phynteny.train_phyntenty:main",
-            "compute_confidence=train_phynteny.compute_confidence:main"
+            "compute_confidence=train_phynteny.compute_confidence:main",
+            "install_models=phynteny_utils.install_models:main"
         ],
     },
     classifiers=[
