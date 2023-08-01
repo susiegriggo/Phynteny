@@ -2,7 +2,6 @@ include *.md
 include LICENSE
 
 recursive-include phynteny_utils/ *
-recursive-include phynteny_utils/models/ *
 recursive-include phynteny_utils/phrog_annotation_info/ *
 recursive-include test_data/ *
 recursive-include train_phynteny/ *  
