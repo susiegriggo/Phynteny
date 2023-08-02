@@ -1,5 +1,6 @@
 include *.md
 include LICENSE
+include VERSION
 
 recursive-include phynteny_utils/ *
 recursive-include phynteny_utils/phrog_annotation_info/ *
