@@ -1,23 +1,24 @@
-[![Edwards Lab](https://img.shields.io/badge/Bioinformatics-EdwardsLab-03A9F4)](https://edwards.sdsu.edu/research)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![DOI](https://zenodo.org/badge/548652990.svg)](https://zenodo.org/badge/latestdoi/548652990)
-![GitHub language count](https://img.shields.io/github/languages/count/susiegriggo/Phynteny) 
-[![CI](https://github.com/susiegriggo/Phynteny/actions/workflows/testing.yml/badge.svg)](https://github.com/susiegriggo/Phynteny/actions/workflows/testing.yml)
-
-
 <p align="center">
   <img src="https://raw.githubusercontent.com/susiegriggo/Phynteny/no_unknowns/phynteny_logo.png" width="600" title="phynteny logo" alt="phynteny logo">
 </p>
 
 Phynteny: Synteny-based annotation of bacteriophage genes 
+[![Edwards Lab](https://img.shields.io/badge/Bioinformatics-EdwardsLab-03A9F4)](https://edwards.sdsu.edu/research)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![DOI](https://zenodo.org/badge/548652990.svg)](https://zenodo.org/badge/latestdoi/548652990)
+![GitHub language count](https://img.shields.io/github/languages/count/susiegriggo/Phynteny) 
+[![CI](https://github.com/susiegriggo/Phynteny/actions/workflows/testing.yml/badge.svg)](https://github.com/susiegriggo/Phynteny/actions/workflows/testing.yml)
+[![PyPI version](https://badge.fury.io/py/phynteny.svg)](https://badge.fury.io/py/phynteny)
+[![Downloads](https://static.pepy.tech/badge/phynteny)](https://pepy.tech/project/phynteny)
+[![Anaconda-Server Badge](https://anaconda.org/bioconda/phynteny/badges/version.svg)](https://anaconda.org/bioconda/phynteny)
+![Conda](https://img.shields.io/conda/dn/bioconda/phynteny)
 =============== 
 
 Approximately 65% of all bacteriophage (phage) genes cannot be attributed a known biological function. Phynteny uses a long-short term memory model trained on phage synteny (the conserved gene order across phages) to assign hypothetical phage proteins to a [PHROG](https://phrogs.lmge.uca.fr/) category. 
 
 Phynteny is still a work in progress and the LSTM model has not yet been optimised. Use with caution! 
 
-**NOTE** This version of Phynteny will only annotate phages with 120 genes or less due to the architecture of the LSTM. We aim to adjust this in future versions. 
-
+**NOTE:** This version of Phynteny will only annotate phages with 120 genes or less due to the architecture of the LSTM. We aim to adjust this in future versions. 
 
 ## Dependencies
 Phynteny installation requires Python 3.8 or above. You will need the following python dependencies to run Phynteny and its related support scripts. The latest tested versions of the dependencies are: 
@@ -35,30 +36,57 @@ We recommend GPU support if you are training Phynteny. This requires CUDA and cu
 * [cuDNN](https://developer.nvidia.com/cudnn) - version 8.1.1 
 
 ## Installation 
+### Option 1: Installing Phynteny using conda (recommended)
+You can install Phynteny from bioconda at [https://anaconda.org/bioconda/phynteny](https://anaconda.org/bioconda/phynteny). Make sure you have [`conda`](https://docs.conda.io/en/latest/) installed. 
+```bash
+# create conda environment and install phynteny 
+conda create -n phynteny -c bioconda phynteny
+ 
+# activate environment
+conda activate phynteny  
+```
 
-Currently Phynteny can be installed from this repository
+**NOTE:** bioconda installations of Phynteny do not have GPU support. This is fine for most uses but not does not enable training of phynteny models. 
+
+Now you can go to [Install Models](#install-models) to install pre-trained phynteny models. 
+
+### Option 2: Installing Phynteny using pip
+You can install Phynteny from PyPI at [https://pypi.org/project/phynteny/](https://pypi.org/project/phynteny/). Make sure you have [`pip`](https://pip.pypa.io/en/stable/) and [`mamba`](https://mamba.readthedocs.io/en/latest/index.html) installed.
+
+```
+pip install phynteny
+```
+
+**NOTE:** pip installation is recommended for training Phynteny models 
+
+Now you can go to [Install Models](#install-models) to install pre-trained phynteny models. 
+
+### Option 3: Installing Phynteny from source 
+If all else fails you can install Phynteny from this repo. 
+
 ```
 git clone https://github.com/susiegriggo/Phynteny.git --branch main --depth 1 
 cd Phynteny 
 pip install . 
 ```
 
+Now you can go to [Install Models](#install-models) to install pre-trained phynteny models. 
+
 ### Install Models 
 Once you've installed Phynteny you'll need to download the pre-trained models
 ```
-install_models.py 
+install_models 
 ```
 If you would like to specify a particular location to download the models run
 ```
-install_models.py -o <path/to/database_dir>
+install_models -o <path/to/database_dir>
 ```
 
 If for some reason this does not work. you can download the pre-trained models from [Zenodo](https://zenodo.org/record/8198288/files/phynteny_models_v0.1.11.tar.gz) and untar in a location of your choice. 
 
-
 ## Usage 
 
-Phynteny takes a genbank file containing PHROG annotations as input. If you phage is not yet in this format, [pharokka](https://github.com/gbouras13/pharokka) can take your phage (in fasta format) to a genbank file with PHROG annotations.  Phynteny will then return a genbank files and a table containing the details of the predictions made using phynteny. Each prediction is accompanied by a 'phynteny score' which ranges between 1-10 and a recalibrated confidence score. 
+Phynteny takes a genbank file containing PHROG annotations as input. If your phage is not yet in this format, [pharokka](https://github.com/gbouras13/pharokka) can take your phage (in fasta format) to a genbank file with PHROG annotations.  Phynteny will then return a genbank files and a table containing the details of the predictions made using phynteny. Each prediction is accompanied by a 'phynteny score' which ranges between 1-10 and a recalibrated confidence score. 
 
 **Reccomended**  
 ```
