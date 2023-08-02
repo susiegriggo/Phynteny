@@ -15,6 +15,10 @@ def is_mac():
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+def get_version():
+    with open("VERSION", "r") as f:
+        return f.readline().strip()
+
 
 if is_mac():
     install_requires = [
@@ -55,7 +59,7 @@ data_files = [(".", ["LICENSE", "README.md"])]
 
 setuptools.setup(
     name="Phynteny",
-    version="0",
+    version=get_version(),
     zip_safe=True,
     author="Susanna Grigson",
     author_email="susie.grigson@gmail.com",
