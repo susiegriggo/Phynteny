@@ -58,7 +58,7 @@ model_files = glob.glob("phynteny_utils/models/*")
 data_files = [(".", ["LICENSE", "README.md"])]
 
 setuptools.setup(
-    name="Phynteny",
+    name="phynteny",
     version=get_version(),
     zip_safe=True,
     author="Susanna Grigson",
