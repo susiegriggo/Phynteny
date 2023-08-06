@@ -144,7 +144,7 @@ def generate_table(outfile, gb_dict, categories, phrog_integer):
 
             strand = [c.strand for c in cds]
             ID = [
-                c.qualifiers.get("ID")[0] if "ID" in c.qualifiers else "" for c in cds
+                c.qualifiers.get("protein_id")[0] if "protein_id" in c.qualifiers else "" for c in cds
             ]
 
             # lists to iterate through
