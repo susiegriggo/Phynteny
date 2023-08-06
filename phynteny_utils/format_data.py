@@ -153,7 +153,7 @@ def one_hot_decode(encoded_seq):
     return [np.argmax(vector) for vector in encoded_seq]
 
 
-def generate_example(sequence, num_functions, max_length, idx):
+def generate_example(sequence, num_functions, max_length, idx, unmask = False):
     """
     Convert a sequence of PHROG functions and associated to a supervised learning problem
 
@@ -161,6 +161,7 @@ def generate_example(sequence, num_functions, max_length, idx):
     :param num_functions: number of possible PHROG categories
     :param max_length: maximum length of a sequence
     :param idx: index of the category to mask
+    :param unmask: specify if masking should be ignored
     :return: training or test example separated as X and y matrices
     """
 
@@ -177,7 +178,8 @@ def generate_example(sequence, num_functions, max_length, idx):
     X = np.array(one_hot_encode(padded_sequence, num_functions))
 
     # replace the function encoding for the masked sequence
-    X[idx] = np.zeros(num_functions)
+    if not unmask:
+        X[idx] = np.zeros(num_functions)
 
     # return y just as this masked function
     y = y[idx]
@@ -211,13 +213,14 @@ def generate_prediction(sequence, num_functions, max_length, idx):
     return X.reshape((1, max_length, num_functions))
 
 
-def generate_dataset(data, num_functions, max_length):
+def generate_dataset(data, num_functions, max_length, unmask = False):
     """
     Generate a dataset ready to parse to LSTM from a dictionary of training data
 
     :param data: dictionary of prophages
     :param num_functions: number of different possible functions - PHROGs has 10
     :param max_length: maximum allowable size of a prophage
+    :param unmask: specify if masking should be ignored
     :return: dataset framed for supervised learning
     :return: list of indices masked for each instance in the dataset
     """
@@ -236,15 +239,17 @@ def generate_dataset(data, num_functions, max_length):
                 "Prophage in your data is larger than the maximum allowable length. Try using a larger maximum"
             )
 
-        # pick a function to mask
-        idx = random.randint(1, len(encoding) - 1)
-
-        # make sure that the mask is not an uknown category
-        while encoding[idx] == 0:
+        idx = 0
+        if not unmask:
+            # pick a function to mask
             idx = random.randint(1, len(encoding) - 1)
 
+            # make sure that the mask is not an uknown category
+            while encoding[idx] == 0:
+                idx = random.randint(1, len(encoding) - 1)
+
         # generate example
-        this_X, this_y = generate_example(encoding, num_functions, max_length, idx)
+        this_X, this_y = generate_example(encoding, num_functions, max_length, idx, unmask)
 
         # store the data
         X.append(this_X)
@@ -257,7 +262,7 @@ def generate_dataset(data, num_functions, max_length):
     return X, y
 
 
-def test_train(data, path, num_functions, max_genes=120, test_size=10):
+def test_train(data, path, num_functions, max_genes=120, test_size=10, unmask = False):
     """
     Split the data into testing and training datasets. Saves these datasets as dictionaries
 
@@ -266,22 +271,17 @@ def test_train(data, path, num_functions, max_genes=120, test_size=10):
     :param num_functions: number of possible cateogories in the encoding
     :param max_genes: maximum number of genes to consider in a prophage
     :param test_size: proportion of the data to be included as test data (default is 11 which indicates one eleventh of the data
+    :param unamsk: specify if masking should be ignored
     """
 
     # get the keys of the data
     keys = list(data.keys())
 
     # encode the data
-    X, y = generate_dataset(data, num_functions, max_genes)
+    X, y = generate_dataset(data, num_functions, max_genes, unmask)
     X_dict = dict(zip(keys, X))
     y_dict = dict(zip(keys, y))
 
-    # generate a list describing which categories get masked
-    # categories = [
-    #    np.where(y[i, np.where(~X[i, :, 0:num_functions].any(axis=1))[0][0]] == 1)[0][0]
-    #    for i in range(len(X))
-    # ]
-    # masked = [statistics.get_masked(X[i], num_functions) for i in range(len(X))]
     categories = [np.where(y[i] == 1)[0][0] for i in range(len(X))]
 
     train_keys, test_keys, train_cat, test_cat = train_test_split(

@@ -73,7 +73,9 @@ def run_phynteny(outfile, gene_predictor, gb_dict, categories):
 
     # Run Phynteny
     with open(outfile, "wt") if outfile != ".gbk" else sys.stdout as handle:
+
         for key in keys:
+
             # print the phage
             print("Annotating the phage: " + key, flush=True)
 

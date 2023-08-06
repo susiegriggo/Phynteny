@@ -34,7 +34,13 @@ import pkg_resources
     type=str,
     help="Prefix for the output files",
 )
-def main(input_data, gene_categories, maximum_genes, prefix):
+@click.option(
+    "--unmask",
+    "-u",
+    is_flag=True,
+    help="Don't mask a random gene in each genome"
+)
+def main(input_data, gene_categories, maximum_genes, prefix, unmask):
     print("STARTING")
 
     # read in annotations
