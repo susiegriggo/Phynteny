@@ -9,6 +9,7 @@ from phynteny_utils import train_model
 import click
 import pkg_resources
 
+
 @click.command()
 # @click.option("--data", "-d", help="File path to training data")
 @click.option("--x_path", "-x", help="File path to X training data")
@@ -118,18 +119,16 @@ import pkg_resources
     "-ki",
     default="random_normal",
     type=str,
-#    type=click.Choice(["zeros", "random_normal", "random_uniform", "truncated_normal"]),
+    #    type=click.Choice(["zeros", "random_normal", "random_uniform", "truncated_normal"]),
     help="kernel initializer",
 )
 @click.option(
-    '--include',
-    '-i',
+    "--include",
+    "-i",
     default=0,
     type=int,
-    help='Restrict kfold index',
-
+    help="Restrict kfold index",
 )
-
 def main(
     x_path,
     y_path,
@@ -183,8 +182,13 @@ def main(
     # perform stratified k-fold validation
     print("Performing cross validation... ")
     model.train_crossValidation(
-        model_out=model_out, history_out=history_out, n_splits=k_folds, epochs=epochs, include=include
+        model_out=model_out,
+        history_out=history_out,
+        n_splits=k_folds,
+        epochs=epochs,
+        include=include,
     )
+
 
 if __name__ == "__main__":
     main()

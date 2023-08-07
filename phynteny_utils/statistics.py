@@ -109,7 +109,7 @@ def predict_softmax(X_encodings, num_categories, model):
 
     # obtain softmax scores for the masked genes
     X_encodings = np.array(X_encodings)
-    yhat = model.predict(X_encodings) 
+    yhat = model.predict(X_encodings)
     scores_list = yhat
 
     return np.array(scores_list)
@@ -358,7 +358,6 @@ def confidence_metrics(scores, confidence_out, known_categories, category_names)
     for num in range(1, len(category_names)):
         test_set_p = confidence_out[scores_index == num]
         test_set_t = known_categories[scores_index == num] == num
-
 
         for tt in score_range:
             df_test_score = class_scores(

@@ -6,8 +6,8 @@ Phynteny: synteny-based annotation of phage genes
 
 import sys
 import click
-import time 
-import datetime 
+import time
+import datetime
 from loguru import logger
 from phynteny_utils import format_data
 from phynteny_utils import handle_genbank
@@ -49,21 +49,20 @@ __status__ = "development"
     ),
 )
 @click.version_option(version=__version__)
-
 def main(infile, out, force, models, confidence_path):
     """
     Phynteny: synteny-based annotation of phage genes
     """
 
-    # get the start time 
+    # get the start time
     start_time = time.time()
 
     # generate the output directory
     format_data.instantiate_dir(out, force)
 
     # generate the logging object
-    logger.add(out + '/phynteny.log', level="DEBUG")
-    logger.info('Starting Phynteny')
+    logger.add(out + "/phynteny.log", level="DEBUG")
+    logger.info("Starting Phynteny")
 
     # get the absolute paths to phrog annotation files, model and confidence_kde
     phrog_categories = pkg_resources.resource_filename(
@@ -82,7 +81,7 @@ def main(infile, out, force, models, confidence_path):
     gb_dict = handle_genbank.get_genbank(infile)
     if not gb_dict:
         click.echo("Error: no sequences found in genbank file")
-        logger.critcal('No sequences found in genbank file. Nothing to annotate')
+        logger.critcal("No sequences found in genbank file. Nothing to annotate")
         sys.exit()
 
     # create predictor object
@@ -112,9 +111,10 @@ def main(infile, out, force, models, confidence_path):
     )
     logger.info("Done :)")
 
-    # show the time elapsed 
+    # show the time elapsed
     elapsed_time = round(time.time() - start_time, 2)
-    logger.info(f'Elpased time: {elapsed_time} seconds')
+    logger.info(f"Elpased time: {elapsed_time} seconds")
+
 
 if __name__ == "__main__":
     main()

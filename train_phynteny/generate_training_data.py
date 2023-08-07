@@ -35,10 +35,7 @@ import pkg_resources
     help="Prefix for the output files",
 )
 @click.option(
-    "--unmask",
-    "-u",
-    is_flag=True,
-    help="Don't mask a random gene in each genome"
+    "--unmask", "-u", is_flag=True, help="Don't mask a random gene in each genome"
 )
 def main(input_data, gene_categories, maximum_genes, prefix, unmask):
     print("STARTING")
@@ -81,6 +78,7 @@ def main(input_data, gene_categories, maximum_genes, prefix, unmask):
     format_data.test_train(derep_dict, prefix, num_functions, maximum_genes)
 
     print("DONE")
+
 
 if __name__ == "__main__":
     main()

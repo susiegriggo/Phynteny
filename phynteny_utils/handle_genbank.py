@@ -184,15 +184,16 @@ def derep_trainingdata(training_data):
 
     # write a function to remove duplicates in the training data
     training_str = ["".join([str(j) for j in i]) for i in training_encodings]
-    #training_sense = ["".join(training_data.get(p).get("sense")) for p in training_keys]
-    #training_hash = [
+    # training_sense = ["".join(training_data.get(p).get("sense")) for p in training_keys]
+    # training_hash = [
     #    training_sense[i] + training_str[i] for i in range(len(training_keys))
-    #]
+    # ]
 
     # get the dereplicated keys
     dedup_keys = list(dict(zip(training_str, training_keys)).values())
 
     return dict(zip(dedup_keys, [training_data.get(d) for d in dedup_keys]))
+
 
 def add_predictions(gb_dict, predictions):
     """
@@ -283,17 +284,16 @@ def get_data(input_data, gene_categories, phrog_integer, maximum_genes=False):
                 if 0 in categories_present:
                     categories_present.remove(0)
 
-                if maximum_genes == False: 
-                    if len(categories_present) >= gene_categories: 
+                if maximum_genes == False:
+                    if len(categories_present) >= gene_categories:
+                        # update the passing candidature
+                        prophage_pass += 1
 
-                        # update the passing candidature 
-                        prophage_pass += 1 
-                        
                         # update dictionary with this entry
                         g = re.split(",|\.", re.split("/", genbank.strip())[-1])[0]
-                        training_data[g + "_" + key] = phage_dict 
+                        training_data[g + "_" + key] = phage_dict
 
-                else: 
+                else:
                     # if above the minimum number of categories are included
                     if (
                         len(phage_dict.get("phrogs")) <= maximum_genes

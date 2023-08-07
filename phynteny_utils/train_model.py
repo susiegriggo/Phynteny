@@ -1,4 +1,3 @@
-
 # imports
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Bidirectional, TimeDistributed, Dense, LSTM
@@ -338,11 +337,11 @@ class Model:
         """
 
         # get the masked category in each instance
-        print('categories', flush = True)
+        print("categories", flush=True)
         masked_cat = [np.where(self.y[i] == 1)[0][0] for i in range(len(self.y))]
 
         # split into kfolds which are stratified
-        print('skf')
+        print("skf")
         skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
 
         # count the number of folds
@@ -352,10 +351,8 @@ class Model:
         train_index_kfold = []
         val_index_kfold = []
         for train_index, val_index in skf.split(np.zeros(len(masked_cat)), masked_cat):
-         
             train_index_kfold.append(train_index)
             val_index_kfold.append(val_index)
-
 
         print(val_index_kfold)
         # create list of kfolds to consider
@@ -363,11 +360,10 @@ class Model:
         if include == 0:
             kfolds = list(range(n_splits))
         else:
-            kfolds = [include-1]
-            counter = include-1
+            kfolds = [include - 1]
+            counter = include - 1
 
         for k in kfolds:
-            
             # generate stratified test and train sets
             X_train = self.X[train_index_kfold[k], :, :]
             y_train = self.y[train_index_kfold[k], :]
@@ -377,10 +373,10 @@ class Model:
             y_val = self.y[val_index_kfold[k], :]
 
             # reshape
-            #print('reshaping') 
-            #print(y_train.shape)
-            #y_train = y_train.reshape((len(y_train), self.num_functions))
-            #y_val = y_val.reshape((len(y_val), self.num_functions))
+            # print('reshaping')
+            # print(y_train.shape)
+            # y_train = y_train.reshape((len(y_train), self.num_functions))
+            # y_val = y_val.reshape((len(y_val), self.num_functions))
 
             # use the compile function here
             self.train_model(
@@ -396,6 +392,7 @@ class Model:
 
             # update counter
             counter += 1
+
 
 def mean_metric(history_out, n_splits):
     """

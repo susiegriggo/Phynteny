@@ -15,6 +15,7 @@ def is_mac():
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+
 def get_version():
     with open("VERSION", "r") as f:
         return f.readline().strip()
@@ -25,7 +26,7 @@ if is_mac():
         "biopython>=1.79",
         "pickle5",
         "scikit-learn<=1.2.2",
-        'numpy',
+        "numpy",
         "pandas",
         "click",
         "joblib",
@@ -50,8 +51,12 @@ else:
 packages = setuptools.find_packages()
 print(packages)
 package_data = {
-	"phynteny_utils": ["phynteny_utils/*", "phynteny_utils/models/*", "phynteny_utils/phrog_annotation_info/*"],
-	"train_phynteny": ["train_phynteny/*"]
+    "phynteny_utils": [
+        "phynteny_utils/*",
+        "phynteny_utils/models/*",
+        "phynteny_utils/phrog_annotation_info/*",
+    ],
+    "train_phynteny": ["train_phynteny/*"],
 }
 
 model_files = glob.glob("phynteny_utils/models/*")
@@ -78,7 +83,7 @@ setuptools.setup(
             "generate_training_data=train_phynteny.generate_training_data:main",
             "train_model=train_phynteny.train_phyntenty:main",
             "compute_confidence=train_phynteny.compute_confidence:main",
-            "install_models=phynteny_utils.install_models:main"
+            "install_models=phynteny_utils.install_models:main",
         ],
     },
     classifiers=[

@@ -73,9 +73,7 @@ def run_phynteny(outfile, gene_predictor, gb_dict, categories):
 
     # Run Phynteny
     with open(outfile, "wt") if outfile != ".gbk" else sys.stdout as handle:
-
         for key in keys:
-
             # print the phage
             print("Annotating the phage: " + key, flush=True)
 
@@ -132,7 +130,6 @@ def generate_table(outfile, gb_dict, categories, phrog_integer):
         )
 
         for k in keys:
-
             # obtain the sequence
             seq = gb_dict.get(k).seq
 
@@ -142,12 +139,23 @@ def generate_table(outfile, gb_dict, categories, phrog_integer):
             # extract the features for the cds
             start = [c.location.start for c in cds]
             end = [c.location.end for c in cds]
-            seq = [str(seq[start[i]:end[i]]) for i in range(len(cds))]
+            seq = [str(seq[start[i] : end[i]]) for i in range(len(cds))]
 
             strand = [c.strand for c in cds]
+
+            # generate list of protein ids
             ID = [
-                c.qualifiers.get("protein_id")[0] if "protein_id" in c.qualifiers else "" for c in cds
+                c.qualifiers.get("protein_id")[0]
+                if "protein_id" in c.qualifiers
+                else ""
+                for c in cds
             ]
+
+            if len(ID) == 0:
+                ID = [
+                    c.qualifiers.get("ID")[0] if "ID" in c.qualifiers else ""
+                    for c in cds
+                ]
 
             # lists to iterate through
             phrog = []

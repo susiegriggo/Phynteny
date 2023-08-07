@@ -6,32 +6,37 @@ Functions to prepare data for training with the LSTM viral gene organisation mod
 import numpy as np
 import random
 import os
-import sys 
-import shutil 
+import sys
+import shutil
 import pickle5
 from loguru import logger
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
 
-def instantiate_dir(output_dir, force): 
+
+def instantiate_dir(output_dir, force):
     """
-    Generate output directory releative to whether force has been specififed 
-    """ 
+    Generate output directory releative to whether force has been specififed
+    """
 
     # remove the existing outdir on force
-    if force == True: 
-        if os.path.isdir(output_dir) == True: 
+    if force == True:
+        if os.path.isdir(output_dir) == True:
             shutil.rmtree(output_dir)
-            
-        else: 
-            print("\n--force was specficied even though the output directory does not exist \n")
 
-    # make directory if force is not specified 
-    else: 
-        if os.path.isdir(output_dir) == True: 
-            sys.exit("\nOutput directory already exists and force was not specified. Please specify -f or --force to overwrite the output directory. \n")
+        else:
+            print(
+                "\n--force was specficied even though the output directory does not exist \n"
+            )
 
-    # instantiate the output directory 
+    # make directory if force is not specified
+    else:
+        if os.path.isdir(output_dir) == True:
+            sys.exit(
+                "\nOutput directory already exists and force was not specified. Please specify -f or --force to overwrite the output directory. \n"
+            )
+
+    # instantiate the output directory
     os.mkdir(output_dir)
 
 
@@ -46,11 +51,14 @@ def get_dict(dict_path):
     with open(dict_path, "rb") as handle:
         dictionary = pickle5.load(handle)
         if any(dictionary):
-            logger.info(f'dictionary loaded from {dict_path}')
+            logger.info(f"dictionary loaded from {dict_path}")
         else:
-            logger.crtical(f'dictionary could not be loaded from {dict_path}. Is it empty?')
+            logger.crtical(
+                f"dictionary could not be loaded from {dict_path}. Is it empty?"
+            )
     handle.close()
     return dictionary
+
 
 def encode_strand(strand):
     """
@@ -153,7 +161,7 @@ def one_hot_decode(encoded_seq):
     return [np.argmax(vector) for vector in encoded_seq]
 
 
-def generate_example(sequence, num_functions, max_length, idx, unmask = False):
+def generate_example(sequence, num_functions, max_length, idx, unmask=False):
     """
     Convert a sequence of PHROG functions and associated to a supervised learning problem
 
@@ -213,7 +221,7 @@ def generate_prediction(sequence, num_functions, max_length, idx):
     return X.reshape((1, max_length, num_functions))
 
 
-def generate_dataset(data, num_functions, max_length, unmask = False):
+def generate_dataset(data, num_functions, max_length, unmask=False):
     """
     Generate a dataset ready to parse to LSTM from a dictionary of training data
 
@@ -249,7 +257,9 @@ def generate_dataset(data, num_functions, max_length, unmask = False):
                 idx = random.randint(1, len(encoding) - 1)
 
         # generate example
-        this_X, this_y = generate_example(encoding, num_functions, max_length, idx, unmask)
+        this_X, this_y = generate_example(
+            encoding, num_functions, max_length, idx, unmask
+        )
 
         # store the data
         X.append(this_X)
@@ -262,7 +272,7 @@ def generate_dataset(data, num_functions, max_length, unmask = False):
     return X, y
 
 
-def test_train(data, path, num_functions, max_genes=120, test_size=10, unmask = False):
+def test_train(data, path, num_functions, max_genes=120, test_size=10, unmask=False):
     """
     Split the data into testing and training datasets. Saves these datasets as dictionaries
 
