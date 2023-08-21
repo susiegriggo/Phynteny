@@ -187,6 +187,7 @@ def generate_example(sequence, num_functions, max_length, idx, unmask=False):
 
     # replace the function encoding for the masked sequence
     if not unmask:
+        print('Doing the masking')
         X[idx] = np.zeros(num_functions)
 
     # return y just as this masked function
@@ -249,6 +250,7 @@ def generate_dataset(data, num_functions, max_length, unmask=False):
 
         idx = 0
         if not unmask:
+            print('selecting masking category')
             # pick a function to mask
             idx = random.randint(1, len(encoding) - 1)
 
@@ -288,6 +290,7 @@ def test_train(data, path, num_functions, max_genes=120, test_size=10, unmask=Fa
     keys = list(data.keys())
 
     # encode the data
+    print('Unmask: ' + str(unmask))
     X, y = generate_dataset(data, num_functions, max_genes, unmask)
     X_dict = dict(zip(keys, X))
     y_dict = dict(zip(keys, y))
@@ -310,10 +313,10 @@ def test_train(data, path, num_functions, max_genes=120, test_size=10, unmask=Fa
         zip([keys[i] for i in train_keys], [y_dict.get(keys[i]) for i in train_keys])
     )
     test_X_data = dict(
-        zip([keys[i] for i in train_keys], [X_dict.get(keys[i]) for i in test_keys])
+        zip([keys[i] for i in test_keys], [X_dict.get(keys[i]) for i in test_keys])
     )
     test_y_data = dict(
-        zip([keys[i] for i in train_keys], [y_dict.get(keys[i]) for i in test_keys])
+        zip([keys[i] for i in test_keys], [y_dict.get(keys[i]) for i in test_keys])
     )
 
     # for the test data get the entire prophages because these can be used to test annotation of the entire genome
