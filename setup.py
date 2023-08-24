@@ -32,7 +32,7 @@ if is_mac():
         "click",
         "joblib",
         "loguru",
-        # "tensorflow-macos",
+        "tensorflow-macos",
         "alive-progress>=3.0.1",
         "requests>=2.25.1",
     ]
