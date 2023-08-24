@@ -1,8 +1,8 @@
 # imports
 import subprocess
 from pathlib import Path
-import pytest
 
+import pytest
 
 TEST_ROODIR = Path(__file__).parent
 EXEC_ROOTDIR = Path(__file__).parent.parent

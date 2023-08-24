@@ -4,15 +4,15 @@
 Phynteny: synteny-based annotation of phage genes
 """
 
-import sys
-import click
-import time
 import datetime
-from loguru import logger
-from phynteny_utils import format_data
-from phynteny_utils import handle_genbank
-from phynteny_utils import predictor
+import sys
+import time
+
+import click
 import pkg_resources
+from loguru import logger
+
+from phynteny_utils import format_data, handle_genbank, predictor
 
 __author__ = "Susanna Grigson"
 __maintainer__ = "Susanna Grigson"

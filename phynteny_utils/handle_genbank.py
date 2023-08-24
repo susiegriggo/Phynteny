@@ -1,15 +1,16 @@
 """
 Module for manipulating genbank files
 """
-# imports
-import pandas as pd
-from pandas.errors import EmptyDataError
-import re
-from loguru import logger
-from Bio import SeqIO
+import binascii
 import gzip
 import random
-import binascii
+import re
+
+# imports
+import pandas as pd
+from Bio import SeqIO
+from loguru import logger
+from pandas.errors import EmptyDataError
 
 
 def get_mmseqs(phrog_file):

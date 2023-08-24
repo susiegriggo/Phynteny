@@ -1,18 +1,20 @@
 # imports
-from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Bidirectional, TimeDistributed, Dense, LSTM
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
-import tensorflow.keras.optimizers as optimizers
-import tensorflow.keras.initializers as initializers
-from tensorflow.keras.regularizers import L1L2
-from sklearn.model_selection import train_test_split, StratifiedKFold
-import pickle5
-from phynteny_utils import format_data
-import numpy as np
 import random
-import pkg_resources
+
 import absl.logging
+import numpy as np
+import pickle5
+import pkg_resources
 import tensorflow as tf
+import tensorflow.keras.initializers as initializers
+import tensorflow.keras.optimizers as optimizers
+from sklearn.model_selection import StratifiedKFold, train_test_split
+from tensorflow.keras import Sequential
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.layers import LSTM, Bidirectional, Dense, TimeDistributed
+from tensorflow.keras.regularizers import L1L2
+
+from phynteny_utils import format_data
 
 absl.logging.set_verbosity(absl.logging.ERROR)
 

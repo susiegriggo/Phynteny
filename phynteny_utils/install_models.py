@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-from phynteny_utils import models
 import click
 import pkg_resources
+
+from phynteny_utils import models
 
 
 @click.command()
