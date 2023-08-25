@@ -1,17 +1,17 @@
 """
 Evaluate all folds of a model and compute the phynteny score
 """
+import glob
+import pickle
+
+import click
+import numpy as np
 import pandas as pd
+import pkg_resources
+import tensorflow as tf
 
 # imports
 from phynteny_utils import statistics
-import numpy as np
-import pandas as pd
-import glob
-import pickle
-import click
-import tensorflow as tf
-import pkg_resources
 
 
 @click.command()

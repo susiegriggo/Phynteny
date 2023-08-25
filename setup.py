@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
-import setuptools
 import glob
 import os
+
+import setuptools
 
 
 def is_mac():
@@ -32,6 +33,8 @@ if is_mac():
         "joblib",
         "loguru",
         "tensorflow-macos",
+        "alive-progress>=3.0.1",
+        "requests>=2.25.1",
     ]
 
 else:
@@ -45,6 +48,8 @@ else:
         "joblib",
         "loguru",
         "tensorflow==2.9.1",
+        "alive-progress>=3.0.1",
+        "requests>=2.25.1",
     ]
 
 

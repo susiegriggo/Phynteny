@@ -5,10 +5,11 @@ Get 'high quality' phages with genes from at least four different categories
 """
 
 import pickle
+
 import click
-from phynteny_utils import handle_genbank
-from phynteny_utils import format_data
 import pkg_resources
+
+from phynteny_utils import format_data, handle_genbank
 
 
 @click.command()
@@ -33,9 +34,7 @@ import pkg_resources
     type=str,
     help="Prefix for the output files",
 )
-
-def main(input_data, gene_categories,  prefix):
-    
+def main(input_data, gene_categories, prefix):
     print("STARTING")
 
     # read in annotations
@@ -53,7 +52,8 @@ def main(input_data, gene_categories,  prefix):
     # takes a text file where each line is the file path to genbank files of phages to train a model
     print("getting input", flush=True)
     data = handle_genbank.get_data(
-        input_data, gene_categories, phrog_integer, False)  # dictionary to store all of the training data
+        input_data, gene_categories, phrog_integer, False
+    )  # dictionary to store all of the training data
 
     # save the training data dictionary
     print("Done Processing!")
@@ -64,13 +64,14 @@ def main(input_data, gene_categories,  prefix):
         pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
     handle.close()
 
-    # save the keys pf the dictionary to a text file 
+    # save the keys pf the dictionary to a text file
     filtered_prophages = list(dict(data.keys()))
-    with open(prefix + '_all_data_headers.txt', 'w') as file: 
-        for item in filtered_prophages: 
-            file.write(item + '\n')
+    with open(prefix + "_all_data_headers.txt", "w") as file:
+        for item in filtered_prophages:
+            file.write(item + "\n")
 
     print("DONE")
+
 
 if __name__ == "__main__":
     main()

@@ -4,18 +4,18 @@ Module to create a predictor object
 Is an option to parse an custom dictionary for the confidence kde if the user trains their own model
 """
 
+import glob
+import pickle
+import sys
+
+import click
+import numpy as np
 # imports
 import tensorflow as tf
-import pickle
-from phynteny_utils import format_data
-import numpy as np
-import glob
-import sys
-from loguru import logger
-from phynteny_utils import statistics
-from phynteny_utils import handle_genbank
 from Bio import SeqIO
-import click
+from loguru import logger
+
+from phynteny_utils import format_data, handle_genbank, statistics
 
 
 def get_dict(dict_path):

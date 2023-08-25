@@ -1,8 +1,9 @@
 import pickle
+
 import click
-from phynteny_utils import handle_genbank
-from phynteny_utils import format_data
 import pkg_resources
+
+from phynteny_utils import format_data, handle_genbank
 
 
 @click.command()

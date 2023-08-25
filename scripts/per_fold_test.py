@@ -2,15 +2,17 @@
 Performance testing for each k-fold separately
 """
 
+import glob
+
+import click
+import numpy as np
+import pickle5
+import pkg_resources
+import tensorflow as tf
+from sklearn.metrics import classification_report
+
 # imports
 from phynteny_utils import statistics
-import click
-import tensorflow as tf
-import pickle5
-import numpy as np
-import glob
-import pkg_resources
-from sklearn.metrics import classification_report
 
 
 # get args

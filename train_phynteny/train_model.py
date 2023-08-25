@@ -4,10 +4,11 @@ Train LSTM with gene order.
 This script trains a single instance of an LSTM using 10-fold stratified crossvalidation
 """
 
-# imports
-from phynteny_utils import train_model
 import click
 import pkg_resources
+
+# imports
+from phynteny_utils import train_model
 
 
 @click.command()

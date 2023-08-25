@@ -6,8 +6,8 @@ This module uses code snippets from PHaNNs https://github.com/Adrian-Cantu/PhANN
 
 import numpy as np
 import pandas as pd
-from sklearn.neighbors import KernelDensity
 from sklearn.metrics import roc_auc_score, roc_curve
+from sklearn.neighbors import KernelDensity
 
 
 def phynteny_score(X_encodings, num_categories, models):

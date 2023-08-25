@@ -2,13 +2,14 @@
 Add mmseqs annotations into phispy annotations 
 """
 
+import gzip
+import os
+import re
+
 # imports
 import glob2
-from Bio import SeqIO, bgzf
-import re
-import os 
-import gzip
 import handle_genbank
+from Bio import SeqIO, bgzf
 
 # read through each genome
 directories = glob2.glob('/home/edwa0468/phage/Prophage/phispy/phispy/GCA/' + '/*', recursive=True)
