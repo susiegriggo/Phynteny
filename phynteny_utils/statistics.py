@@ -163,6 +163,56 @@ def build_roc(scores, known_categories, category_names):
     return ROC_df
 
 
+import numpy as np
+import pandas as pd
+from sklearn.metrics import precision_recall_curve
+
+def build_precision_recall(scores, known_categories, category_names):
+    """
+    Build the Precision-Recall curve for multiple categories.
+
+    Args:
+        scores (list): List of values for each category, such as phylogeny scores or softmax scores.
+        known_categories (list): Actual labels of each sequence.
+        category_names (list): Names of the categories.
+
+    Returns:
+        pd.DataFrame: Dataframe for plotting the Precision-Recall curve.
+    """
+
+    # Normalize the scores for precision-recall computation
+    normed_scores = norm_scores(scores)
+    known_categories = np.array(known_categories)
+
+    # Initialize arrays to store precision and recall values
+    precision_list = np.zeros((10001, len(category_names) - 1))
+    mean_recall = np.linspace(0, 1, 10001)
+
+    # Loop through each category
+    for i in range(1, len(category_names)):
+        # Select items for the category in this iteration
+        include = known_categories == i
+
+        # Convert the predictions to binary classifications
+        binary_index = [1 for j in known_categories[include]] + [0 for j in known_categories[~include]]
+        binary_scores = list(normed_scores[include][:, i - 1]) + list(normed_scores[~include][:, i - 1])
+
+        # Compute Precision-Recall curve
+        precision, recall, _ = precision_recall_curve(binary_index, binary_scores)
+
+        # Interpolate precision values to match mean recall values
+        precision = np.interp(mean_recall, recall[::-1], precision[::-1])
+        precision_list[:, i - 1] = precision
+
+    # Create a DataFrame to store the Precision-Recall curve data
+    PR_df = pd.DataFrame(precision_list)
+    PR_df["Recall"] = mean_recall
+    PR_df.columns = [category_names.get(i) for i in range(len(category_names))][1:] + [
+        "Recall"
+    ]
+
+    return PR_df
+
 def per_category_auc(scores, known_categories, category_names, method="ovr"):
     """
     Calculate the per category under the curve.

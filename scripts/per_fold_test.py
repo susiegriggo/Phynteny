@@ -61,6 +61,11 @@ def main(base, x, y, out):
         )
 
         # build the ROC curve for this data
+        print("Building precision-recall curve")
+        PR_df = statistics.build_precision_recall(scores, known_categories, category_names)
+        PR_df.to_csv(out + "_" + str(i) + "_PR.tsv", sep="\t")
+
+        # build the ROC curve for this data
         print("Building ROC curve")
         ROC_df = statistics.build_roc(scores, known_categories, category_names)
         ROC_df.to_csv(out + "_" + str(i) + "_ROC.tsv", sep="\t")
