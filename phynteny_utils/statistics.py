@@ -286,10 +286,6 @@ def per_category_aps(scores, known_categories, category_names):
         # compute AUC
         aps_dict[category_names.get(i)] = average_precision_score(binary_index, binary_scores)
 
-    # calculate the average auc
-    aps_dict["average"] = average_precision_score(
-        known_categories, normed_scores, average="weighted"
-    )
 
     return aps_dict
 
