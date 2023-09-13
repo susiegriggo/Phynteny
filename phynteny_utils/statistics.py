@@ -6,7 +6,7 @@ This module uses code snippets from PHaNNs https://github.com/Adrian-Cantu/PhANN
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import roc_auc_score, roc_curve
+from sklearn.metrics import roc_auc_score, roc_curve, precision_recall_curve, average_precision_score
 from sklearn.neighbors import KernelDensity
 
 
@@ -163,9 +163,6 @@ def build_roc(scores, known_categories, category_names):
     return ROC_df
 
 
-import numpy as np
-import pandas as pd
-from sklearn.metrics import precision_recall_curve
 
 def build_precision_recall(scores, known_categories, category_names):
     """
@@ -253,6 +250,49 @@ def per_category_auc(scores, known_categories, category_names, method="ovr"):
     )
 
     return auc_dict
+
+
+def per_category_aps(scores, known_categories, category_names):
+    """
+    Calculate the per category average precision score.
+    Calculate the average APS separately
+
+    :param known_category: known category of each instance
+    :param scores: list of either softmax or phynteny scores for each instance
+    :param
+    :return: AUC score for each category
+    """
+
+    # dictionary to store AUC
+    aps_dict = {}
+
+    # normalise the scores such that ROC can be computed
+    normed_scores = norm_scores(scores)
+    known_categories = np.array(known_categories)
+
+    # loop through each category
+    for i in range(1, len(category_names)):
+        # get items for the category in this iteration
+        include = known_categories == i
+
+        # convert the predictions to a series of binary classifications
+        binary_index = [1 for j in known_categories[include]] + [
+            0 for j in known_categories[~include]
+        ]
+        binary_scores = list(normed_scores[include][:, i - 1]) + list(
+            normed_scores[~include][:, i - 1]
+        )
+
+        # compute AUC
+        aps_dict[category_names.get(i)] = average_precision_score(binary_index, binary_scores)
+
+    # calculate the average auc
+    aps_dict["average"] = average_precision_score(
+        known_categories, normed_scores, average="weighted"
+    )
+
+    return aps_dict
+
 
 
 def norm_scores(scores_list):

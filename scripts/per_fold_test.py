@@ -84,6 +84,12 @@ def main(base, x, y, out):
         with open(out + "_" + str(i) + "_AUC.pkl", "wb") as f:
             pickle5.dump(auc, f)
 
+        # calculate the average precision score for each category
+        print("Calculating APS")
+        aps = statistics.per_category_aps(scores, known_categories, category_names)
+        with open(out + "_" + str(i) + "_APS.pkl", "wb") as f:
+            pickle5.dump(aps, f)
+
         # get the thresholds
         print("Evaluating thresholds")
         phynteny_df = statistics.threshold_metrics(
