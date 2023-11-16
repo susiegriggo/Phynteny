@@ -43,7 +43,10 @@ You can install Phynteny from bioconda at [https://anaconda.org/bioconda/phynten
 conda create -n phynteny -c bioconda phynteny
  
 # activate environment
-conda activate phynteny  
+conda activate phynteny
+
+# install phynteny
+conda install -c bioconda phynteny
 ```
 
 **NOTE:** bioconda installations of Phynteny do not have GPU support. This is fine for most uses but not does not enable training of phynteny models. 
