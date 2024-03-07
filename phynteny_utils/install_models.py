@@ -9,7 +9,7 @@ from phynteny_utils import models
 @click.option(
     "-o",
     "--outfile",
-    type=click.Path(exists=True),
+    type=click.Path(),
     help="Path to install Phynteny models",
     default=None,
 )
