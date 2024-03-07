@@ -82,7 +82,7 @@ def run_phynteny(outfile, gene_predictor, gb_dict, categories):
 
             # get phrog annotations
             phages[key]["phrogs"] = [
-                0 if i == "No_PHROG" else int(i) for i in phages[key]["phrogs"]
+                0 if i in ["No_PHROG", "vfdb", "acr", "card", "defensefinder"] else int(i) for i in phages[key]["phrogs"] 
             ]
 
             # make predictions
