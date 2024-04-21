@@ -1,5 +1,5 @@
-LOCUS       MW460250_1             20860 bp    DNA     linear   PHG 11-FEB-2024
-DEFINITION  MW460250_1 truncated genome.
+LOCUS       MW460250_1             20860 bp    DNA              PHG 22-APR-2024
+DEFINITION  .
 ACCESSION   MW460250_1
 VERSION     MW460250_1
 KEYWORDS    .
@@ -11,39 +11,30 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0065"
                      /transl_table=11
                      /phrog="2892"
-                     /top_hit="KP881332_p99"
                      /locus_tag="TRSNFOVH_CDS_0065"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-161.02654167882125"
-                     /phase="0"
                      /translation="HVIVPYLVGVIVIILSIIFRDSLYSAQSGFGVIITSFIYMLVYVI
                      IGLVGSFVLTIFQARKARQYQTQEDNNEVQ"
      CDS             215..526
                      /ID="TRSNFOVH_CDS_0066"
                      /transl_table=11
                      /phrog="3644"
-                     /top_hit="JX080301_p157"
                      /locus_tag="TRSNFOVH_CDS_0066"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-17295.249555904564"
-                     /phase="0"
                      /translation="MKFNDIYEQLIKNDTVQNIHESQDDKGNIYTIQFDKGNDKYLFNV
                      INDGFLKEMTNGMVDHPEGQPYSVSLINKETPSMSVKQYLTDVEDIVPTIRKMEKDFL"
      CDS             590..1126
                      /ID="TRSNFOVH_CDS_0067"
                      /transl_table=11
                      /phrog="1080"
-                     /top_hit="NC_024360_p172"
                      /locus_tag="TRSNFOVH_CDS_0067"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-301154.76445591974"
-                     /phase="0"
                      /translation="MDFNFSAFDNSSLAMRISEGVYYFNDTPYYFIEHVEEEMSEYVIV
                      YDIHDREEKENPQKKYRIEPYQRTIPGGTPLSNLIKSMMPQRKYPKKVTEDPIFVANVI
                      PLGTDTVTGKTGKGFFERDKDRTIYSQKEPTKVVHGQYTGVFIGLTSVKWNRTYTPLES
@@ -51,14 +42,12 @@ FEATURES             Location/Qualifiers
      CDS             1119..1886
                      /ID="TRSNFOVH_CDS_0068"
                      /transl_table=11
-                     /phrog="984"
-                     /top_hit="p282458 VI_10890"
+                     /phrog="defensefinder"
                      /locus_tag="TRSNFOVH_CDS_0068"
-                     /function="unknown function"
-                     /product="hypothetical protein"
+                     /function="moron, auxiliary metabolic gene and host
+                     takeover"
+                     /product="DefenseFinder protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-4265070.409919892"
-                     /phase="0"
                      /translation="MSNDVVKFYEKDIKDLIRTKKHMFKDDEITSDINDIRIFNEKVIC
                      QGKCRTDCLVLDRNGTVMGIEIKTERDSTQRLNNQLKYYSLVCKYVYVMCHDKHVPKVE
                      QILKRYKHNHVGIMSYISFKGKPVVGKYKDATPSPHRSPYHTMNILWKTNLMTILRLIR
@@ -67,14 +56,11 @@ FEATURES             Location/Qualifiers
      CDS             1864..2310
                      /ID="TRSNFOVH_CDS_0069"
                      /transl_table=11
-                     /phrog="21462"
-                     /top_hit="JX875065_p154"
+                     /phrog="2356"
                      /locus_tag="TRSNFOVH_CDS_0069"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-4507.709109512559"
-                     /phase="0"
                      /translation="MSKDKPNRRKEIQHQPVNFAPTNTLTGANNSFFAKKPSEPKDATS
                      VIEYRILFIKRFDNVTSTDVKLQKKYALNLISEALDVKETYLSLKQKGKKTESILHTDR
                      VYYVHRGKKLIGKCSIREQRTFKGKHLIFIFKTRHRVKAERKDK"
@@ -82,13 +68,10 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0070"
                      /transl_table=11
                      /phrog="1113"
-                     /top_hit="KJ586795_p34"
                      /locus_tag="TRSNFOVH_CDS_0070"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-778110562.5383499"
-                     /phase="0"
                      /translation="MLKGFSEHVDKPTTIKTLYKTLTSGKVELLGVSYDSDYFPSGVTV
                      QSYIEDIGNEDEGLQFVNKVNVVESMKQAVVGMNNQLGSSGLGYVRTEQLKKELEETGL
                      MTDLLARGTNLTSTKKVDIVSTFIEPEVTYQNITIAKDIKLRLYKVEEESPLNGYTHIV
@@ -99,13 +82,10 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0071"
                      /transl_table=11
                      /phrog="1007"
-                     /top_hit="NC_011421_p2"
                      /locus_tag="TRSNFOVH_CDS_0071"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-14744784782.087603"
-                     /phase="0"
                      /translation="MARKKNLRNKNSDIKVVPDKEKESILSKLYHNKLLRSKVDNALDE
                      DMSYDDIIELCKEYDLELSKSAITRYKSKRKEAIENGWDLGELIDKRKKTSVKDIKEKE
                      TPILEEEQLSPFEQSKHHTQTIYDDIQVLDMIISKGAKGLEFVETLDPALMIRAMETKD
@@ -115,13 +95,10 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0072"
                      /transl_table=11
                      /phrog="1104"
-                     /top_hit="NC_021781_p184"
                      /locus_tag="TRSNFOVH_CDS_0072"
                      /function="head and packaging"
                      /product="virion structural protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-78829.80838600847"
-                     /phase="0"
                      /translation="MADEISLNPIQDAKPIDDIVDIMTYLKNGKVLRVKQDNQGDILVR
                      MSPGKHKFTEVSRDLDKESFYYKRHWVLYNVSVNSLITFDVYLDEEYSETTKVKYPKDT
                      IVEYTREDQEKDVAMIKEILTDNNGNYFYALTGETILFDENKLNKVKD"
@@ -129,14 +106,10 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0073"
                      /transl_table=11
                      /phrog="1303"
-                     /top_hit="NC_020873_p120"
                      /locus_tag="TRSNFOVH_CDS_0073"
-                     /function="DNA"
-                     /function=" RNA and nucleotide metabolism"
+                     /function="DNA, RNA and nucleotide metabolism"
                      /product="DNA binding protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-61865.78906141837"
-                     /phase="0"
                      /translation="MFISLNQEEKELLTKEESKYTPLETSREFNTPKEEFIVTSYNEGK
                      PLDYIAKEAKVSMGLIYTVLNYYKVGKRNKKSPVEERIAHILKDKNLVKEIIKDYQYMN
                      LQDIYSKYNLHKNGLYYILDLYHVERKSELKDKALEEDNIVVE"
@@ -144,13 +117,10 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0074"
                      /transl_table=11
                      /phrog="2726"
-                     /top_hit="EU418428_p166"
                      /locus_tag="TRSNFOVH_CDS_0074"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-5832257.198751371"
-                     /phase="0"
                      /translation="MRNKKSFQEQLNDMRNKEKWVSEEEFTEEVAPPEEPEVEEEKLYT
                      LNELKESLLDAQGLKDVVADFPASKDLYEPNKLYICTIPKGYQSTEVQPGQYIGISTGL
                      LSESEDFSHLRGQMPRNLYETSHVLKPLIRINNTNIEYQQHELLEDIKDDKKIYDVELE
@@ -160,13 +130,10 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0075"
                      /transl_table=11
                      /phrog="2863"
-                     /top_hit="EU418428_p167"
                      /locus_tag="TRSNFOVH_CDS_0075"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-188.3566920257155"
-                     /phase="0"
                      /translation="MSRKASIFYILVVIVLAFSISSYYISSFMYHDKAKNEVSTELSNT
                      GKIKEEKNVEFVGDYTLKKVEDNKAYFMETLPTYLPGRTGDNSIDMRYYKTSRFKEGVN
                      FKLIRVYTEDGEDNPIHKYRFEAVPTKK"
@@ -174,69 +141,53 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0076"
                      /transl_table=11
                      /phrog="3157"
-                     /top_hit="EU418428_p169"
                      /locus_tag="TRSNFOVH_CDS_0076"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-961.5381327043939"
-                     /phase="0"
                      /translation="MEMADLERFDAFVRLISDDELSEERILELSVDLLNPILEGGTAYK
                      AKKRIKSKFGKLEAKNFKRNYKFLLKSIAQIDQRR"
      CDS             6835..6999
                      /ID="TRSNFOVH_CDS_0077"
                      /transl_table=11
                      /phrog="6754"
-                     /top_hit="MF398190_p176"
                      /locus_tag="TRSNFOVH_CDS_0077"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-148.63092712455355"
-                     /phase="0"
                      /translation="MTEREKLIKDIEEANRDIQLQLKEVDNYKDSIRSKGTRNYISTKV
                      LDSIMVGFI"
      CDS             6986..7165
                      /ID="TRSNFOVH_CDS_0078"
                      /transl_table=11
                      /phrog="7869"
-                     /top_hit="MF398190_p177"
                      /locus_tag="TRSNFOVH_CDS_0078"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-6.27917912275923"
-                     /phase="0"
                      /translation="LVSYDEVDIVSKHNLRQITFSEINILHLKYMRYNKAVEQHTKLSK
                      ELFKKDKETVDKNK"
      CDS             7201..7377
                      /ID="TRSNFOVH_CDS_0079"
                      /transl_table=11
                      /phrog="3664"
-                     /top_hit="MF398190_p178"
                      /locus_tag="TRSNFOVH_CDS_0079"
-                     /function="DNA"
-                     /function=" RNA and nucleotide metabolism"
+                     /function="DNA, RNA and nucleotide metabolism"
                      /product="DNA sliding clamp inhibitor"
                      /arrest of S.aureus DNA synthesis="true"
                      /source="PHANOTATE_1.5.1"
-                     /score="-90.51058590454915"
-                     /phase="0"
                      /translation="MVIPSIKAQNKFKNELEYYKQGHISESKMLELAFDYIQELEQNNE
                      YVTNLLEEERYGE"
      CDS             7367..7900
                      /ID="TRSNFOVH_CDS_0080"
                      /transl_table=11
                      /phrog="3854"
-                     /top_hit="MF398190_p179"
                      /locus_tag="TRSNFOVH_CDS_0080"
-                     /function="moron"
-                     /function=" auxiliary metabolic gene and host takeover"
+                     /function="moron, auxiliary metabolic gene and host
+                     takeover"
                      /product="ribulose-1"
                      /5-bisphosphate carboxylase/oxygenase small subunit="true"
                      /source="PHANOTATE_1.5.1"
-                     /score="-56288.47887020783"
-                     /phase="0"
                      /translation="MVSKFIGVYLFNLLIAIILTLTLIGTITDSIESTLAQIIVGMFII
                      ITIYGILSALIPILVHKAVSPGWSYTEWNESYYIRLPGEENYKYYSKWYLDLLGVKEFY
                      YKRDNGEEVKEKNISWAFQAEVKRPEDVNHWKNQLLTNRPLTILEYKKLKKLDKESEIR
@@ -245,66 +196,51 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0081"
                      /transl_table=11
                      /phrog="4009"
-                     /top_hit="KY779849_p187"
                      /locus_tag="TRSNFOVH_CDS_0081"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-399.99504332553965"
-                     /phase="0"
                      /translation="MISSFDSILLVIYIIIAFAVAMAIIYLVFKGMTILLDKLMMLLLS
                      KTTLDVEACSMIMAVISTIVFGIIVLLIWLAVNNILL"
      CDS             8175..8351
                      /ID="TRSNFOVH_CDS_0082"
                      /transl_table=11
                      /phrog="3524"
-                     /top_hit="MF398190_p180"
                      /locus_tag="TRSNFOVH_CDS_0082"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-27.232676118684225"
-                     /phase="0"
                      /translation="MDFNDFINSESDRVGKPKQKKKVENKLPSSTPIEDKEKKLKEIRK
                      KSLYIDLRRKRND"
      CDS             8344..8640
                      /ID="TRSNFOVH_CDS_0083"
                      /transl_table=11
                      /phrog="3128"
-                     /top_hit="NC_020877_p88"
                      /locus_tag="TRSNFOVH_CDS_0083"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-63165.31652358397"
-                     /phase="0"
                      /translation="MTKETNVLYKDKYRDYTIVVRLAGNIIVTEVDKKHKTAFTPIIFD
                      NGVEGVELVMRIGSVELNMTDLREFTKEVSTAQKALEYFNKKLYIKGLTDEAF"
      CDS             8688..8870
                      /ID="TRSNFOVH_CDS_0084"
                      /transl_table=11
                      /phrog="3640"
-                     /top_hit="MH107769_p180"
                      /locus_tag="TRSNFOVH_CDS_0084"
-                     /function="moron"
-                     /function=" auxiliary metabolic gene and host takeover"
+                     /function="moron, auxiliary metabolic gene and host
+                     takeover"
                      /product="membrane protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-4.495303862960321"
-                     /phase="0"
                      /translation="MLLGILWFIWGFVSYFVLMFGIEFWKDRWMPGVIGAGTLLLFLFW
                      IMKSIHNAMTVVYLY"
      CDS             8883..9251
                      /ID="TRSNFOVH_CDS_0085"
                      /transl_table=11
                      /phrog="3669"
-                     /top_hit="MH107769_p181"
                      /locus_tag="TRSNFOVH_CDS_0085"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-343340.01203929674"
-                     /phase="0"
                      /translation="MDILIIHYKETNKRVLKETIQTIQNHLNDEHGLVKMTATKLSREN
                      IEKRFNNYNIVIAEDDPDNSYHYGEAVEDADFIIDIPISYLDIHAGIEWDVDNPVDMLD
                      RNPDFIEAVNKLNEDLML"
@@ -312,13 +248,10 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0086"
                      /transl_table=11
                      /phrog="2988"
-                     /top_hit="NC_020877_p89"
                      /locus_tag="TRSNFOVH_CDS_0086"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-34856.85272546005"
-                     /phase="0"
                      /translation="MLNEKLKNLEDTKVYMINSIASLLSASTGKSSKVFFDEGTIKIVS
                      GETKAVEVIDNLVHPHSGRLPIKTTERIALGRLTDSLQFVISEIEVVKDQIIDEENEAY
                      IDFVMEDWNWD"
@@ -326,39 +259,30 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0087"
                      /transl_table=11
                      /phrog="3804"
-                     /top_hit="MH107769_p183"
                      /locus_tag="TRSNFOVH_CDS_0087"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-481.47677546972847"
-                     /phase="0"
                      /translation="MPMDLLTIASVAFIAVVIVDLINDDMSYMLTGTAILINIWAGFYG
                      WFFLLQAGMLLFLLLARKVKDDKESILYSSASLICALGMIINLLSFS"
      CDS             9959..10264
                      /ID="TRSNFOVH_CDS_0088"
                      /transl_table=11
                      /phrog="3143"
-                     /top_hit="MH107769_p184"
                      /locus_tag="TRSNFOVH_CDS_0088"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-1672.848791554455"
-                     /phase="0"
                      /translation="MSKETIRRQFSNAIEIMATTKEWWNFPKSFDTNKEFKIKTFKNDT
                      LVFEVREGSRNLGSFVVFTNIDFDYDKLEGTSTQYMINYFAKKLTKDMFNYHKLQL"
      CDS             10279..10629
                      /ID="TRSNFOVH_CDS_0089"
                      /transl_table=11
                      /phrog="3752"
-                     /top_hit="NC_005880_p179"
                      /locus_tag="TRSNFOVH_CDS_0089"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-100500.84214099092"
-                     /phase="0"
                      /translation="MREELKPFNRKQVNVKGYLDDVKYSKRRRHKGNQHGCVKITVTDV
                      KINGIPIDHVNIEVGISFYEKLKELQGKRIQFVGTVYKYVKHARGRKGRIKGFYKEDYS
                      VTLDKKLQKEEK"
@@ -366,14 +290,10 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0090"
                      /transl_table=11
                      /phrog="4208"
-                     /top_hit="NC_005880_p180"
                      /locus_tag="TRSNFOVH_CDS_0090"
-                     /function="DNA"
-                     /function=" RNA and nucleotide metabolism"
+                     /function="DNA, RNA and nucleotide metabolism"
                      /product="HNH endonuclease"
                      /source="PHANOTATE_1.5.1"
-                     /score="-3210575.503629955"
-                     /phase="0"
                      /translation="MIKRRKHLDHSLQPEKGWRTVPFNGYYEAHPTGLIRNKVTKKLIK
                      GTQTRKNHPKWTAHEIVYLINPKKTSYSRGVVIAHTFPEMISQSRGDLKNGHVCFKDGD
                      RSNCHVDNMFIGKGNVNKNIYKLNDSYLTRKDIEEDVNNLVNERLFSQLELLIKKNEPE
@@ -382,39 +302,30 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0091"
                      /transl_table=11
                      /phrog="3701"
-                     /top_hit="NC_025426_p82"
                      /locus_tag="TRSNFOVH_CDS_0091"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-296.4631383135389"
-                     /phase="0"
                      /translation="MNEWYALCYYNKIGKKKIPRQIKAHRDVSVLEDLKDRLEEQNPKE
                      EYKIKTTKEFDKER"
      CDS             11553..11651
                      /ID="TRSNFOVH_CDS_0092"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0092"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-2.5890377320966174"
-                     /phase="0"
                      /translation="MTYVIRNFYIGSTVCTWIYEWMELRRLDKEWL"
      CDS             11651..12052
                      /ID="TRSNFOVH_CDS_0093"
                      /transl_table=11
                      /phrog="1486"
-                     /top_hit="MF288921_p261"
                      /locus_tag="TRSNFOVH_CDS_0093"
-                     /function="moron"
-                     /function=" auxiliary metabolic gene and host takeover"
+                     /function="moron, auxiliary metabolic gene and host
+                     takeover"
                      /product="membrane protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-65713.52208291469"
-                     /phase="0"
                      /translation="MKLEDKVLERIDSLGNKAGNLSNQVMESLVKYQITYGIIDIVVSI
                      LVIALTIFLGKVYLKEYKKVKMDLKESLLYDDYDDLSGIGWCYTILLILLTLFSLYAIV
                      AGIPTDIMRLINPEVYAVKDLIEQVKGGN"
@@ -422,105 +333,81 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0094"
                      /transl_table=11
                      /phrog="11913"
-                     /top_hit="MF398190_p193"
                      /locus_tag="TRSNFOVH_CDS_0094"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-451.02420560190507"
-                     /phase="0"
                      /translation="MKQRDFEFEEDFVLTYECEDCKHFEDWGHDEEPEECSECGSSDLI
                      SIIQVMKILSVICVEGILICGKMDIDIWEIIKSILKKRNQV"
      CDS             12366..12653
                      /ID="TRSNFOVH_CDS_0095"
                      /transl_table=11
                      /phrog="1486"
-                     /top_hit="MF288921_p261"
                      /locus_tag="TRSNFOVH_CDS_0095"
-                     /function="moron"
-                     /function=" auxiliary metabolic gene and host takeover"
+                     /function="moron, auxiliary metabolic gene and host
+                     takeover"
                      /product="membrane protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-12664.149957647738"
-                     /phase="0"
                      /translation="MNKAVEQASNALGQGFSAMVWHQVLVGLGFILLGLVLSLLVWVLV
                      KKFHVPFNHPTAFVVYSIMLVSIVASFIWGGLHVINPEYYAILELKGFIK"
      CDS             12664..12780
                      /ID="TRSNFOVH_CDS_0096"
                      /transl_table=11
                      /phrog="4580"
-                     /top_hit="MH028956_p143"
                      /locus_tag="TRSNFOVH_CDS_0096"
                      /function="transcription regulation"
                      /product="transcription factor"
                      /source="PHANOTATE_1.5.1"
-                     /score="-90.20006723407859"
-                     /phase="0"
                      /translation="MTKEELEQKVKELEAENKELKKQIERFEDEGGKTKDEQ"
      CDS             12770..13033
                      /ID="TRSNFOVH_CDS_0097"
                      /transl_table=11
-                     /phrog="32014"
-                     /top_hit="KJ206562_p189"
+                     /phrog="4584"
                      /locus_tag="TRSNFOVH_CDS_0097"
-                     /function="unknown function"
-                     /product="hypothetical protein"
+                     /function="other"
+                     /product="carboxypeptidase"
                      /source="PHANOTATE_1.5.1"
-                     /score="-5253.9612586796175"
-                     /phase="0"
                      /translation="MNSREKKILTLTVNNFLMLALDIVALVRYKKGKIKQENYNTGQIS
                      RTIVTTANSLGILYLEEQERKEKKSVKIGTLESGTLRGFKNK"
      CDS             13110..13289
                      /ID="TRSNFOVH_CDS_0098"
                      /transl_table=11
                      /phrog="4743"
-                     /top_hit="NC_024355_p101"
                      /locus_tag="TRSNFOVH_CDS_0098"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-305.1570720983821"
-                     /phase="0"
                      /translation="MKHFILILGIVILVIALGIVLPAWILQLVLSAFGVKVSIWVCIGI
                      FILISAIGSMFSRN"
      CDS             13304..13567
                      /ID="TRSNFOVH_CDS_0099"
                      /transl_table=11
                      /phrog="4418"
-                     /top_hit="NC_025417_p198"
                      /locus_tag="TRSNFOVH_CDS_0099"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-1550.6684973753047"
-                     /phase="0"
                      /translation="MAKYESNINGENYIATPSQALREALAKLITEEKSFAEYQTKGEEQ
                      YESQLQLRHFDTMISQYEEAIRVLEDKYRPQIFIPKDNKEEN"
      CDS             13570..13887
                      /ID="TRSNFOVH_CDS_0100"
                      /transl_table=11
                      /phrog="4081"
-                     /top_hit="NC_025417_p199"
                      /locus_tag="TRSNFOVH_CDS_0100"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-278220.8502299005"
-                     /phase="0"
                      /translation="MKAESIARFFNDKVLQIEGYKVRFLQASSSYILDIDTIDESVLFL
                      EAQVSTLSGKHLLDTAITIERPETLSAKELYTEISNKLQAIVGDQTKTTIELSRYFKEE
                      K"
      CDS             13888..14568
                      /ID="TRSNFOVH_CDS_0101"
                      /transl_table=11
-                     /phrog="4650"
-                     /top_hit="JX080304_p196"
+                     /phrog="11777"
                      /locus_tag="TRSNFOVH_CDS_0101"
-                     /function="unknown function"
-                     /product="hypothetical protein"
+                     /function="DNA, RNA and nucleotide metabolism"
+                     /product="dihydrofolate reductase"
                      /source="PHANOTATE_1.5.1"
-                     /score="-16811342.929869816"
-                     /phase="0"
                      /translation="VSNKTITNYLLNLEGIKGETYSIIAHINKQTGWGDKGDYFEISIS
                      YKADKDPRTTRYITTEIFVDYGSNNPKEILLQLRDKIFSIVEEQVETDNDFIESIKEIN
                      STKELEKLKPYINNEYYSMFKSSIEKEIPVALSSEVLNRCTGKTSTLAYLALEKDLPLV
@@ -530,65 +417,50 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0102"
                      /transl_table=11
                      /phrog="4430"
-                     /top_hit="NC_025417_p202"
                      /locus_tag="TRSNFOVH_CDS_0102"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-333.3978594144251"
-                     /phase="0"
                      /translation="MIPVIVILIGLILFLSSGYKLVLGKYYDDVDLKILFTIFGVGIAL
                      LLGGFIL"
      CDS             14850..15050
                      /ID="TRSNFOVH_CDS_0103"
                      /transl_table=11
                      /phrog="3453"
-                     /top_hit="KP881332_p117"
                      /locus_tag="TRSNFOVH_CDS_0103"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-345.94942583922654"
-                     /phase="0"
                      /translation="MNYRDFITDCISGGYNVHISVTEKRVHIISEMTSASYPKKEINLD
                      ELQAYVYYMNNFGSQITTEGL"
      CDS             15051..15341
                      /ID="TRSNFOVH_CDS_0104"
                      /transl_table=11
                      /phrog="4096"
-                     /top_hit="JX080304_p199"
                      /locus_tag="TRSNFOVH_CDS_0104"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-828.7576793290485"
-                     /phase="0"
                      /translation="MELVINIVAVLVGMYAIYFYVTKFSTGLSGILIVLGMAIGLYFYL
                      DYLNVRENVIRLVSVMFGAFLFSIEMIYNKIMFEIKKSNVQKTVRVYDKEQ"
      CDS             15433..15741
                      /ID="TRSNFOVH_CDS_0105"
                      /transl_table=11
                      /phrog="1099"
-                     /top_hit="MH078572_p111"
                      /locus_tag="TRSNFOVH_CDS_0105"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-3698.828101284656"
-                     /phase="0"
                      /translation="MYPEIDVEELAYKLKSTREYLESITTKEVEIYEIYHLKTGKLVFK
                      GEYIEVKELLRKMYKENLTLVDVDTMLSIGKGFIDVIKNISAENVFQITYKKELSTK"
      CDS             15738..16646
                      /ID="TRSNFOVH_CDS_0106"
                      /transl_table=11
                      /phrog="619"
-                     /top_hit="NC_024383_p145"
                      /locus_tag="TRSNFOVH_CDS_0106"
                      /function="other"
                      /product="ribose-phosphate pyrophosphokinase"
                      /source="PHANOTATE_1.5.1"
-                     /score="-175377882824.63766"
-                     /phase="0"
                      /translation="MIKIFSEVDKEYKPIITEKFPNGEINFKYDDLKYLVEEDLRFDVF
                      FKWENDADLMHLYMFTKYLEQLGIKDKAEFLEIAYLPYSRMDRVEEGHNNMFSLKYITE
                      FINNLNYKSVWVAEPHSPVTEELLTNSFAIDVTLKLLNQYIEMSEEPVTIVLPDKGAYD
@@ -599,13 +471,10 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0107"
                      /transl_table=11
                      /phrog="448"
-                     /top_hit="NC_031034_p67"
                      /locus_tag="TRSNFOVH_CDS_0107"
                      /function="other"
                      /product="nicotinamide phosphoribosyl transferase"
                      /source="PHANOTATE_1.5.1"
-                     /score="-5.597635324645471e+16"
-                     /phase="0"
                      /translation="MLNPTLMCDFYKLSHREQYPEGTEIVYSTLVPRSNKYYEHSDNIV
                      VFGIQSLVKKYFIDMFNKEFFNRPKEEVINEYKRTVKFTLGQENPDAKHLEQLHDLGYL
                      PIDVRALKEGTVVHPNTPVMTIENTHSDFFWLTNYLETIISTQTWQAMTSATLAYDMRK
@@ -619,26 +488,20 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0108"
                      /transl_table=11
                      /phrog="4028"
-                     /top_hit="AY954969_p122"
                      /locus_tag="TRSNFOVH_CDS_0108"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-566.2801750685812"
-                     /phase="0"
                      /translation="MIYKISKHNYYSRFEHSTYPPDEGFAYVDYVDVILIGVDNPRKRK
                      IITLKVNEFNPDDYRVGHKYNIIKILWFEKWEWLKP"
      CDS             18477..18869
                      /ID="TRSNFOVH_CDS_0109"
                      /transl_table=11
                      /phrog="3847"
-                     /top_hit="AY954969_p123"
                      /locus_tag="TRSNFOVH_CDS_0109"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-462540.68541212927"
-                     /phase="0"
                      /translation="MIIDKLNGVKLEIGGHVVSFSVRKFNTINGERQLIDYHHIKRNRQ
                      QYFRTTEEFYNEYKEIKPDKNEIDEMFESLGYVDTELDDVVRNQEKVTEILGVSEQYLN
                      QLSYKAIEEYVDKVVTLEIKELKGEK"
@@ -646,39 +509,30 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0110"
                      /transl_table=11
                      /phrog="4340"
-                     /top_hit="AY954969_p124"
                      /locus_tag="TRSNFOVH_CDS_0110"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-141.6869723615173"
-                     /phase="0"
                      /translation="MNNNWEKEGVNYWEKEGVNYWENEDCPREYLEKAFIDLVEYVEGV
                      TVPPKDVKQLREDKLREDIGFYEYVADK"
      CDS             19158..19469
                      /ID="TRSNFOVH_CDS_0111"
                      /transl_table=11
                      /phrog="3224"
-                     /top_hit="NC_021328_p223"
                      /locus_tag="TRSNFOVH_CDS_0111"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-9379.636003901229"
-                     /phase="0"
                      /translation="MKKLIVLLTITISLLLGGCSPDNHEGKVVGVGEYREPTTYIKSGS
                      VTVPVIGEMKYYVDLETDKGEDRVYLNKEVYHKFDKGDDFSNVGEKVYKNDELIYKGD"
      CDS             19472..19981
                      /ID="TRSNFOVH_CDS_0112"
                      /transl_table=11
                      /phrog="4855"
-                     /top_hit="JX080302_p207"
                      /locus_tag="TRSNFOVH_CDS_0112"
                      /function="lysis"
                      /product="endolysin"
                      /source="PHANOTATE_1.5.1"
-                     /score="-376629.95295131224"
-                     /phase="0"
                      /translation="MYLNDYVGKFIKEDNYYGYQSTDLVSNYVQRLTLGRYKTKLNANK
                      MKYERLPSSWKIIKAKDLLRTDDYREGDIFVSERISVFGFNGIIVYNHDFNNVTVITQN
                      RDGKATNPVEEHLYPKKDIDYIIRPIERDYREYFKKSDSKEKVTLSKQEYKKLLEAYNK
@@ -687,13 +541,10 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0113"
                      /transl_table=11
                      /phrog="4637"
-                     /top_hit="AP018375_p196"
                      /locus_tag="TRSNFOVH_CDS_0113"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-7879.215505156711"
-                     /phase="0"
                      /translation="MNSTKLVEYFTNKQGKSLILPDENKVELYRVDVTPYTMRLNFTYN
                      TEVVAIDIDKLHSDSIEMHIPQGLYITTVVKITSTQSISSVLHKVLEEWVRQVQNDGIF
                      GFVWE"
@@ -701,26 +552,20 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0114"
                      /transl_table=11
                      /phrog="4983"
-                     /top_hit="JX080302_p209"
                      /locus_tag="TRSNFOVH_CDS_0114"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-135.85189896617342"
-                     /phase="0"
                      /translation="MISIEHDYTIRTVDNRKYTYYSKYESLVTLYENIMSKDCIEVTKY
                      GKDKKVIIDTRHIVSIERW"
      CDS             20536..20850
                      /ID="TRSNFOVH_CDS_0115"
                      /transl_table=11
                      /phrog="5741"
-                     /top_hit="AP018375_p194"
                      /locus_tag="TRSNFOVH_CDS_0115"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-63981.16436974037"
-                     /phase="0"
                      /translation="MINAGHAKYLSEIYEDDVHYETIDSIVEDILDNINDGIIEEAMKG
                      NTSYQYVLRDLRVDNEVEYRVIEELTNQGYSVNHISNDIEYPSISTNNLAGLDYLNIKW
                      "
@@ -1074,8 +919,8 @@ ORIGIN
     20761 agtgtaaacc acattagtaa tgatatagag tacccttcta tatctacaaa taatttagca
     20821 gggttagatt acttaaatat taaatggtaa gggagggaat
 //
-LOCUS       NC_004617.1             6392 bp    DNA     linear   PHG 11-FEB-2024
-DEFINITION  NC_004617.1 Staphylococcus prophage phi 13 truncated genome.
+LOCUS       NC_004617.1             6392 bp    DNA              PHG 22-APR-2024
+DEFINITION  .
 ACCESSION   NC_004617
 VERSION     NC_004617.1
 KEYWORDS    .
@@ -1087,76 +932,58 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0017"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0017"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-0.1057237248180529"
-                     /phase="0"
                      /translation="VLSIVLSFSSNLLMRHSCSCFLNHPNSVHPLSKRIKIMSI"
      CDS             157..387
                      /ID="TRSNFOVH_CDS_0018"
                      /transl_table=11
                      /phrog="276"
-                     /top_hit="p93870 VI_00335"
                      /locus_tag="TRSNFOVH_CDS_0018"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-117.0636741452214"
-                     /phase="0"
                      /translation="MLSTLNEIKLGQKTQEQVNIKLDKTLDAIQKEREIDEKNKKENDK
                      NIRDMKMWVLGLVGTIFGSLIIALLRMLMGI"
      CDS             complement(494..703)
                      /ID="TRSNFOVH_CDS_0019"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0019"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-0.0598718013992514"
-                     /phase="0"
                      /translation="LLNSISLITRPINAIRNKPNCNMVLIVIIRRLLSKDFSNATIGTT
                      SLYSDSHHLSNLLTSAYYHNYNNK"
      CDS             complement(766..873)
                      /ID="TRSNFOVH_CDS_0020"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0020"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-0.3162192765351381"
-                     /phase="0"
                      /translation="LIFILWCVNLYIEKGQHAQTCYPNEPVKKTVAILD"
      CDS             925..1179
                      /ID="TRSNFOVH_CDS_0021"
                      /transl_table=11
                      /phrog="297"
-                     /top_hit="p26528 VI_00260"
                      /locus_tag="TRSNFOVH_CDS_0021"
                      /function="lysis"
                      /product="holin"
                      /source="PHANOTATE_1.5.1"
-                     /score="-3564.0604711569845"
-                     /phase="0"
                      /translation="MINWKIRMKQKSFWVAILSAIFLFAQNIAKAIGYDIQVYTEQLTD
                      GLNAILGFLVLTGVIQDPTTKGIGDSHQALEYEEPRRKY"
      CDS             1191..1946
                      /ID="TRSNFOVH_CDS_0022"
                      /transl_table=11
                      /phrog="635"
-                     /top_hit="p151018 VI_04917"
                      /locus_tag="TRSNFOVH_CDS_0022"
                      /function="lysis"
                      /product="endolysin"
                      /source="PHANOTATE_1.5.1"
-                     /score="-24938023.7700924"
-                     /phase="0"
                      /translation="MKTYSEARARLRWYQGRYIDFDGWYGYQCADLAVDYIYWLLEIRM
                      WGNAKDAINNDFKNMATVYENTPSFVPQIGDVAVFTKGIYKQYGHIGLVFNGGNTNQFL
                      ILEQNYDGNANTPAKLRWDNYYGCTHFIRPKYKSEGLMNKITNKVKPPAQKAVGKSASK
@@ -1166,16 +993,10 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0023"
                      /transl_table=11
                      /phrog="4358"
-                     /top_hit="p309755 VI_04700"
                      /locus_tag="TRSNFOVH_CDS_0023"
                      /function="other"
                      /product="kinase"
-                     /vfdb_short_name="sak"
-                     /vfdb_description="Staphylokinase precursor"
-                     /vfdb_species="Staphylococcus aureus subsp. aureus MW2"
                      /source="PHANOTATE_1.5.1"
-                     /score="-739004.2994216916"
-                     /phase="0"
                      /translation="MLKRSLLFLTVLLLLFSFSSITNEVSASSSFDKGKYKKGDDASYF
                      EPTGPYLMVNVTGVDGKGNELLSPHYVEFPIKPGTTLTKEKIEYYVEWALDATAYKEFR
                      VVELDPSAKIEVTYYDKNKKKEETKSFPITEKGFVVPDLSEHIKNPGFNLITKVIIEKK
@@ -1184,92 +1005,67 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0024"
                      /transl_table=11
                      /phrog="33273"
-                     /top_hit="p114020 VI_00944"
                      /locus_tag="TRSNFOVH_CDS_0024"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-1.7729186029969957"
-                     /phase="0"
                      /translation="MCSENYLSSNSHSCTNGSSPPNQILGDLWGEIS"
      CDS             2784..2918
                      /ID="TRSNFOVH_CDS_0025"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0025"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-1.3993567037150243"
-                     /phase="0"
                      /translation="VDNPFLGRYFGTCLFFYVIIFLDVFKGRLFRLYVIASFRASFLL"
      CDS             2918..3055
                      /ID="TRSNFOVH_CDS_0026"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0026"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-1.2080614089671315"
-                     /phase="0"
                      /translation="MCYTCINYLHLSLFTQACHWVFFLMIESIVFILLPRSIYDFSIPV
                      "
      CDS             3156..3410
                      /ID="TRSNFOVH_CDS_0027"
                      /transl_table=11
                      /phrog="20517"
-                     /top_hit="p269772 VI_00174"
                      /locus_tag="TRSNFOVH_CDS_0027"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-0.4221660272562929"
-                     /phase="0"
                      /translation="LISFLPFTRYIYLNNIEILQSLHRILNGVVIFIGSVYQVSVMLKH
                      QLKMKRIHQCQQVIHSIKTMYRIKKRLVITQLPMLKVIT"
      CDS             3414..3548
                      /ID="TRSNFOVH_CDS_0028"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0028"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-16.43284400938881"
-                     /phase="0"
                      /translation="MAIQLIQELQVYYPITQLSNMTAHIALMAIDGLLILLIVDNVVI"
      CDS             3610..3711
                      /ID="TRSNFOVH_CDS_0029"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0029"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-0.1622978714157445"
-                     /phase="0"
                      /translation="LIIRYIKVWQVMKCLPNLYIKKKYLPFNLCNYY"
      CDS             complement(3708..4157)
                      /ID="TRSNFOVH_CDS_0030"
                      /transl_table=11
                      /phrog="7039"
-                     /top_hit="KY653125_p70"
                      /locus_tag="TRSNFOVH_CDS_0030"
-                     /function="moron"
-                     /function=" auxiliary metabolic gene and host takeover"
+                     /function="moron, auxiliary metabolic gene and host
+                     takeover"
                      /product="chemotaxis inhibition protein"
-                     /vfdb_short_name="chp"
-                     /vfdb_description="chemotaxis-inhibiting protein CHIPS"
-                     /vfdb_species="Staphylococcus aureus subsp. aureus str.
-                     Newman"
                      /source="PHANOTATE_1.5.1"
-                     /score="-579577.243963508"
-                     /phase="0"
                      /translation="MKKKLATTVLALSFLTAGISTHHHSAKAFTFEPFPTNEEIESNKK
                      LLEKEKAYKESFKNSGLPTTLGKLDERLRNYLKKGTKNSAQFEKMVILTENKGYYTVYL
                      NTPLAEDRKNVELLGKMYKTYFFKKGESKSSYVINGPGKTNEYAY"
@@ -1277,53 +1073,39 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0031"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0031"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-1.4775404874930156"
-                     /phase="0"
                      /translation="MCYIYLRHSNVFKFSSIHKLAFGLVFLCYIFVLIK"
      CDS             4524..4664
                      /ID="TRSNFOVH_CDS_0032"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0032"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-4.235151800643256"
-                     /phase="0"
                      /translation="MLILPWAFSRSAFHFLCIAPLRASILNLFLRFPNQCICVILFMGS
                      R"
      CDS             4636..4746
                      /ID="TRSNFOVH_CDS_0033"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0033"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-0.4718141735947838"
-                     /phase="0"
                      /translation="VLYCLWEVGKHFGAYLFLFFYKYNKVCQFDNLLIFI"
      CDS             4840..5190
                      /ID="TRSNFOVH_CDS_0034"
                      /transl_table=11
-                     /phrog="4954"
-                     /top_hit="p298184 VI_05250"
+                     /phrog="vfdb"
                      /locus_tag="TRSNFOVH_CDS_0034"
-                     /function="other"
-                     /product="complement inhibitor"
-                     /vfdb_short_name="scn"
-                     /vfdb_description="complement inhibitor SCIN"
-                     /vfdb_species="Staphylococcus aureus subsp. aureus MW2"
+                     /function="moron, auxiliary metabolic gene and host
+                     takeover"
+                     /product="VFDB virulence factor protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-44858.207701540094"
-                     /phase="0"
                      /translation="MKIRKSILAGTLAIVLASPLVTNLDKNEAQASTSLPTSNEYQNEK
                      LANELKSLLDELNVNELATGSLNTYYKRTIKISGLKAMYALKSKDFKKMSEAKYQLQKI
                      YNEIDEALKSKY"
@@ -1331,39 +1113,30 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0035"
                      /transl_table=11
                      /phrog="20340"
-                     /top_hit="NC_021773_p11"
                      /locus_tag="TRSNFOVH_CDS_0035"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-2.902565450940445"
-                     /phase="0"
                      /translation="MAAPFLMTNADYVWTPMTTVTLFILSLIIFLIFIKTKDVVHLTIF
                      ILNLLFSILYCLPILFYL"
      CDS             complement(5482..5790)
                      /ID="TRSNFOVH_CDS_0036"
                      /transl_table=11
                      /phrog="19469"
-                     /top_hit="NC_021326_p2"
                      /locus_tag="TRSNFOVH_CDS_0036"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-21.80261798181077"
-                     /phase="0"
                      /translation="VKNHTNIINILLVIVNSLTHFLTLNTSFFNSSASDFCFIIGAIFF
                      LIGIFVAIYGMKRATYWLNLLILFTNIFYFLHFCVLLLLKYIGFKLFIYEGCVLLFT"
      CDS             complement(5814..5993)
                      /ID="TRSNFOVH_CDS_0037"
                      /transl_table=11
                      /phrog="18311"
-                     /top_hit="KY653123_p67"
                      /locus_tag="TRSNFOVH_CDS_0037"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-2.936955207280504"
-                     /phase="0"
                      /translation="VKFKTTKECKSNKSLKRSQEINNRESEKGCLWGISMLILLFLLIL
                      FGITACSSSIHFIN"
 ORIGIN
@@ -1475,8 +1248,8 @@ ORIGIN
      6301 ttgataatga taaagttata aaccttgata ttatgctgtt ttactttttg aatgataagt
      6361 aattttatgt taaaagtctc cagtttggat ac
 //
-LOCUS       NC_007458.1             8973 bp    DNA     linear   PHG 11-FEB-2024
-DEFINITION  NC_007458.1 Bacillus phage Gamma truncated genome.
+LOCUS       NC_007458.1             8973 bp    DNA              PHG 22-APR-2024
+DEFINITION  .
 ACCESSION   NC_007458
 VERSION     NC_007458.1
 KEYWORDS    .
@@ -1488,14 +1261,10 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0038"
                      /transl_table=11
                      /phrog="50"
-                     /top_hit="NC_025421_p36"
                      /locus_tag="TRSNFOVH_CDS_0038"
-                     /function="DNA"
-                     /function=" RNA and nucleotide metabolism"
+                     /function="DNA, RNA and nucleotide metabolism"
                      /product="DnaC-like helicase loader"
                      /source="PHANOTATE_1.5.1"
-                     /score="-76584921.75926818"
-                     /phase="0"
                      /translation="GTVYCPRCMVEEQNSVLFQQANNHYKKINRERKKNVLFQHSIIEN
                      QSITESRLSTYKTDCQETKENKEKAIKILERIKNGEFLNVYIAGIQGVGKSHLAYAMLY
                      ELVKHYWVISDGEKLNDEHAFKNMKSCLFVEIEKLIRLIQHSFRNIESKYTMDYCISLM
@@ -1505,26 +1274,20 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0039"
                      /transl_table=11
                      /phrog="8412"
-                     /top_hit="p152402 VI_00436"
                      /locus_tag="TRSNFOVH_CDS_0039"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-291.25523085817247"
-                     /phase="0"
                      /translation="MKEVKGKNTKLMEEFDVLLRQLLIKSKTDERVKNFLDDLFEMLSD
                      NKLQSDIDFKTALNKLREKHFPKFDKGESKND"
      CDS             1025..1771
                      /ID="TRSNFOVH_CDS_0040"
                      /transl_table=11
                      /phrog="351"
-                     /top_hit="p152325 VI_00860"
                      /locus_tag="TRSNFOVH_CDS_0040"
                      /function="transcription regulation"
                      /product="RNA polymerase sigma factor"
                      /source="PHANOTATE_1.5.1"
-                     /score="-5366677230.746145"
-                     /phase="0"
                      /translation="MTKEKGQAKEVVNVRGMSDDEFIEKYGRLVHHCVWKRYAKKKASI
                      ERDTGLDIEDLTQFGMIGLIKARDNFDLEFGCAFSTYAVPKIIGEIGRAIRDNQKIKVQ
                      RTVYGVKGKILNQQLADKEPEEIADILDESVSLVKTALEYQPSTDSLNKVVYASGANEE
@@ -1534,13 +1297,10 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0041"
                      /transl_table=11
                      /phrog="8281"
-                     /top_hit="NC_007458_p36"
                      /locus_tag="TRSNFOVH_CDS_0041"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-17849.917875096115"
-                     /phase="0"
                      /translation="LSVTKGVCIDVDHSDLLHEKVEYFLFPAKPSHYYVSRFNRKGAHF
                      GCYQAERFQITEKEVWTPEPQPNLPELNTSLFYRAQLIWRKKGYKDKPLKDYIVQPRGK
                      HCYFWHDRERKKFCGCFPLHWFTDFVPVQSHHIEEKTREEVKLLQRPDGQLAFF"
@@ -1548,14 +1308,10 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0042"
                      /transl_table=11
                      /phrog="173"
-                     /top_hit="KX961631_p3"
                      /locus_tag="TRSNFOVH_CDS_0042"
-                     /function="DNA"
-                     /function=" RNA and nucleotide metabolism"
+                     /function="DNA, RNA and nucleotide metabolism"
                      /product="nucleoside triphosphate pyrophosphohydrolase"
                      /source="PHANOTATE_1.5.1"
-                     /score="-9170752.144299136"
-                     /phase="0"
                      /translation="MDIKKLFAMQNILDKRVLESKNLSRGEVFEFRILAFLDELGECMK
                      EWRVFKFWSDDRKPRTSIPTGEIIVLDDGYEVEVYKNPLLEEYVDGLHFAIGLCIDLKT
                      EINFPASMRCETVTEQFFELYHLAIRLKEEPTAFRADVLLSHYLGLGELLCFSLEEIGH
@@ -1564,55 +1320,41 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0043"
                      /transl_table=11
                      /phrog="6214"
-                     /top_hit="NC_030920_p14"
                      /locus_tag="TRSNFOVH_CDS_0043"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-33.23345779483264"
-                     /phase="0"
                      /translation="MRVIEISWWAIAIGLYLLIGVALLIWIIATDSWGSLFLYPVFAVV
                      IVLGWLPLMIRSIVQEISKAIHKWKRKQKTE"
      CDS             3128..3244
                      /ID="TRSNFOVH_CDS_0044"
                      /transl_table=11
                      /phrog="30820"
-                     /top_hit="p48633 VI_05296"
                      /locus_tag="TRSNFOVH_CDS_0044"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-30.120154257499166"
-                     /phase="0"
                      /translation="MIYEVTDYCSQCDRKIENCDCCCNKCDEWLHDCKCKDK"
      CDS             3207..3677
                      /ID="TRSNFOVH_CDS_0045"
                      /transl_table=11
-                     /phrog="1672"
-                     /top_hit="p140854 VI_00999"
+                     /phrog="9572"
                      /locus_tag="TRSNFOVH_CDS_0045"
-                     /function="unknown function"
-                     /product="hypothetical protein"
+                     /function="other"
+                     /product="sulfatase-modifying factor enzyme"
                      /source="PHANOTATE_1.5.1"
-                     /score="-67431.74182867807"
-                     /phase="0"
                      /translation="MSGCTIVNVKINKQKRGMKDMKWMYNLDSNNEIWTSDKFEMKEEA
                      IQAALKDWTDKMVADRAAVDNEFQIGQFKQYSPWINADVLLDELYERATDECGEVAEYW
                      LSGVPMDEGEKLQEQINKVVTEWLKGINEHPSFGSIENIETIDASKIEYKEN"
      CDS             complement(3724..4089)
                      /ID="TRSNFOVH_CDS_0046"
                      /transl_table=11
-                     /phrog="34466"
-                     /top_hit="NC_007458_p40"
+                     /phrog="card"
                      /locus_tag="TRSNFOVH_CDS_0046"
-                     /function="unknown function"
-                     /product="hypothetical protein"
-                     /CARD_short_name="FosB2"
-                     /AMR_Gene_Family="fosfomycin thiol transferase"
-                     /CARD_species="Bacillus anthracis str. Ames"
+                     /function="moron, auxiliary metabolic gene and host
+                     takeover"
+                     /product="CARD resistance protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-834.2618152390484"
-                     /phase="0"
                      /translation="LNSIKKILQAKLLVKGRKLAYFDLNGLWIALNVEEDIPRNEIKQS
                      YTHMAFTVTNEALDHLKEVLIQNDVNILPGRERDERDQRSLYFTDPDGHKFEFHTGTLQ
                      NRLEYYKEDKKHMTFYI"
@@ -1620,101 +1362,77 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0047"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0047"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-0.0666349971846306"
-                     /phase="0"
                      /translation="LDGLHYYQFGIQYSFLNPCYSSWSKSTALSNGALFNSNNYFVVIL
                      YKSRINFYNLYIKILKII"
      CDS             4425..4517
                      /ID="TRSNFOVH_CDS_0048"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0048"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-0.9705283956783496"
-                     /phase="0"
                      /translation="MLLIFKQNAYLKTKEGFLKRSLRKIKKNTS"
      CDS             4594..4764
                      /ID="TRSNFOVH_CDS_0049"
                      /transl_table=11
                      /phrog="18684"
-                     /top_hit="NC_007814_p38"
                      /locus_tag="TRSNFOVH_CDS_0049"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-435.5178177495365"
-                     /phase="0"
                      /translation="MIVKATIKLELDDSQKNWVSYVREQGGEEAVFHYLEEEVQKKIEL
                      ADFVEMKYKNK"
      CDS             4959..5258
                      /ID="TRSNFOVH_CDS_0050"
                      /transl_table=11
                      /phrog="2275"
-                     /top_hit="KX160217_p26"
                      /locus_tag="TRSNFOVH_CDS_0050"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-7638.329170897839"
-                     /phase="0"
                      /translation="MSLVGNLKELQEKAIDEKVLEFAEEMEIVITKSAASGYSGHRYKI
                      HNENPNRHMMCSKIFIEKLQELLDGVKVEFKEEEKKNILGGSYYEHYIRFKWND"
      CDS             5251..5490
                      /ID="TRSNFOVH_CDS_0051"
                      /transl_table=11
                      /phrog="1235"
-                     /top_hit="p273008 VI_04651"
                      /locus_tag="TRSNFOVH_CDS_0051"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-198.7438569617704"
-                     /phase="0"
                      /translation="MTNFLLKILFWRKGVERMKTFNVTFTELKIYEAVIEAESAEKIID
                      VIKHLKRTEDDLVDKGVIINEVSEINVSKEQKFE"
      CDS             5505..5612
                      /ID="TRSNFOVH_CDS_0052"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0052"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-0.1319338851318585"
-                     /phase="0"
                      /translation="LFILRRKQLSEYHKTLLAKKLLFERTSLLYTLHGN"
      CDS             5726..5818
                      /ID="TRSNFOVH_CDS_0053"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0053"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-0.11968879768218"
-                     /phase="0"
                      /translation="LEKYFCEIRNHKIKKEKQLVGDKSLFQMAM"
      CDS             5939..6334
                      /ID="TRSNFOVH_CDS_0054"
                      /transl_table=11
                      /phrog="36"
-                     /top_hit="p23176 VI_04007"
                      /locus_tag="TRSNFOVH_CDS_0054"
                      /function="transcription regulation"
                      /product="transcriptional regulator"
                      /source="PHANOTATE_1.5.1"
-                     /score="-8943.290939549137"
-                     /phase="0"
                      /translation="LFNWLRDYQKLEEDIAYLEYNLDKTKAELRRWVSGDLREVRLTAE
                      SEGAKVENRIEAIEYELAHKMNDMYKLKKLISKFRGLENQILKLKYVDGMTLEEIAEAV
                      NYSSSHIKKKHAELVRLIKFVEREGVI"
@@ -1722,51 +1440,39 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0055"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0055"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-0.0462879739024085"
-                     /phase="0"
                      /translation="LIAYNFSRRATGARLLFLILEVIRRWMYKSCRDD"
      CDS             6454..6678
                      /ID="TRSNFOVH_CDS_0056"
                      /transl_table=11
                      /phrog="10998"
-                     /top_hit="KY963369_p54"
                      /locus_tag="TRSNFOVH_CDS_0056"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-914.4222356397933"
-                     /phase="0"
                      /translation="MDVQELSRRLENLEHKVLQVETKADVLNRTAIQKGDKIKVVYPHL
                      GIQGEYLVEKIDNGVLELVAEETMKKIQE"
      CDS             6721..6906
                      /ID="TRSNFOVH_CDS_0057"
                      /transl_table=11
                      /phrog="2395"
-                     /top_hit="p53747 VI_00978"
                      /locus_tag="TRSNFOVH_CDS_0057"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-37.729528244045774"
-                     /phase="0"
                      /translation="MTHCISTLGEQIVNEHINPQKLAQASALHNDLFDNTTPKERREAT
                      ISLLGKAIDEFLESKE"
      CDS             6911..7315
                      /ID="TRSNFOVH_CDS_0058"
                      /transl_table=11
                      /phrog="9442"
-                     /top_hit="p61184 VI_00415"
                      /locus_tag="TRSNFOVH_CDS_0058"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-338777.6938142892"
-                     /phase="0"
                      /translation="MGKGYFNKAVCLVCGHQDRVNHPSKKEYQEVTVCPECNGAFVDVW
                      KLGKYKRNTQSNEEPLLTITLTDIDAKPIVHYKGEQIDRKLRVTFDWESQSIDKINRTY
                      IHIEHVPADNKRLNTETIQHNHPIANKEQV"
@@ -1774,79 +1480,60 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0059"
                      /transl_table=11
                      /phrog="11511"
-                     /top_hit="KY963369_p57"
                      /locus_tag="TRSNFOVH_CDS_0059"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-511.6636153990394"
-                     /phase="0"
                      /translation="MNGFNKIVNDMQNEQVGNAMLDFALAAKMMFAAFTQFKEAGFNEE
                      QSFELTREILIDSLSKNQ"
      CDS             7631..7885
                      /ID="TRSNFOVH_CDS_0060"
                      /transl_table=11
                      /phrog="1315"
-                     /top_hit="p145203 VI_05454"
                      /locus_tag="TRSNFOVH_CDS_0060"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-276.6513447126033"
-                     /phase="0"
                      /translation="MQVYCSECDKSYDMQPQVTQLPNRIEKCFFICPHCNHEHIAAYVN
                      DKIRKYQADIAKCHERINKKNLAIEDEMKRLRKRFDRRK"
      CDS             7906..8052
                      /ID="TRSNFOVH_CDS_0061"
                      /transl_table=11
                      /phrog="16900"
-                     /top_hit="DQ222855_p48"
                      /locus_tag="TRSNFOVH_CDS_0061"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-8.134902163180906"
-                     /phase="0"
                      /translation="MLLTKHWCLDRNCGFEETSHKVRDGWKCPDCNGPMAFQQVNKKKE
                      SAK"
      CDS             8084..8275
                      /ID="TRSNFOVH_CDS_0062"
                      /transl_table=11
                      /phrog="9119"
-                     /top_hit="NC_007814_p48"
                      /locus_tag="TRSNFOVH_CDS_0062"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-1228.4562395328217"
-                     /phase="0"
                      /translation="MEGQELTLEKKDSIYLRPRYPHKIDASKIKSLKDVIKILGLMDIR
                      LDDKAVIGLEHLIEKEEE"
      CDS             8277..8543
                      /ID="TRSNFOVH_CDS_0063"
                      /transl_table=11
-                     /phrog="38026"
-                     /top_hit="p152420 VI_00436"
+                     /phrog="4705"
                      /locus_tag="TRSNFOVH_CDS_0063"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-5966.410897715393"
-                     /phase="0"
                      /translation="MANNKLIIEVTADTTEALEGIKEVTEAANECADALDKLEKIMDKF
                      TNRSDTVELYCEGKLLSKSTVNHTADSIQCRIIKGEELGGSER"
      CDS             8543..8926
                      /ID="TRSNFOVH_CDS_0064"
                      /transl_table=11
                      /phrog="144"
-                     /top_hit="p226223 VI_00940"
                      /locus_tag="TRSNFOVH_CDS_0064"
-                     /function="DNA"
-                     /function=" RNA and nucleotide metabolism"
+                     /function="DNA, RNA and nucleotide metabolism"
                      /product="HNH endonuclease"
                      /source="PHANOTATE_1.5.1"
-                     /score="-396.7004595283794"
-                     /phase="0"
                      /translation="MKKPLRPCCEFHCYNLTRERYCEEHRYKEKETQQDKNRYYDRFKR
                      DKESTAFYRSKAWERLREQALMRDKGLCLHCKNNRKIKVADMVDHIIPIKVDPSLKLKL
                      ENLQSLCNPCHNRKTAEDKKKYG"
@@ -2002,9 +1689,8 @@ ORIGIN
      8881 atgtcacaac agaaaaacag cagaagacaa aaagaaatac gggtaggggc gggtcgaaaa
      8941 acattcaggg cggtctgtcc gtaccgccgc ccc
 //
-LOCUS       NC_030884.1             5740 bp    DNA     linear   PHG 11-FEB-2024
-DEFINITION  NC_030884.1 Sulfolobus islandicus rudivirus 3 isolate SIRV3
-            truncated.
+LOCUS       NC_030884.1             5740 bp    DNA              PHG 22-APR-2024
+DEFINITION  .
 ACCESSION   NC_030884
 VERSION     NC_030884.1
 KEYWORDS    .
@@ -2016,114 +1702,89 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0001"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0001"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-0.0781242139123488"
-                     /phase="0"
                      /translation="LQLVIYASIFCVCNGGNWKFREKSLNTSRRHLIMLVRTILLFFII
                      FLYILILLQS"
      CDS             1024..1134
                      /ID="TRSNFOVH_CDS_0002"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0002"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-1.318538552220769"
-                     /phase="0"
                      /translation="VAFFKKLEIEKLEPSIYICSDDKNWKLLIESREIQT"
      CDS             1193..1360
                      /ID="TRSNFOVH_CDS_0003"
                      /transl_table=11
                      /phrog="7067"
-                     /top_hit="NC_034627_p52"
                      /locus_tag="TRSNFOVH_CDS_0003"
                      /function="head and packaging"
                      /product="terminase small subunit"
                      /source="PHANOTATE_1.5.1"
-                     /score="-7.077568664279065"
-                     /phase="0"
                      /translation="MKRQVRVGNTIYYVESEDDLVSVTHELARQGIKIEKIAYLLGVSV
                      RKVRQYLESC"
      CDS             complement(1430..1684)
                      /ID="TRSNFOVH_CDS_0004"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0004"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-0.4167083435934713"
-                     /phase="0"
                      /translation="LKFRPQDQKINLFLLFRNFQILHLTFFLILCNSFFFPQHNLCIFC
                      YLNLSLSFYFSISLFFHLSIFSTFRISITILKKTKHNLS"
      CDS             1705..1875
                      /ID="TRSNFOVH_CDS_0005"
                      /transl_table=11
-                     /phrog="4902"
-                     /top_hit="NC_004086_p10"
+                     /phrog="acr"
                      /locus_tag="TRSNFOVH_CDS_0005"
-                     /function="unknown function"
-                     /product="hypothetical protein"
+                     /function="moron, auxiliary metabolic gene and host
+                     takeover"
+                     /product="anti-CRISPR protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-1.4665926462386263"
-                     /phase="0"
                      /translation="VKNADPLQKVVGDNYITETFEWWEFENQYLEFELDYYVKDEKIFV
                      LEMHFWRKIRK"
      CDS             complement(1934..2035)
                      /ID="TRSNFOVH_CDS_0006"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0006"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-0.8712026393345706"
-                     /phase="0"
                      /translation="MTFLNFYLSFHLSIFSTNWNNITILKKIVHSFS"
      CDS             2069..2377
                      /ID="TRSNFOVH_CDS_0007"
                      /transl_table=11
                      /phrog="31459"
-                     /top_hit="NC_004086_p51"
                      /locus_tag="TRSNFOVH_CDS_0007"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-1656.6687010832559"
-                     /phase="0"
                      /translation="MNKDMEEVIDTVQRLIQENIIGEKVVSFENSIDLHIQEFEWVIEV
                      LIYADVKHYWFTIGREKKRYDIFIFDNTRELKRIIIESHFNVERIFIDSIQLIRYPR"
      CDS             complement(2402..2491)
                      /ID="TRSNFOVH_CDS_0008"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0008"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-0.8695072148316689"
-                     /phase="0"
                      /translation="MTILNFHSRKLLKNRIIIPNLKKIKDRIS"
      CDS             2521..2862
                      /ID="TRSNFOVH_CDS_0009"
                      /transl_table=11
-                     /phrog="13653"
-                     /top_hit="NC_004086_p52"
+                     /phrog="acr"
                      /locus_tag="TRSNFOVH_CDS_0009"
-                     /function="unknown function"
-                     /product="hypothetical protein"
+                     /function="moron, auxiliary metabolic gene and host
+                     takeover"
+                     /product="anti-CRISPR protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-358068.6812892056"
-                     /phase="0"
                      /translation="MGYQDIPNEIIKLSEKYVKIVGERKNIFKTLRRKSIEKKIIEKFE
                      KFCDIIPLYILENILKPNNVFEYSFEKSYKNKSEKIEVITKARLKFKYENYELKLLSVK
                      FEKSINLIS"
@@ -2131,25 +1792,19 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0010"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0010"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-0.1122474759297378"
-                     /phase="0"
                      /translation="LTHLSYLNIIFVKLLYKAFSIFLHLYLSIFSSL"
      CDS             2994..3389
                      /ID="TRSNFOVH_CDS_0011"
                      /transl_table=11
                      /phrog="32900"
-                     /top_hit="NC_030884_p5"
                      /locus_tag="TRSNFOVH_CDS_0011"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-17005.71400098344"
-                     /phase="0"
                      /translation="MSQEIEFPVNINLESQEEKIQPQVKKLYKFFNYVSNYHNGKIDTM
                      TTQSYLYLFVRDGAIKVDYDGEISIETTGLNISIWVNRVEKEVEINGNANGYEFNIQFT
                      GKVKVRTEENRLVLTLKPETIPQITTH"
@@ -2157,38 +1812,30 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0012"
                      /transl_table=11
                      /phrog="18124"
-                     /top_hit="NC_034627_p28"
                      /locus_tag="TRSNFOVH_CDS_0012"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-41.674299357707966"
-                     /phase="0"
                      /translation="MKTKMSKKENKKNKVYFCRMCSFVATDLDELDFHYKMSHESFDED
                      SFW"
      CDS             complement(3830..3919)
                      /ID="TRSNFOVH_CDS_0013"
                      /transl_table=11
                      /phrog="No_PHROG"
-                     /top_hit="No_PHROG"
                      /locus_tag="TRSNFOVH_CDS_0013"
                      /function="unknown function"
                      /product="hypothetical protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-2.4157816133134498"
-                     /phase="0"
                      /translation="MTILNFHSRKLLKNRIIIPNLRKIKDRIS"
      CDS             3949..4266
                      /ID="TRSNFOVH_CDS_0014"
                      /transl_table=11
-                     /phrog="4902"
-                     /top_hit="NC_004086_p10"
+                     /phrog="acr"
                      /locus_tag="TRSNFOVH_CDS_0014"
-                     /function="unknown function"
-                     /product="hypothetical protein"
+                     /function="moron, auxiliary metabolic gene and host
+                     takeover"
+                     /product="anti-CRISPR protein"
                      /source="PHANOTATE_1.5.1"
-                     /score="-964.5971884031848"
-                     /phase="0"
                      /translation="MEFEDLDVVLYVFFENQEMKSFEFEFKELFEITENGLRYLVGVPD
                      SRNKIKSNSEIIEEFIYYQNDNIVIKLTFYYTKDTNKIYIRKIYGWREKRSESENEEDN
                      I"
@@ -2196,14 +1843,11 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0015"
                      /transl_table=11
                      /phrog="887"
-                     /top_hit="NC_004086_p13"
                      /locus_tag="TRSNFOVH_CDS_0015"
-                     /function="moron"
-                     /function=" auxiliary metabolic gene and host takeover"
+                     /function="moron, auxiliary metabolic gene and host
+                     takeover"
                      /product="queuine tRNA-ribosyltransferase"
                      /source="PHANOTATE_1.5.1"
-                     /score="-20125604350.391846"
-                     /phase="0"
                      /translation="MKLVFEITSSKELLLKTNFPVLINQLHNKKITWKNETWVDSGGYQ
                      ISLYNLKISVKDVLEKYKTYNAYAFFSLDIPSIFEPLNRKNFEYFEYLYTKIEYIERII
                      PVIHLYPIREVDEALDFYKQYTDYIAFGGIIASSKLKILIYTFPWYYYLRKYTKKLHVL
@@ -2214,13 +1858,10 @@ FEATURES             Location/Qualifiers
                      /ID="TRSNFOVH_CDS_0016"
                      /transl_table=11
                      /phrog="8289"
-                     /top_hit="NC_004086_p14"
                      /locus_tag="TRSNFOVH_CDS_0016"
                      /function="other"
                      /product="aminoacid permease"
                      /source="PHANOTATE_1.5.1"
-                     /score="-4110.268777089818"
-                     /phase="0"
                      /translation="MPIANKIQSRLIQTMSFDKVLPETFSKINPNILLLIFATETIANV
                      LENLLGFNISFGLDGLLFIFWNFIIVAFAYLKLMNDKKLFSIVLTSLAIQIFLFFYLGY
                      QNPIFYKFVISGNIEDTILRIIIIPIIGSIVYLLRRNKINVIPK"
