@@ -5,9 +5,9 @@ Convert pickle to alternate embedding type
 #imports  
 from phynteny_utils import statistics 
 
-x = pickle5.load(open('/home/grig0076/scratch/phynteny_data/phynteny_data_test_X.pkl', 'rb'))
+x = pickle.load(open('/home/grig0076/scratch/phynteny_data/phynteny_data_test_X.pkl', 'rb'))
 x_values = list(x.values())
-y = pickle5.load(open('/home/grig0076/scratch/phynteny_data/phynteny_data_test_y.pkl', 'rb'))
+y = pickle.load(open('/home/grig0076/scratch/phynteny_data/phynteny_data_test_y.pkl', 'rb'))
 y_values = list(y.values())
 
 y_rows = []
@@ -22,6 +22,6 @@ for i in range(len(x_values)):
 x_rows_dict = dict(zip(list(x.keys()), x_rows))
 y_rows_dict = dict(zip(list(y.keys()), y_rows))
 
-pickle5.dump(x_rows_dict, open('/home/grig0076/scratch/phynteny_data/phynteny_data_test_X_row.pkl', 'wb'))
-pickle5.dump(y_rows_dict, open('/home/grig0076/scratch/phynteny_data/phynteny_data_test_y_row.pkl', 'wb'))
+pickle.dump(x_rows_dict, open('/home/grig0076/scratch/phynteny_data/phynteny_data_test_X_row.pkl', 'wb'))
+pickle.dump(y_rows_dict, open('/home/grig0076/scratch/phynteny_data/phynteny_data_test_y_row.pkl', 'wb'))
 

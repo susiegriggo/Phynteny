@@ -18,7 +18,7 @@ y_dict = dict(zip(derep_keys, derep_y))
 # Open the file in binary write mode ('wb')
 with open('/home/grig0076//scratch/phynteny_data/many_to_one_data/phynteny_data_dereplicated_X.pkl', 'wb') as file:
     # Use the pickle.dump() method to save the dictionary to the file
-    pickle5.dump(X_dict, file)
+    pickle.dump(X_dict, file)
 
 # Open the file in binary write mode ('wb')
 with open('/home/grig0076/scratch/phynteny_data/many_to_one_data/phynteny_data_dereplicated_y.pkl', 'wb') as file:
