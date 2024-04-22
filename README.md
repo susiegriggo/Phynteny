@@ -129,3 +129,5 @@ If you use pharokka to annotate your phage before using Phynteny please cite it 
 Bouras, G., Nepal, R., Houtak, G., Psaltis, A. J., Wormald, P. J., & Vreugde, S. (2023). Pharokka: a fast scalable bacteriophage annotation tool. Bioinformatics, 39(1), btac776.
 ```
 
+If you found Phynteny useful and would like to get even better annotations for your phages check out [phold](https://github.com/gbouras13/phold)!
+
