@@ -6,7 +6,7 @@ import glob
 
 import click
 import numpy as np
-import pickle5
+import pickle
 import pkg_resources
 import tensorflow as tf
 from sklearn.metrics import classification_report
@@ -40,9 +40,9 @@ def main(base, x, y, out):
     category_names = pickle5.load(open(category_path, "rb"))
 
     # fetch the testing data
-    test_X = pickle5.load(open(x, "rb"))
+    test_X = pickle.load(open(x, "rb"))
     test_X = list(test_X.values())
-    test_y = pickle5.load(open(y, "rb"))
+    test_y = pickle.load(open(y, "rb"))
     test_y = list(test_y.values())
 
     # fetch the models
@@ -76,19 +76,19 @@ def main(base, x, y, out):
             known_categories, [np.argmax(i) for i in scores], output_dict=True
         )
         with open(out + "_" + str(i) + "_report.tsv", "wb") as f:
-            pickle5.dump(report, f)
+            pickle.dump(report, f)
 
         # calculate the AUC for each category
         print("Calculating AUC")
         auc = statistics.per_category_auc(scores, known_categories, category_names)
         with open(out + "_" + str(i) + "_AUC.pkl", "wb") as f:
-            pickle5.dump(auc, f)
+            pickle.dump(auc, f)
 
         # calculate the average precision score for each category
         print("Calculating APS")
         aps = statistics.per_category_aps(scores, known_categories, category_names)
         with open(out + "_" + str(i) + "_APS.pkl", "wb") as f:
-            pickle5.dump(aps, f)
+            pickle.dump(aps, f)
 
         # get the thresholds
         print("Evaluating thresholds")

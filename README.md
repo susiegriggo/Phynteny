@@ -93,7 +93,7 @@ Phynteny takes a genbank file containing PHROG annotations as input. If your pha
 
 **Reccomended**  
 ```
-phynteny test_data/test_phage.gbk  -o test_phynteny
+phynteny tests/data/test_phage.gbk  -o test_phynteny
 ```
 
 **Custom** 

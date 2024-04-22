@@ -4,8 +4,9 @@ Get the phrog id, category and protein id of each mmseqs annotated protein
 
 # imports
 import pandas as pd
-import pickle5 as pickle
+import pickle
 import glob
+from phynteny_utils import handle_genbank 
 
 # read in the phrog annotations
 annot = pd.read_csv("/home/grig0076/LSTMs/phrog_annot_v4.tsv", sep="\t")
@@ -34,10 +35,14 @@ phrog_encoding = dict(
 )
 
 # add a None object to this dictionary which is consist with the unknown
-phrog_encoding[None] = one_letter.get("unknown function")
+#phrog_encoding[None] = one_letter.get("unknown function")
+
+# get phrog dictionary going in the other dictionary 
+category_encoding = dict(zip(list(one_letter.values()), list(one_letter.keys())))
+#category_encoding[None] = 'unknown function'
 
 # get the directorys containing the genomes
-levelone = glob.glob("/home/grig0076/phispy_phrog_pickles/GCA_inc_translation/*")
+levelone = glob.glob("/scratch/user/grig0076/phispy_phrogs/GCA/*")
 
 # get each of the possible phrog categories
 all_categories = [
@@ -45,28 +50,34 @@ all_categories = [
     for i in range(1, len(one_letter))
 ]
 
-with open("/home/grig0076/phispy_phrog_pickles/protein_IDs/protein_IDs_phrogs", "w") as f:
+with open("/home/grig0076/phispy_phrog_pickles/protein_IDs/protein_IDs_phrogs.tsv", "w") as f:
+    f.write('protein_id' + '\t' + 'category' + '\t' + 'phrog_ids'+'\n')
     for l1 in levelone:
         leveltwo = glob.glob(l1 + "/*")
-
+        
         for l2 in leveltwo:
-            files = glob.glob(l2 + "/*")
-
+            files = glob.glob(l2 + "/*/*")
+             
             for file in files:
-                with open(file, "rb") as handle:
-                    genomes = pickle.load(handle)
 
+                #with open(file, "rb") as handle:
+                genomes = handle_genbank.get_genbank(file)
+            
+        
                 for g in list(genomes.keys()):
 
                     # get the phrog categories
-                    this_genome = genomes.get(g)
+                    this_genome =handle_genbank.extract_features( genomes.get(g)) 
+        
+                    
                     categories = [
-                        phrog_encoding.get(i) for i in this_genome.get("phrogs")
+                        category_encoding.get(phrog_encoding.get(i)) for i in this_genome.get("phrogs")
                     ]
                     phrog_ids = this_genome.get("phrogs")
                     protein_ids = this_genome.get("protein_id")
 
                     for i in range(len(categories)):
-                        f.write(protein_ids[i] + '\t' + categories[i] + '\t' + phrog_ids[i])
+                        if protein_ids[i] != None: 
+                            f.write(protein_ids[i] + '\t' + str(categories[i]) + '\t' + str(phrog_ids[i])+'\n') 
 
 f.close()

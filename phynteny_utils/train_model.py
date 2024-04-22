@@ -3,7 +3,7 @@ import random
 
 import absl.logging
 import numpy as np
-import pickle5
+import pickle
 import pkg_resources
 import tensorflow as tf
 import tensorflow.keras.initializers as initializers
@@ -25,7 +25,7 @@ def get_dict(dict_path):
     """
 
     with open(dict_path, "rb") as handle:
-        dictionary = pickle5.load(handle)
+        dictionary = pickle.load(handle)
     handle.close()
 
     return dictionary

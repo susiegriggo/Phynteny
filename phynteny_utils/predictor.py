@@ -81,6 +81,7 @@ def run_phynteny(outfile, gene_predictor, gb_dict, categories):
             phages = {key: handle_genbank.extract_features(gb_dict.get(key))}
 
             # get phrog annotations
+            # mark as something to predict if no phrog is given or if the gene has hits to the vfdb, acr, card or defensefinder databases 
             phages[key]["phrogs"] = [
                 0 if i in ["No_PHROG", "vfdb", "acr", "card", "defensefinder"] else int(i) for i in phages[key]["phrogs"] 
             ]

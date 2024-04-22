@@ -3,9 +3,9 @@
 Get set of a prophages from genbank files 
 """ 
 
-prophage_ids="/scratch/user/grig0076/phynteny_data/many_to_one_data/phynteny_data_test_prophage_ids.txt"
+prophage_ids="/scratch/user/grig0076/poznan_phynteny/prophage_dataset_gLM/phynteny_data_dereplicated_names.txt"
 prophages='/scratch/user/grig0076/phispy_phrogs/GCA/'
-out_path='/scratch/user/grig0076/phynteny_data/testing_prophages/'
+out_path='/home/grig0076/scratch/poznan_phynteny/prophage_dataset_gLM/phynteny_data_dereplicated_allgenbank_29112023/'
 dash='/'
 gbk='.gbk'
 

@@ -9,7 +9,7 @@ import sys
 
 # imports
 import numpy as np
-import pickle5
+import pickle
 from loguru import logger
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.preprocessing.sequence import pad_sequences
@@ -50,7 +50,7 @@ def get_dict(dict_path):
     """
 
     with open(dict_path, "rb") as handle:
-        dictionary = pickle5.load(handle)
+        dictionary = pickle.load(handle)
         if any(dictionary):
             logger.info(f"dictionary loaded from {dict_path}")
         else:
@@ -328,14 +328,14 @@ def test_train(data, path, num_functions, max_genes=120, test_size=10, unmask=Fa
         pickle5.dump(train_X_data, handle)
     handle.close()
     with open(path + "_train_y.pkl", "wb") as handle:
-        pickle5.dump(train_y_data, handle)
+        pickle.dump(train_y_data, handle)
     handle.close()
     with open(path + "_test_X.pkl", "wb") as handle:
-        pickle5.dump(test_X_data, handle)
+        pickle.dump(test_X_data, handle)
     handle.close()
     with open(path + "_test_y.pkl", "wb") as handle:
-        pickle5.dump(test_y_data, handle)
+        pickle.dump(test_y_data, handle)
     handle.close()
     with open(path + "_test_prophages.pkl", "wb") as handle:
-        pickle5.dump(test_phage, handle)
+        pickle.dump(test_phage, handle)
     handle.close()

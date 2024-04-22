@@ -48,6 +48,7 @@ def instantiate_install(db_dir):
     """
     instantiate_dir(db_dir)
     downloaded_flag = check_db_installation(db_dir)
+    print('HERE') 
     if downloaded_flag == True:
         print("All phynteny models have already been downloaded and checked.")
     else:
@@ -191,6 +192,8 @@ def get_model_zenodo(db_dir):
 
     # download the tarball
     print(f"Downloading Phynteny Models from {db_url}.")
+    print('path')
+    print(db_url)
     download(db_url, tarball_path)
 
     # check md5
