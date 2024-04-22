@@ -325,7 +325,7 @@ def test_train(data, path, num_functions, max_genes=120, test_size=10, unmask=Fa
 
     # save each of these dictionaries
     with open(path + "_train_X.pkl", "wb") as handle:
-        pickle5.dump(train_X_data, handle)
+        pickle.dump(train_X_data, handle)
     handle.close()
     with open(path + "_train_y.pkl", "wb") as handle:
         pickle.dump(train_y_data, handle)

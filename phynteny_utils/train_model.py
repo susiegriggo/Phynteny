@@ -316,7 +316,7 @@ class Model:
 
         # save the history dictionary as a pickle
         with open(history_out + ".pkl", "wb") as handle:
-            pickle5.dump(history.history, handle, protocol=pickle5.HIGHEST_PROTOCOL)
+            pickle.dump(history.history, handle)
 
     def train_crossValidation(
         self,

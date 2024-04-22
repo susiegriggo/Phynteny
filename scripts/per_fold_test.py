@@ -37,7 +37,7 @@ def main(base, x, y, out):
     category_path = pkg_resources.resource_filename(
         "phynteny_utils", "phrog_annotation_info/integer_category.pkl"
     )
-    category_names = pickle5.load(open(category_path, "rb"))
+    category_names = pickle.load(open(category_path, "rb"))
 
     # fetch the testing data
     test_X = pickle.load(open(x, "rb"))

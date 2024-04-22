@@ -3,11 +3,10 @@ Script to split up the dereplicated dictionary
 '''
 
 # imports 
-import pickle5
 from phynteny_utils import format_data
 
 # dereplicate dictionary
-derep = pickle5.load(open('/home/grig0076/scratch/phynteny_data/many_to_one_data/phynteny_data_dereplicated.pkl', "rb"))
+derep = pickle.load(open('/home/grig0076/scratch/phynteny_data/many_to_one_data/phynteny_data_dereplicated.pkl', "rb"))
 derep_keys = list(derep.keys())
 
 # need to encode all of the data in the dereplicated dictionary
@@ -24,4 +23,4 @@ with open('/home/grig0076//scratch/phynteny_data/many_to_one_data/phynteny_data_
 # Open the file in binary write mode ('wb')
 with open('/home/grig0076/scratch/phynteny_data/many_to_one_data/phynteny_data_dereplicated_y.pkl', 'wb') as file:
     # Use the pickle.dump() method to save the dictionary to the file
-    pickle5.dump(y_dict, file)
+    pickle.dump(y_dict, file)

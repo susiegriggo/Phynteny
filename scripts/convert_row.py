@@ -2,8 +2,7 @@
 Convert pickle to alternate embedding type
 """ 
 
-#imports 
-import pickle5 
+#imports  
 from phynteny_utils import statistics 
 
 x = pickle5.load(open('/home/grig0076/scratch/phynteny_data/phynteny_data_test_X.pkl', 'rb'))

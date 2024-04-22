@@ -39,7 +39,6 @@ if is_mac():
 else:
     install_requires = [
         "biopython>=1.79",
-        "pickle5",
         "scikit-learn<=1.2.2",
         "numpy",
         "pandas",

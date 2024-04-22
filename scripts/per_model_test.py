@@ -6,7 +6,7 @@ import glob
 
 import click
 import numpy as np
-import pickle5
+import pickle
 import pkg_resources
 import tensorflow as tf
 from sklearn.metrics import classification_report
@@ -36,19 +36,19 @@ def main(base, x, y, out):
     category_path = pkg_resources.resource_filename(
         "phynteny_utils", "phrog_annotation_info/integer_category.pkl"
     )
-    category_names = pickle5.load(open(category_path, "rb"))
+    category_names = pickle.load(open(category_path, "rb"))
 
     # import the confidence dict
     confidence_path = pkg_resources.resource_filename(
         "phynteny_utils", "phrog_annotation_info/confidence_kde.pkl"
     )
-    confidence_dict = pickle5.load(open(confidence_path, "rb"))
+    confidence_dict = pickle.load(open(confidence_path, "rb"))
 
     # fetch the testing data
     print("reading in data", flush=True)
-    test_X = pickle5.load(open(x, "rb"))
+    test_X = pickle.load(open(x, "rb"))
     test_X = list(test_X.values())
-    test_y = pickle5.load(open(y, "rb"))
+    test_y = pickle.load(open(y, "rb"))
     test_y = list(test_y.values())
 
     # fetch the models
