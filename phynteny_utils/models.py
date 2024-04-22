@@ -47,8 +47,7 @@ def instantiate_install(db_dir):
     :param: path to install the models
     """
     instantiate_dir(db_dir)
-    downloaded_flag = check_db_installation(db_dir)
-    print('HERE') 
+    downloaded_flag = check_db_installation(db_dir) 
     if downloaded_flag == True:
         print("All phynteny models have already been downloaded and checked.")
     else:
