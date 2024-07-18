@@ -26,12 +26,12 @@ if is_mac():
     install_requires = [
         "biopython>=1.79",
         "scikit-learn<=1.2.2",
-        "numpy",
+        "numpy<=1.26.4",
         "pandas",
         "click",
         "joblib",
         "loguru",
-        "tensorflow-macos",
+        "tensorflow-macos==2.9.1",
         "alive-progress>=3.0.1",
         "requests>=2.25.1",
     ]
