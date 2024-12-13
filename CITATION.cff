@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Grigson"
+  given-names: "Susanna"
+  orcid: "0000-0003-4738-3451"
+title: "Phynteny: Synteny-based annotation of bacteriophage genes"
+version: 0.1.13
+doi: 10.5281/zenodo.8128898
+date-released: 2024-04-22
+url: "https://github.com/susiegriggo/Phynteny"
