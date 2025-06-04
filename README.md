@@ -14,6 +14,9 @@ Phynteny: Synteny-based annotation of bacteriophage genes
 ![Conda](https://img.shields.io/conda/dn/bioconda/phynteny)
 =============== 
 
+***READ THIS*** New version of Phynteny, [Phynteny Transformer](https://github.com/susiegriggo/Phynteny_transformer) is now available. This should provide more accurate results. 
+
+
 Approximately 65% of all bacteriophage (phage) genes cannot be attributed a known biological function. Phynteny uses a long-short term memory model trained on phage synteny (the conserved gene order across phages) to assign hypothetical phage proteins to a [PHROG](https://phrogs.lmge.uca.fr/) category. 
 
 Phynteny is still a work in progress and the LSTM model has not yet been optimised. Use with caution! 
